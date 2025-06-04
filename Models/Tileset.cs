@@ -52,8 +52,8 @@ namespace TileBasedLevelEditor.Models
                 BitmapCacheOption.OnLoad
             );
             var frame = decoder.Frames[0];
-            ImageSize.X = frame.PixelHeight;
-            ImageSize.Y = frame.PixelWidth;
+            ImageSize.X = frame.PixelWidth;
+            ImageSize.Y = frame.PixelHeight;
         }
     }
 }

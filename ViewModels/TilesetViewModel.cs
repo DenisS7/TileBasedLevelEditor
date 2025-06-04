@@ -6,9 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using Microsoft.Win32;
 using NotesApp.Commands;
 using NotesApp.ViewModel;
@@ -21,7 +23,7 @@ namespace TileBasedLevelEditor.ViewModels
     {
         private Tileset? _currentTileset;
 
-        public Tileset CurrentTileset
+        public Tileset? CurrentTileset
         {
             get => _currentTileset;
             private set
@@ -62,6 +64,8 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
+        public ObservableCollection<Line> GridLines { get; } = [];
+
         public ICommand LoadTilesetCommand { get; }
 
         public TilesetViewModel()
@@ -91,7 +95,7 @@ namespace TileBasedLevelEditor.ViewModels
             if (!File.Exists(path)) 
                 return;
 
-            string name = Path.GetFileNameWithoutExtension(path);
+            string name = System.IO.Path.GetFileNameWithoutExtension(path);
 
             //hardcoded size for now
             Vec2<int> tileSize = new Vec2<int>(32, 32);
@@ -99,6 +103,7 @@ namespace TileBasedLevelEditor.ViewModels
             try
             {
                 CurrentTileset = new Tileset(name, tileSize, path);
+                GenerateGridLines();
             }
             catch (Exception ex)
             {
@@ -135,6 +140,51 @@ namespace TileBasedLevelEditor.ViewModels
             catch
             {
                 TilesetImage = null;
+            }
+        }
+
+        private void GenerateGridLines()
+        {
+            GridLines.Clear();
+
+            if (CurrentTileset == null)
+                return;
+
+            int columns = CurrentTileset.ImageSize.X / CurrentTileset.TileSize.X;
+            int rows = CurrentTileset.ImageSize.Y / CurrentTileset.TileSize.Y;
+
+            for (int i = 0; i <= columns; i++)
+            {
+                double x = i * CurrentTileset.TileSize.X;
+                Line line = new Line()
+                {
+                    X1 = x,
+                    Y1 = 0,
+                    X2 = x,
+                    Y2 = CurrentTileset.ImageSize.Y,
+                    Stroke = Brushes.DarkGray,
+                    StrokeThickness = 1
+                };
+                if (i > 0 && i < columns)
+                    line.StrokeDashArray = [2, 2];
+                GridLines.Add(line);
+            }
+
+            for (int i = 0; i <= rows; i++)
+            {
+                double y = i * CurrentTileset.TileSize.Y;
+                Line line = new Line()
+                {
+                    X1 = 0,
+                    Y1 = y,
+                    X2 = CurrentTileset.ImageSize.X,
+                    Y2 = y,
+                    Stroke = Brushes.DarkGray,
+                    StrokeThickness = 1
+                };
+                if (i > 0 && i < rows)
+                    line.StrokeDashArray = [2, 2];
+                GridLines.Add(line);
             }
         }
     }

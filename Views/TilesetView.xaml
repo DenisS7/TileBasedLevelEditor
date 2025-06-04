@@ -52,18 +52,37 @@
                 
             </Grid>
 
-            <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                <Border Background="Gray">
+            <ScrollViewer Grid.Row="3" 
+                          Background="Gray"
+                          VerticalScrollBarVisibility="Auto" 
+                          HorizontalScrollBarVisibility="Auto" 
+                          Padding="1, 1, 0 , 0">
+                <Border>
                     <Grid>
                         <Image x:Name="TilesetImage"
                                Source="{Binding TilesetImage}"
                                Stretch="none"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Top"/>
-                        <Canvas x:Name="OverlayCanvas"
-                                Background="Transparent"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Top"/>
+                        <ItemsControl ItemsSource="{Binding GridLines}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas x:Name="OverlayCanvas"
+                                            Background="Transparent"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Width="{Binding ImageSize.X}"
+                                            Height="{Binding ImageSize.Y}"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ContentPresenter Content="{Binding}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
                     </Grid>
                 </Border>
             </ScrollViewer>
