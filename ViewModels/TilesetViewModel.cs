@@ -156,34 +156,44 @@ namespace TileBasedLevelEditor.ViewModels
             for (int i = 0; i <= columns; i++)
             {
                 double x = i * CurrentTileset.TileSize.X;
+                if (i == 0)
+                    x += 1.0;
                 Line line = new Line()
                 {
                     X1 = x,
                     Y1 = 0,
                     X2 = x,
                     Y2 = CurrentTileset.ImageSize.Y,
-                    Stroke = Brushes.DarkGray,
+                    Stroke = Brushes.LightGray,
                     StrokeThickness = 1
                 };
                 if (i > 0 && i < columns)
                     line.StrokeDashArray = [2, 2];
+                else
+                    line.Stroke = Brushes.Black;
+
                 GridLines.Add(line);
             }
 
             for (int i = 0; i <= rows; i++)
             {
                 double y = i * CurrentTileset.TileSize.Y;
+                if (i == 0)
+                    y += 1.0;
                 Line line = new Line()
                 {
                     X1 = 0,
                     Y1 = y,
                     X2 = CurrentTileset.ImageSize.X,
                     Y2 = y,
-                    Stroke = Brushes.DarkGray,
+                    Stroke = Brushes.LightGray,
                     StrokeThickness = 1
                 };
                 if (i > 0 && i < rows)
                     line.StrokeDashArray = [2, 2];
+                else
+                    line.Stroke = Brushes.Black;
+
                 GridLines.Add(line);
             }
         }
