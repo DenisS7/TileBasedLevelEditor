@@ -12,13 +12,9 @@ namespace TileBasedLevelEditor.Models
     {
         public string Name { get; }
 
-        public int TileHeight { get; }
+        public Vec2<int> TileSize { get; }
 
-        public int TileWidth { get; }
-
-        public int ImageHeight { get; }
-
-        public int ImageWidth { get; }
+        public Vec2<int> ImageSize { get; }
 
         public byte[] ImageData { get; }
 
@@ -26,24 +22,22 @@ namespace TileBasedLevelEditor.Models
         public Tileset(string name, int tileHeight, int tileWidth, string imageSource)
         {
             Name = name;
-            TileHeight = tileHeight;
-            TileWidth = tileWidth;
+            TileSize = new Vec2<int>(tileHeight, tileWidth);
+            ImageSize = new Vec2<int>(0);
             ImageData = File.ReadAllBytes(imageSource);
 
             if (ImageData.Length == 0)
-                ImageHeight = ImageWidth = 0;
-            else
-            {
-                using var ms = new MemoryStream(ImageData);
-                var decoder = BitmapDecoder.Create(
-                    ms,
-                    BitmapCreateOptions.PreservePixelFormat,
-                    BitmapCacheOption.OnLoad
-                );
-                var frame = decoder.Frames[0];
-                ImageHeight = frame.PixelHeight;
-                ImageWidth = frame.PixelWidth;
-            }
+                return;
+
+            using var ms = new MemoryStream(ImageData);
+            var decoder = BitmapDecoder.Create(
+                ms,
+                BitmapCreateOptions.PreservePixelFormat,
+                BitmapCacheOption.OnLoad
+            );
+            var frame = decoder.Frames[0];
+            ImageSize.X = frame.PixelHeight;
+            ImageSize.Y = frame.PixelWidth;
         }
     }
 }
