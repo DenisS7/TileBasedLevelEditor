@@ -15,6 +15,8 @@ namespace TileBasedLevelEditor.Models
 
         public Vec2<int> TileSize { get; }
 
+        public Vec2<int> NrTiles { get; }
+
         public Vec2<int> ImageSize { get; }
 
         public byte[] ImageData { get; private set; }
@@ -27,6 +29,7 @@ namespace TileBasedLevelEditor.Models
             ImageSize = new Vec2<int>(0);
             ImageData = [];
             GetImageData(path);
+            NrTiles = ImageSize / TileSize;
         }
 
         public Tileset(string name, Vec2<int> tileSize, string path)
@@ -36,6 +39,7 @@ namespace TileBasedLevelEditor.Models
             ImageSize = new Vec2<int>(0);
             ImageData = [];
             GetImageData(path);
+            NrTiles = ImageSize / TileSize;
         }
 
         private void GetImageData(string path)

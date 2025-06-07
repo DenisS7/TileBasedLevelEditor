@@ -31,7 +31,7 @@
                         Command="{Binding LoadTilesetCommand}"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        FontSize="15"
+                        FontSize="15"   
                         Background="Azure"
                         BorderThickness="0"
                         Margin="5, 0, 0, 0"/>
@@ -56,36 +56,33 @@
             <Grid Grid.Row="2" Background="Black"></Grid>
 
             <ScrollViewer Grid.Row="3" 
-                          Background="White"
+                          Background="DimGray"
                           VerticalScrollBarVisibility="Auto" 
                           HorizontalScrollBarVisibility="Auto" 
-                          Padding="1, 1, 0 , 0">
+                          Padding="1, 1, 0 , 0"
+                          Name="TilesetBorder">
                 <Border BorderThickness="0">
                     <Canvas misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
                             misc:TileSelector.SelectCommand="{Binding SelectTileCommand}">
-                        <Image x:Name="TilesetImage"
-                               Source="{Binding TilesetImage}"
-                               Stretch="none"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Top"/>
-                        <ItemsControl ItemsSource="{Binding GridLines}">
+
+                        <ItemsControl ItemsSource="{Binding TileImages}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <Canvas x:Name="OverlayCanvas"
-                                            Background="Transparent"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Top"
-                                            Width="{Binding ImageSize.X}"
-                                            Height="{Binding ImageSize.Y}"/>
+                                    <UniformGrid Columns="{Binding NrTiles.X}"
+                                                 Rows="{Binding NrTiles.Y}"
+                                                 Background="Transparent"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
-
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <ContentPresenter Content="{Binding}"/>
+                                    <Grid>
+                                        <Image Source="{Binding}"
+                                               Margin="{Binding DataContext.TileMargin, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                    </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+
                         <Rectangle Width="{Binding TileSize.X}"
                                    Height="{Binding TileSize.Y}"
                                    Visibility="{Binding IsTileHovered, Converter={StaticResource BoolToVis}}"
@@ -103,10 +100,6 @@
                                    IsHitTestVisible="False"
                                    Canvas.Left="{Binding SelectedTileLocation.X}"
                                    Canvas.Top="{Binding SelectedTileLocation.Y}"/>
-
-                        <Canvas.InputBindings>
-                            <MouseBinding Gesture=""></MouseBinding>
-                        </Canvas.InputBindings>
                     </Canvas>
                 </Border>
             </ScrollViewer>

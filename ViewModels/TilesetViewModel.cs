@@ -37,12 +37,14 @@ namespace TileBasedLevelEditor.ViewModels
                     GetTilesetImage();
                     OnPropertyChanged(nameof(ImageSize));
                     OnPropertyChanged(nameof(TileSize));
+                    OnPropertyChanged(nameof(NrTiles));
                 }
                 else
                 {
                     TilesetImage = null;
                     OnPropertyChanged(nameof(ImageSize));
                     OnPropertyChanged(nameof(TileSize));
+                    OnPropertyChanged(nameof(NrTiles));
                 }
             }
         }
@@ -50,6 +52,11 @@ namespace TileBasedLevelEditor.ViewModels
         public Vec2<int> TileSize => CurrentTileset?.TileSize ?? new Vec2<int>(0);
 
         public Vec2<int> ImageSize => CurrentTileset?.ImageSize ?? new Vec2<int>(0);
+
+        public Vec2<int> NrTiles => CurrentTileset?.NrTiles ?? new Vec2<int>(0);
+
+        //Right & Bottom should always be 0
+        public Thickness TileMargin { get; } = new Thickness(2, 2, 0, 0);
 
         private ImageSource? _tilesetImage;
 
@@ -64,7 +71,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        public ObservableCollection<Line> GridLines { get; } = [];
+        public ObservableCollection<CroppedBitmap> TileImages { get; private set; } = [];
 
         private bool _isTileHovered = true;
 
@@ -90,7 +97,7 @@ namespace TileBasedLevelEditor.ViewModels
                 if (_hoveredTileIndex != null && _hoveredTileIndex.X >= 0 && _hoveredTileIndex.Y >= 0)
                 {
                     IsTileHovered = true;
-                    HoveredTileLocation = new Vec2<double>(_hoveredTileIndex.X * TileSize.X, _hoveredTileIndex.Y * TileSize.Y);
+                    HoveredTileLocation = new Vec2<double>(_hoveredTileIndex.X * (TileSize.X + TileMargin.Left) + TileMargin.Left, _hoveredTileIndex.Y * (TileSize.Y + TileMargin.Top) + TileMargin.Top);
                 }
                 else
                 {
@@ -114,7 +121,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private bool _isTileSelected = true;
+        private bool _isTileSelected = false;
 
         public bool IsTileSelected
         {
@@ -138,7 +145,7 @@ namespace TileBasedLevelEditor.ViewModels
                 if (_selectedTileIndex != null && _selectedTileIndex.X >= 0 && _selectedTileIndex.Y >= 0)
                 {
                     IsTileSelected = true;
-                    SelectedTileLocation = new Vec2<double>(_selectedTileIndex.X * TileSize.X, _selectedTileIndex.Y * TileSize.Y);
+                    SelectedTileLocation = HoveredTileLocation;
                 }
                 else
                 {
@@ -206,7 +213,6 @@ namespace TileBasedLevelEditor.ViewModels
             try
             {
                 CurrentTileset = new Tileset(name, tileSize, path);
-                GenerateGridLines();
             }
             catch (Exception ex)
             {
@@ -226,6 +232,7 @@ namespace TileBasedLevelEditor.ViewModels
                 return;
             }
 
+            TileImages.Clear();
             try
             {
                 var bmp = new BitmapImage();
@@ -239,57 +246,25 @@ namespace TileBasedLevelEditor.ViewModels
                     bmp.Freeze();
                 }
                 TilesetImage = bmp;
+
+                for (int y = 0; y < NrTiles.Y; y++)
+                {
+                    for (int x = 0; x < NrTiles.X; x++)
+                    {
+                        var rect = new Int32Rect(
+                            x * TileSize.X,
+                            y * TileSize.Y,
+                            TileSize.X,
+                            TileSize.Y
+                        );
+                        var tileBmp = new CroppedBitmap(bmp, rect);
+                        TileImages.Add(tileBmp);
+                    }
+                }
             }
             catch
             {
                 TilesetImage = null;
-            }
-        }
-
-        private void GenerateGridLines()
-        {
-            GridLines.Clear();
-
-            if (CurrentTileset == null)
-                return;
-
-            int columns = CurrentTileset.ImageSize.X / CurrentTileset.TileSize.X;
-            int rows = CurrentTileset.ImageSize.Y / CurrentTileset.TileSize.Y;
-
-            for (int i = 0; i <= columns; i++)
-            {
-                double x = i * CurrentTileset.TileSize.X;
-                if (i == 0)
-                    x += 1.0;
-                Line line = new Line()
-                {
-                    X1 = x,
-                    Y1 = 0,
-                    X2 = x,
-                    Y2 = CurrentTileset.ImageSize.Y,
-                    Stroke = Brushes.White,
-                    StrokeThickness = 1
-                };
-
-                GridLines.Add(line);
-            }
-
-            for (int i = 0; i <= rows; i++)
-            {
-                double y = i * CurrentTileset.TileSize.Y;
-                if (i == 0)
-                    y += 1.0;
-                Line line = new Line()
-                {
-                    X1 = 0,
-                    Y1 = y,
-                    X2 = CurrentTileset.ImageSize.X,
-                    Y2 = y,
-                    Stroke = Brushes.White,
-                    StrokeThickness = 1
-                };
-
-                GridLines.Add(line);
             }
         }
     }

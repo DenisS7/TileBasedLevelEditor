@@ -61,6 +61,7 @@ namespace TileBasedLevelEditor.Misc
 
             Point p = e.GetPosition(canvas);
 
+            Thickness tilesMargin = vm.TileMargin;
             Vec2<int> tileSize = vm.CurrentTileset.TileSize;
             Vec2<int> gridSize = vm.ImageSize / tileSize;
 
@@ -70,7 +71,7 @@ namespace TileBasedLevelEditor.Misc
                 return;
             }
 
-            Vec2<int> hoveredTileIndex = new Vec2<int>((int)(p.X / tileSize.X), (int)(p.Y / tileSize.Y));
+            Vec2<int> hoveredTileIndex = new Vec2<int>((int)(p.X / (tileSize.X + tilesMargin.Left)), (int)(p.Y / (tileSize.Y + tilesMargin.Top)));
             if (hoveredTileIndex.X < 0 || hoveredTileIndex.X >= gridSize.X || hoveredTileIndex.Y < 0 ||
                 hoveredTileIndex.Y >= gridSize.Y)
             {
