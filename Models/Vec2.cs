@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TileBasedLevelEditor.Models
 {
-    public class Vec2<T>
+    public class Vec2<T> where T : INumber<T>
     {
         public T X { get; set; }
         public T Y { get; set; }
@@ -21,6 +21,16 @@ namespace TileBasedLevelEditor.Models
         public Vec2(T a)
         {
             X = Y = a;
+        }
+
+        public static Vec2<T> operator /(Vec2<T> v, T scalar)
+        {
+            return new Vec2<T>(v.X / scalar, v.Y / scalar);
+        }
+
+        public static Vec2<T> operator /(Vec2<T> a, Vec2<T> b)
+        {
+            return new Vec2<T>(a.X / b.X, a.Y / b.Y);
         }
     }
 }

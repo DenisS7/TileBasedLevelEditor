@@ -5,12 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
              xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
+             xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="500">
 
     <UserControl.DataContext>
         <vm:TilesetViewModel/>
     </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
     
     <Border Background="BlanchedAlmond">
         <Grid>
@@ -48,17 +53,15 @@
                            Margin="5 0 0 0"/>
             </Grid>
 
-            <Grid Grid.Row="2" Background="Black">
-                
-            </Grid>
+            <Grid Grid.Row="2" Background="Black"></Grid>
 
             <ScrollViewer Grid.Row="3" 
                           Background="White"
                           VerticalScrollBarVisibility="Auto" 
                           HorizontalScrollBarVisibility="Auto" 
                           Padding="1, 1, 0 , 0">
-                <Border>
-                    <Grid>
+                <Border BorderThickness="0">
+                    <Canvas misc:TileSelector.HoverCommand="{Binding HoverTileCommand}">
                         <Image x:Name="TilesetImage"
                                Source="{Binding TilesetImage}"
                                Stretch="none"
@@ -82,8 +85,18 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-
-                    </Grid>
+                        <Rectangle Width="{Binding TileSize.X}"
+                                   Height="{Binding TileSize.Y}"
+                                   Visibility="{Binding IsTileHovered, Converter={StaticResource BoolToVis}}"
+                                   Opacity="0.3"
+                                   Fill="Aqua"
+                                   IsHitTestVisible="False"
+                                   Canvas.Left="{Binding HoveredTileLocation.X}"
+                                   Canvas.Top="{Binding HoveredTileLocation.Y}"/>
+                        <Canvas.InputBindings>
+                            <MouseBinding Gesture=""></MouseBinding>
+                        </Canvas.InputBindings>
+                    </Canvas>
                 </Border>
             </ScrollViewer>
         </Grid>

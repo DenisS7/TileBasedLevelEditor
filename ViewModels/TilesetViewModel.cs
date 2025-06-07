@@ -66,12 +66,63 @@ namespace TileBasedLevelEditor.ViewModels
 
         public ObservableCollection<Line> GridLines { get; } = [];
 
+        private bool _isTileHovered = true;
+
+        public bool IsTileHovered
+        {
+            get => _isTileHovered;
+            set
+            {
+                _isTileHovered = value;
+                OnPropertyChanged(nameof(IsTileHovered));
+            }
+        }
+
+        private Vec2<int>? _hoveredTileIndex = new Vec2<int>(-1);
+
+        public Vec2<int>? HoveredTileIndex
+        {
+            get => _hoveredTileIndex;
+            set
+            {
+                _hoveredTileIndex = value;
+                OnPropertyChanged(nameof(HoveredTileIndex));
+                if (_hoveredTileIndex != null && _hoveredTileIndex.X >= 0 && _hoveredTileIndex.Y >= 0)
+                {
+                    IsTileHovered = true;
+                    HoveredTileLocation = new Vec2<double>(_hoveredTileIndex.X * TileSize.X, _hoveredTileIndex.Y * TileSize.Y);
+                }
+                else
+                {
+                    IsTileHovered = false;
+                    HoveredTileLocation = new Vec2<double>(0.0, 0.0);
+                }
+                OnPropertyChanged(nameof(IsTileHovered));
+                OnPropertyChanged(nameof(HoveredTileLocation));
+            }
+        }
+
+        private Vec2<double> _hoveredTileLocation = new Vec2<double>(0.0);
+
+        public Vec2<double> HoveredTileLocation
+        {
+            get => _hoveredTileLocation;
+            set
+            {
+                _hoveredTileLocation = value;
+                OnPropertyChanged(nameof(HoveredTileLocation));
+            }
+        }
+
         public ICommand LoadTilesetCommand { get; }
+        public ICommand HoverTileCommand { get; } 
 
         public TilesetViewModel()
         {
             _currentTileset = null;
             LoadTilesetCommand = new RelayCommand(OnLoadTileset);
+            HoverTileCommand = new RelayCommand(p => HoveredTileIndex = p as Vec2<int>);
+            
         }
         public TilesetViewModel(Tileset currentTileset)
         {
@@ -164,13 +215,9 @@ namespace TileBasedLevelEditor.ViewModels
                     Y1 = 0,
                     X2 = x,
                     Y2 = CurrentTileset.ImageSize.Y,
-                    Stroke = Brushes.LightGray,
+                    Stroke = Brushes.White,
                     StrokeThickness = 1
                 };
-                if (i > 0 && i < columns)
-                    line.StrokeDashArray = [2, 2];
-                else
-                    line.Stroke = Brushes.Black;
 
                 GridLines.Add(line);
             }
@@ -186,13 +233,9 @@ namespace TileBasedLevelEditor.ViewModels
                     Y1 = y,
                     X2 = CurrentTileset.ImageSize.X,
                     Y2 = y,
-                    Stroke = Brushes.LightGray,
+                    Stroke = Brushes.White,
                     StrokeThickness = 1
                 };
-                if (i > 0 && i < rows)
-                    line.StrokeDashArray = [2, 2];
-                else
-                    line.Stroke = Brushes.Black;
 
                 GridLines.Add(line);
             }
