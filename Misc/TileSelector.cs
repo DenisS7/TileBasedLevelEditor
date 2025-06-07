@@ -70,15 +70,15 @@ namespace TileBasedLevelEditor.Misc
                 return;
             }
 
-            Vec2<int> HoveredTileIndex = new Vec2<int>((int)(p.X / tileSize.X), (int)(p.Y / tileSize.Y));
-            if (HoveredTileIndex.X < 0 || HoveredTileIndex.X >= gridSize.X || HoveredTileIndex.Y < 0 ||
-                HoveredTileIndex.Y >= gridSize.Y)
+            Vec2<int> hoveredTileIndex = new Vec2<int>((int)(p.X / tileSize.X), (int)(p.Y / tileSize.Y));
+            if (hoveredTileIndex.X < 0 || hoveredTileIndex.X >= gridSize.X || hoveredTileIndex.Y < 0 ||
+                hoveredTileIndex.Y >= gridSize.Y)
             {
                 cmd.Execute(null);
             }
             else
             {
-                cmd.Execute(HoveredTileIndex);
+                cmd.Execute(hoveredTileIndex);
             }
         }
 
@@ -88,5 +88,53 @@ namespace TileBasedLevelEditor.Misc
             CommandBase cmd = GetHoverCommand(canvas);
             cmd?.Execute(null);
         }
+
+        public static readonly DependencyProperty SelectCommandProperty =
+            DependencyProperty.RegisterAttached(
+                "SelectCommand",
+                typeof(CommandBase),
+                typeof(TileSelector),
+                new PropertyMetadata(null, OnSelectCommandChanged)
+            );
+
+        public static void SetSelectCommand(DependencyObject d, CommandBase cmd) =>
+            d.SetValue(SelectCommandProperty, cmd);
+
+        public static CommandBase GetSelectCommand(DependencyObject d) =>
+            (CommandBase)d.GetValue(SelectCommandProperty);
+
+        private static void OnSelectCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is not Canvas canvas)
+                return;
+
+            if (e.OldValue == null && e.NewValue != null)
+            {
+                canvas.MouseLeftButtonDown += Canvas_MouseLeftButtonDown;
+            }
+            else if (e.OldValue != null && e.NewValue == null)
+            {
+                canvas.MouseLeftButtonDown -= Canvas_MouseLeftButtonDown;
+            }
+        }
+
+        private static void Canvas_MouseLeftButtonDown(object sender, MouseEventArgs e)
+        {
+            Canvas canvas = (Canvas)sender;
+            CommandBase cmd = GetSelectCommand(canvas);
+
+            if (cmd == null)
+                return;
+
+            if (canvas.DataContext is TilesetViewModel vm && vm.CurrentTileset != null)
+            {
+                cmd.Execute(vm.HoveredTileIndex);
+            }
+            else
+            {
+                cmd.Execute(null);
+            }
+        }
+
     }
 }

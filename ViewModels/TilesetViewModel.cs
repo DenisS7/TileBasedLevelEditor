@@ -114,20 +114,72 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
+        private bool _isTileSelected = true;
+
+        public bool IsTileSelected
+        {
+            get => _isTileSelected;
+            set
+            {
+                _isTileSelected = value;
+                OnPropertyChanged(nameof(IsTileSelected));
+            }
+        }
+
+        private Vec2<int>? _selectedTileIndex = new Vec2<int>(-1);
+
+        public Vec2<int>? SelectedTileIndex
+        {
+            get => _selectedTileIndex;
+            set
+            {
+                _selectedTileIndex = value;
+                OnPropertyChanged(nameof(SelectedTileIndex));
+                if (_selectedTileIndex != null && _selectedTileIndex.X >= 0 && _selectedTileIndex.Y >= 0)
+                {
+                    IsTileSelected = true;
+                    SelectedTileLocation = new Vec2<double>(_selectedTileIndex.X * TileSize.X, _selectedTileIndex.Y * TileSize.Y);
+                }
+                else
+                {
+                    IsTileSelected = false;
+                    SelectedTileLocation = new Vec2<double>(0.0, 0.0);
+                }
+                OnPropertyChanged(nameof(IsTileSelected));
+                OnPropertyChanged(nameof(SelectedTileLocation));
+            }
+        }
+
+        private Vec2<double> _selectedTileLocation = new Vec2<double>(0.0);
+
+        public Vec2<double> SelectedTileLocation
+        {
+            get => _selectedTileLocation;
+            set
+            {
+                _selectedTileLocation = value;
+                OnPropertyChanged(nameof(SelectedTileLocation));
+            }
+        }
+
         public ICommand LoadTilesetCommand { get; }
         public ICommand HoverTileCommand { get; } 
+        public ICommand SelectTileCommand { get; } 
 
         public TilesetViewModel()
         {
             _currentTileset = null;
             LoadTilesetCommand = new RelayCommand(OnLoadTileset);
             HoverTileCommand = new RelayCommand(p => HoveredTileIndex = p as Vec2<int>);
+            SelectTileCommand = new RelayCommand(p => SelectedTileIndex = p as Vec2<int>);
             
         }
         public TilesetViewModel(Tileset currentTileset)
         {
             _currentTileset = currentTileset;
             LoadTilesetCommand = new RelayCommand(OnLoadTileset);
+            HoverTileCommand = new RelayCommand(p => HoveredTileIndex = p as Vec2<int>);
+            SelectTileCommand = new RelayCommand(p => SelectedTileIndex = p as Vec2<int>);
         }
 
         private void OnLoadTileset(object? parameter)

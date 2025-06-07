@@ -61,7 +61,8 @@
                           HorizontalScrollBarVisibility="Auto" 
                           Padding="1, 1, 0 , 0">
                 <Border BorderThickness="0">
-                    <Canvas misc:TileSelector.HoverCommand="{Binding HoverTileCommand}">
+                    <Canvas misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
+                            misc:TileSelector.SelectCommand="{Binding SelectTileCommand}">
                         <Image x:Name="TilesetImage"
                                Source="{Binding TilesetImage}"
                                Stretch="none"
@@ -93,6 +94,16 @@
                                    IsHitTestVisible="False"
                                    Canvas.Left="{Binding HoveredTileLocation.X}"
                                    Canvas.Top="{Binding HoveredTileLocation.Y}"/>
+
+                        <Rectangle Width="{Binding TileSize.X}"
+                                   Height="{Binding TileSize.Y}"
+                                   Visibility="{Binding IsTileSelected, Converter={StaticResource BoolToVis}}"
+                                   Opacity="0.3"
+                                   Fill="DeepSkyBlue"
+                                   IsHitTestVisible="False"
+                                   Canvas.Left="{Binding SelectedTileLocation.X}"
+                                   Canvas.Top="{Binding SelectedTileLocation.Y}"/>
+
                         <Canvas.InputBindings>
                             <MouseBinding Gesture=""></MouseBinding>
                         </Canvas.InputBindings>
