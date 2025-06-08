@@ -64,11 +64,10 @@
                                       X2="{Binding X2}"
                                       Y2="{Binding Y2}"
                                       Stroke="Black"
-                                      StrokeThickness="1"
-                                      Opacity="1">
+                                      StrokeThickness="0.5">
                                     <Line.Style>
                                         <Style TargetType="Line">
-                                            <Setter Property="StrokeDashArray" Value="1, 5"/>
+                                            <Setter Property="StrokeDashArray" Value="4, 4"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsEdge}" Value="True">
                                                     <Setter Property="StrokeDashArray" Value="{x:Null}"/>
