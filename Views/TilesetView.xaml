@@ -55,54 +55,8 @@
 
             <Grid Grid.Row="2" Background="Black"></Grid>
 
-            <ScrollViewer Grid.Row="3" 
-                          Background="DimGray"
-                          VerticalScrollBarVisibility="Auto" 
-                          HorizontalScrollBarVisibility="Auto" 
-                          Padding="1, 1, 0 , 0"
-                          Name="TilesetBorder">
-                <Border BorderThickness="0">
-                    <Canvas misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
-                            misc:TileSelector.SelectCommand="{Binding SelectTileCommand}">
-
-                        <ItemsControl ItemsSource="{Binding TileImages}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Columns="{Binding NrTiles.X}"
-                                                 Rows="{Binding NrTiles.Y}"
-                                                 Background="Transparent"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Image Source="{Binding}"
-                                               Margin="{Binding DataContext.TileMargin, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <Rectangle Width="{Binding TileSize.X}"
-                                   Height="{Binding TileSize.Y}"
-                                   Visibility="{Binding IsTileHovered, Converter={StaticResource BoolToVis}}"
-                                   Opacity="0.3"
-                                   Fill="Aqua"
-                                   IsHitTestVisible="False"
-                                   Canvas.Left="{Binding HoveredTileLocation.X}"
-                                   Canvas.Top="{Binding HoveredTileLocation.Y}"/>
-
-                        <Rectangle Width="{Binding TileSize.X}"
-                                   Height="{Binding TileSize.Y}"
-                                   Visibility="{Binding IsTileSelected, Converter={StaticResource BoolToVis}}"
-                                   Opacity="0.3"
-                                   Fill="DeepSkyBlue"
-                                   IsHitTestVisible="False"
-                                   Canvas.Left="{Binding SelectedTileLocation.X}"
-                                   Canvas.Top="{Binding SelectedTileLocation.Y}"/>
-                    </Canvas>
-                </Border>
-            </ScrollViewer>
+            <local:TileGrid Grid.Row="3"
+                            DataContext="{Binding TileGridVM}"/>
         </Grid>
     </Border>
 </UserControl>

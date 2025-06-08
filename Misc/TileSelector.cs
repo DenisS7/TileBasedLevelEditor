@@ -9,6 +9,7 @@ using System.Windows.Input;
 using NotesApp.Commands;
 using TileBasedLevelEditor.Models;
 using TileBasedLevelEditor.ViewModels;
+using TileBasedLevelEditor.Views;
 
 namespace TileBasedLevelEditor.Misc
 {
@@ -53,7 +54,7 @@ namespace TileBasedLevelEditor.Misc
             if (cmd == null)
                 return;
 
-            if (!(canvas.DataContext is TilesetViewModel vm) || vm.CurrentTileset == null)
+            if (canvas.DataContext is not TileGridViewModel vm)
             {
                 cmd.Execute(null);
                 return;
@@ -61,9 +62,9 @@ namespace TileBasedLevelEditor.Misc
 
             Point p = e.GetPosition(canvas);
 
-            Thickness tilesMargin = vm.TileMargin;
-            Vec2<int> tileSize = vm.CurrentTileset.TileSize;
-            Vec2<int> gridSize = vm.ImageSize / tileSize;
+            Vec2<int> tilesMargin = vm.TileMargin;
+            Vec2<int> tileSize = vm.TileSize;
+            Vec2<int> gridSize = vm.NrTiles;
 
             if (tileSize.X <= 0 || tileSize.Y <= 0)
             {
@@ -71,7 +72,7 @@ namespace TileBasedLevelEditor.Misc
                 return;
             }
 
-            Vec2<int> hoveredTileIndex = new Vec2<int>((int)(p.X / (tileSize.X + tilesMargin.Left)), (int)(p.Y / (tileSize.Y + tilesMargin.Top)));
+            Vec2<int> hoveredTileIndex = new Vec2<int>((int)(p.X / (tileSize.X + tilesMargin.X)), (int)(p.Y / (tileSize.Y + tilesMargin.Y)));
             if (hoveredTileIndex.X < 0 || hoveredTileIndex.X >= gridSize.X || hoveredTileIndex.Y < 0 ||
                 hoveredTileIndex.Y >= gridSize.Y)
             {
@@ -127,7 +128,7 @@ namespace TileBasedLevelEditor.Misc
             if (cmd == null)
                 return;
 
-            if (canvas.DataContext is TilesetViewModel vm && vm.CurrentTileset != null)
+            if (canvas.DataContext is TileGridViewModel vm)
             {
                 cmd.Execute(vm.HoveredTileIndex);
             }

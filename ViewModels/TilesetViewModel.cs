@@ -55,9 +55,6 @@ namespace TileBasedLevelEditor.ViewModels
 
         public Vec2<int> NrTiles => CurrentTileset?.NrTiles ?? new Vec2<int>(0);
 
-        //Right & Bottom should always be 0
-        public Thickness TileMargin { get; } = new Thickness(2, 2, 0, 0);
-
         private ImageSource? _tilesetImage;
 
         public ImageSource? TilesetImage
@@ -71,122 +68,23 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        public ObservableCollection<CroppedBitmap> TileImages { get; private set; } = [];
-
-        private bool _isTileHovered = true;
-
-        public bool IsTileHovered
-        {
-            get => _isTileHovered;
-            set
-            {
-                _isTileHovered = value;
-                OnPropertyChanged(nameof(IsTileHovered));
-            }
-        }
-
-        private Vec2<int>? _hoveredTileIndex = new Vec2<int>(-1);
-
-        public Vec2<int>? HoveredTileIndex
-        {
-            get => _hoveredTileIndex;
-            set
-            {
-                _hoveredTileIndex = value;
-                OnPropertyChanged(nameof(HoveredTileIndex));
-                if (_hoveredTileIndex != null && _hoveredTileIndex.X >= 0 && _hoveredTileIndex.Y >= 0)
-                {
-                    IsTileHovered = true;
-                    HoveredTileLocation = new Vec2<double>(_hoveredTileIndex.X * (TileSize.X + TileMargin.Left) + TileMargin.Left, _hoveredTileIndex.Y * (TileSize.Y + TileMargin.Top) + TileMargin.Top);
-                }
-                else
-                {
-                    IsTileHovered = false;
-                    HoveredTileLocation = new Vec2<double>(0.0, 0.0);
-                }
-                OnPropertyChanged(nameof(IsTileHovered));
-                OnPropertyChanged(nameof(HoveredTileLocation));
-            }
-        }
-
-        private Vec2<double> _hoveredTileLocation = new Vec2<double>(0.0);
-
-        public Vec2<double> HoveredTileLocation
-        {
-            get => _hoveredTileLocation;
-            set
-            {
-                _hoveredTileLocation = value;
-                OnPropertyChanged(nameof(HoveredTileLocation));
-            }
-        }
-
-        private bool _isTileSelected = false;
-
-        public bool IsTileSelected
-        {
-            get => _isTileSelected;
-            set
-            {
-                _isTileSelected = value;
-                OnPropertyChanged(nameof(IsTileSelected));
-            }
-        }
-
-        private Vec2<int>? _selectedTileIndex = new Vec2<int>(-1);
-
-        public Vec2<int>? SelectedTileIndex
-        {
-            get => _selectedTileIndex;
-            set
-            {
-                _selectedTileIndex = value;
-                OnPropertyChanged(nameof(SelectedTileIndex));
-                if (_selectedTileIndex != null && _selectedTileIndex.X >= 0 && _selectedTileIndex.Y >= 0)
-                {
-                    IsTileSelected = true;
-                    SelectedTileLocation = HoveredTileLocation;
-                }
-                else
-                {
-                    IsTileSelected = false;
-                    SelectedTileLocation = new Vec2<double>(0.0, 0.0);
-                }
-                OnPropertyChanged(nameof(IsTileSelected));
-                OnPropertyChanged(nameof(SelectedTileLocation));
-            }
-        }
-
-        private Vec2<double> _selectedTileLocation = new Vec2<double>(0.0);
-
-        public Vec2<double> SelectedTileLocation
-        {
-            get => _selectedTileLocation;
-            set
-            {
-                _selectedTileLocation = value;
-                OnPropertyChanged(nameof(SelectedTileLocation));
-            }
-        }
-
         public ICommand LoadTilesetCommand { get; }
-        public ICommand HoverTileCommand { get; } 
-        public ICommand SelectTileCommand { get; } 
+
+        public TileGridViewModel TileGridVM { get; }
 
         public TilesetViewModel()
         {
             _currentTileset = null;
             LoadTilesetCommand = new RelayCommand(OnLoadTileset);
-            HoverTileCommand = new RelayCommand(p => HoveredTileIndex = p as Vec2<int>);
-            SelectTileCommand = new RelayCommand(p => SelectedTileIndex = p as Vec2<int>);
-            
+            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2));
         }
+
         public TilesetViewModel(Tileset currentTileset)
         {
             _currentTileset = currentTileset;
+            GetTilesetImage();
+            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2));
             LoadTilesetCommand = new RelayCommand(OnLoadTileset);
-            HoverTileCommand = new RelayCommand(p => HoveredTileIndex = p as Vec2<int>);
-            SelectTileCommand = new RelayCommand(p => SelectedTileIndex = p as Vec2<int>);
         }
 
         private void OnLoadTileset(object? parameter)
@@ -213,6 +111,8 @@ namespace TileBasedLevelEditor.ViewModels
             try
             {
                 CurrentTileset = new Tileset(name, tileSize, path);
+                TileGridVM.TileSize = tileSize;
+                TileGridVM.NrTiles = NrTiles;
             }
             catch (Exception ex)
             {
@@ -232,7 +132,7 @@ namespace TileBasedLevelEditor.ViewModels
                 return;
             }
 
-            TileImages.Clear();
+            TileGridVM.TileImages.Clear();
             try
             {
                 var bmp = new BitmapImage();
@@ -258,7 +158,7 @@ namespace TileBasedLevelEditor.ViewModels
                             TileSize.Y
                         );
                         var tileBmp = new CroppedBitmap(bmp, rect);
-                        TileImages.Add(tileBmp);
+                        TileGridVM.TileImages.Add(tileBmp);
                     }
                 }
             }
