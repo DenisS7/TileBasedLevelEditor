@@ -57,6 +57,8 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
+        public Vec2<int> GridSize => TileSize * NrTiles;
+
         public ObservableCollection<CroppedBitmap?> TileImages { get; private set; }
 
         private bool _gridLinesVisibility;
@@ -70,7 +72,10 @@ namespace TileBasedLevelEditor.ViewModels
                 OnPropertyChanged(nameof(GridLinesVisibility));
             }
         }
-        public ObservableCollection<Line> GridLines { get; private set; } = [];
+
+        public record LineInfo(double X1, double Y1, double X2, double Y2, bool IsEdge);
+
+        public ObservableCollection<LineInfo> GridLines { get; private set; } = [];
 
         private bool _isTileHovered = true;
 
@@ -117,6 +122,18 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 _hoveredTileLocation = value;
                 OnPropertyChanged(nameof(HoveredTileLocation));
+            }
+        }
+
+        private bool _canHighlightSelectedTile;
+
+        public bool CanHighlightSelectedTile
+        {
+            get => _canHighlightSelectedTile;
+            set
+            {
+                _canHighlightSelectedTile = value;
+                OnPropertyChanged(nameof(CanHighlightSelectedTile));
             }
         }
 
@@ -171,14 +188,17 @@ namespace TileBasedLevelEditor.ViewModels
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
 
-        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tileImages = null, bool gridLinesVisibility = false)
+        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tileImages = null, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
         {
             _tileSize = tileSize;
             _nrTiles = nrTiles;
             _tileMargin = tileMargin;
             _gridLinesVisibility = gridLinesVisibility;
+            _canHighlightSelectedTile = canHighlightSelectedTile;
+
             HoverTileCommand = new RelayCommand(p => HoveredTileIndex = p as Vec2<int>);
             SelectTileCommand = new RelayCommand(p => SelectedTileIndex = p as Vec2<int>);
+
             if (tileImages != null)
                 TileImages = new ObservableCollection<CroppedBitmap?>(tileImages); 
             else
@@ -200,24 +220,14 @@ namespace TileBasedLevelEditor.ViewModels
         {
             GridLines.Clear();
 
-            Vec2<double> tileGridMax = new Vec2<double>(NrTiles.X * TileSize.X, NrTiles.Y * TileSize.Y);
-
             for (int i = 0; i <= NrTiles.X; i++)
             {
                 double x = i * TileSize.X;
                 if (i == 0)
                     x += 1.0;
-                Line line = new Line()
-                {
-                    X1 = x,
-                    Y1 = 0,
-                    X2 = x,
-                    Y2 = tileGridMax.Y,
-                    Stroke = Brushes.White,
-                    StrokeThickness = 1
-                };
 
-                GridLines.Add(line);
+                bool isEdge = i == 0 || i == NrTiles.X;
+                GridLines.Add(new LineInfo(x, 0, x, GridSize.Y, isEdge));
             }
 
             for (int i = 0; i <= NrTiles.Y; i++)
@@ -225,17 +235,9 @@ namespace TileBasedLevelEditor.ViewModels
                 double y = i * TileSize.Y;
                 if (i == 0)
                     y += 1.0;
-                Line line = new Line()
-                {
-                    X1 = 0,
-                    Y1 = y,
-                    X2 = tileGridMax.X,
-                    Y2 = y,
-                    Stroke = Brushes.White,
-                    StrokeThickness = 1
-                };
 
-                GridLines.Add(line);
+                bool isEdge = i == 0 || i == NrTiles.Y;
+                GridLines.Add(new LineInfo(0, y, GridSize.X, y, isEdge));
             }
         }
     }

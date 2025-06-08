@@ -5,16 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
              xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
-             xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels" d:DataContext="{d:DesignInstance Type=vm:TileGridViewModel}"
+             xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
+             xmlns:converters="clr-namespace:NotesApp.Converters"
+             d:DataContext="{d:DesignInstance Type=vm:TileGridViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <converters:BooleanAndToVisibilityConverter x:Key="BoolAndToVis"/>
     </UserControl.Resources>
 
     <Grid>
-        <ScrollViewer Background="DimGray"
+        <ScrollViewer Background="White"
                       VerticalScrollBarVisibility="Auto" 
                       HorizontalScrollBarVisibility="Auto" 
                       Padding="1, 1, 0 , 0"
@@ -41,6 +44,43 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
+                    <ItemsControl ItemsSource="{Binding GridLines}"
+                                  Visibility="{Binding GridLinesVisibility, Converter={StaticResource BoolToVis}}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas x:Name="OverlayCanvas"
+                                        Background="Transparent"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Width="{Binding GridSize.X}"
+                                        Height="{Binding GridSize.Y}"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Line X1="{Binding X1}"
+                                      Y1="{Binding Y1}"
+                                      X2="{Binding X2}"
+                                      Y2="{Binding Y2}"
+                                      Stroke="Black"
+                                      StrokeThickness="1"
+                                      Opacity="1">
+                                    <Line.Style>
+                                        <Style TargetType="Line">
+                                            <Setter Property="StrokeDashArray" Value="1, 5"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEdge}" Value="True">
+                                                    <Setter Property="StrokeDashArray" Value="{x:Null}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Line.Style>
+                                </Line>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
                     <Rectangle Width="{Binding TileSize.X}"
                                Height="{Binding TileSize.Y}"
                                Visibility="{Binding IsTileHovered, Converter={StaticResource BoolToVis}}"
@@ -52,12 +92,18 @@
 
                     <Rectangle Width="{Binding TileSize.X}"
                                Height="{Binding TileSize.Y}"
-                               Visibility="{Binding IsTileSelected, Converter={StaticResource BoolToVis}}"
                                Opacity="0.3"
                                Fill="DeepSkyBlue"
                                IsHitTestVisible="False"
                                Canvas.Left="{Binding SelectedTileLocation.X}"
-                               Canvas.Top="{Binding SelectedTileLocation.Y}"/>
+                               Canvas.Top="{Binding SelectedTileLocation.Y}">
+                        <Rectangle.Visibility>
+                            <MultiBinding Converter="{StaticResource BoolAndToVis}">
+                                <Binding Path="IsTileSelected"/>
+                                <Binding Path="CanHighlightSelectedTile"/>
+                            </MultiBinding>
+                        </Rectangle.Visibility>
+                    </Rectangle>
                 </Canvas>
             </Border>
         </ScrollViewer>

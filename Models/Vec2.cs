@@ -32,5 +32,15 @@ namespace TileBasedLevelEditor.Models
         {
             return new Vec2<T>(a.X / b.X, a.Y / b.Y);
         }
+
+        public static Vec2<T> operator *(Vec2<T> v, T scalar)
+        {
+            return new Vec2<T>(v.X * scalar, v.Y * scalar);
+        }
+
+        public static Vec2<T> operator *(Vec2<T> a, Vec2<T> b)
+        {
+            return new Vec2<T>(a.X * b.X, a.Y * b.Y);
+        }
     }
 }
