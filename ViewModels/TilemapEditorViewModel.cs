@@ -9,6 +9,8 @@ using System.Windows.Input;
 using System.Windows.Shapes;
 using NotesApp.ViewModel;
 using TileBasedLevelEditor.Models;
+using TileBasedLevelEditor.Services;
+using System.Windows.Media.Imaging;
 
 namespace TileBasedLevelEditor.ViewModels
 {
@@ -34,13 +36,21 @@ namespace TileBasedLevelEditor.ViewModels
         public TilemapEditorViewModel()
         {
             _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(32, 32), new Vec2<int>(10, 15));
-            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, true, false);
+            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, null, OnTileSelected, true, false);
         }
 
         public TilemapEditorViewModel(Tilemap currentTilemap)
         {
             _currentTilemap = currentTilemap;
-            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, true, false);
+            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, null, OnTileSelected, true, false);
+        }
+        private void OnTileSelected(Vec2<int> vec)
+        {
+            if (TileSelectedService.SelectedTile == null)
+                return;
+
+            CurrentTilemap.SetTile(vec, TileSelectedService.SelectedTile.TilesetIndex, TileSelectedService.SelectedTile.TilesetName);
+            TileGridVM.TileImages[TileGridVM.SelectedTileIndex.X + TileGridVM.SelectedTileIndex.Y * TileGridVM.NrTiles.X] = TileSelectedService.SelectedTileImage;
         }
     }
 }

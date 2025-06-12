@@ -26,14 +26,14 @@ namespace TileBasedLevelEditor.Models
             Tiles = new Dictionary<Vec2<int>, TileData>(tilemapSize.X * tilemapSize.Y);
         }
 
-        public void SetTile(Vec2<int> tilesetIndex, Vec2<int> tilemapIndex, CroppedBitmap tileImage)
+        public void SetTile(Vec2<int> tilemapIndex, Vec2<int> tilesetIndex, string tilesetName)
         {
             int tileIndex = tilemapIndex.Y * TilemapSize.X + tilemapIndex.X;
             if (0 > tileIndex || tileIndex >= Tiles.Count)
                 return;
 
             Tiles[tilemapIndex].TilesetIndex = tilesetIndex;
-            Tiles[tilemapIndex].TileImage = tileImage;
+            Tiles[tilemapIndex].TilesetName = tilesetName;
         }
     }
 }

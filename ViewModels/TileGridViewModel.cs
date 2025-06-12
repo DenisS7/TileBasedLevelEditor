@@ -188,7 +188,7 @@ namespace TileBasedLevelEditor.ViewModels
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
 
-        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tileImages = null, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
+        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tileImages = null, Action<Vec2<int>>? OnHover = null, Action<Vec2<int>>? OnSelect = null, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
         {
             _tileSize = tileSize;
             _nrTiles = nrTiles;
@@ -196,8 +196,23 @@ namespace TileBasedLevelEditor.ViewModels
             _gridLinesVisibility = gridLinesVisibility;
             _canHighlightSelectedTile = canHighlightSelectedTile;
 
-            HoverTileCommand = new RelayCommand(p => HoveredTileIndex = p as Vec2<int>);
-            SelectTileCommand = new RelayCommand(p => SelectedTileIndex = p as Vec2<int>);
+            HoverTileCommand = new RelayCommand(p => 
+            {
+                if (p is not Vec2<int>)
+                    return;
+
+                HoveredTileIndex = p as Vec2<int>;
+                OnHover?.Invoke(HoveredTileIndex);
+            });
+
+            SelectTileCommand = new RelayCommand(p =>
+            {
+                if (p is not Vec2<int>)
+                    return;
+
+                SelectedTileIndex = p as Vec2<int>;
+                OnSelect?.Invoke(SelectedTileIndex);
+            });
 
             if (tileImages != null)
                 TileImages = new ObservableCollection<CroppedBitmap?>(tileImages); 

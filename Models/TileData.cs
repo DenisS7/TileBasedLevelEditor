@@ -7,15 +7,16 @@ using System.Windows.Media.Imaging;
 
 namespace TileBasedLevelEditor.Models
 {
-    class TileData
+    public class TileData
     {
         public Vec2<int> TilesetIndex { get; set; }
-        public CroppedBitmap TileImage { get; set; }
+        //public CroppedBitmap TileImage { get; set; }
+        public string TilesetName { get; set; }
 
-        public TileData(Vec2<int> tilesetIndex, CroppedBitmap tileImage)
+        public TileData(Vec2<int> tilesetIndex, string tilesetName = "")
         {
             TilesetIndex = tilesetIndex;
-            TileImage = tileImage;
+            TilesetName = tilesetName;
         }
     }
 

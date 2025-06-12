@@ -15,6 +15,7 @@ using Microsoft.Win32;
 using NotesApp.Commands;
 using NotesApp.ViewModel;
 using TileBasedLevelEditor.Models;
+using TileBasedLevelEditor.Services;
 using TileBasedLevelEditor.Views;
 
 namespace TileBasedLevelEditor.ViewModels
@@ -76,7 +77,7 @@ namespace TileBasedLevelEditor.ViewModels
         {
             _currentTileset = null;
             LoadTilesetCommand = new RelayCommand(OnLoadTileset);
-            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2));
+            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), null, OnTileSelected);
         }
 
         public TilesetViewModel(Tileset currentTileset)
@@ -166,6 +167,19 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 TilesetImage = null;
             }
+        }
+
+        private void OnTileSelected(Vec2<int> vec)
+        {
+            if (CurrentTileset == null)
+                return;
+
+            if (TileGridVM.SelectedTileIndex.X < 0 || TileGridVM.SelectedTileIndex.Y < 0 ||
+                TileGridVM.SelectedTileIndex.X >= NrTiles.X || TileGridVM.SelectedTileIndex.Y >= NrTiles.Y)
+                return;
+
+            TileSelectedService.SelectedTileImage = TileGridVM.TileImages[TileGridVM.SelectedTileIndex.X + TileGridVM.SelectedTileIndex.Y * NrTiles.X];
+            TileSelectedService.SelectedTile = new TileData(TileGridVM.SelectedTileIndex, CurrentTileset.Name);
         }
     }
 }
