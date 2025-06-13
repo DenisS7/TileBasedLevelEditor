@@ -169,7 +169,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private void OnTileSelected(Vec2<int> vec)
+        private void OnTileSelected(Vec2<int>? vec)
         {
             if (CurrentTileset == null || TileGridVM.InitialSelectedTile == null)
                 return;
@@ -177,8 +177,26 @@ namespace TileBasedLevelEditor.ViewModels
             if (TileGridVM.InitialSelectedTile < 0 || TileGridVM.InitialSelectedTile >= NrTiles)
                 return;
 
-            TileSelectedService.SelectedTileImage = TileGridVM.TileImages[TileGridVM.InitialSelectedTile.X + TileGridVM.InitialSelectedTile.Y * NrTiles.X];
-            TileSelectedService.SelectedTile = new TileData(TileGridVM.InitialSelectedTile, CurrentTileset.Name);
+            HashSet<TileData> SelectedTiles = [];
+            foreach (SelectionArea selectionArea in TileGridVM.SelectionAreas)
+            {
+                for (int i = selectionArea.StartTile.X; i <= selectionArea.EndTile.X; i++)
+                {
+                    for (int j = selectionArea.StartTile.Y; j <= selectionArea.EndTile.Y; j++)
+                    {
+                        SelectedTiles.Add(new TileData(new Vec2<int>(i, j), CurrentTileset.Name));
+                    }
+                }
+            }
+
+            List<Tuple<TileData, CroppedBitmap?>>? SelectedTilesFull = [];
+            foreach (TileData tileData in SelectedTiles)
+            {
+                CroppedBitmap? tileImage = TileGridVM.TileImages[tileData.TilesetIndex.X + tileData.TilesetIndex.Y * NrTiles.X];
+                SelectedTilesFull.Add(new Tuple<TileData, CroppedBitmap?>(tileData, tileImage));
+            }
+
+            TileSelectedService.SelectedTiles = SelectedTilesFull;
         }
     }
 }

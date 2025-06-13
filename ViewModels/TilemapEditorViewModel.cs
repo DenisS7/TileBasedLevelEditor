@@ -11,6 +11,7 @@ using NotesApp.ViewModel;
 using TileBasedLevelEditor.Models;
 using TileBasedLevelEditor.Services;
 using System.Windows.Media.Imaging;
+using System.Diagnostics;
 
 namespace TileBasedLevelEditor.ViewModels
 {
@@ -44,13 +45,22 @@ namespace TileBasedLevelEditor.ViewModels
             _currentTilemap = currentTilemap;
             TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, null, OnTileSelected, true, false);
         }
-        private void OnTileSelected(Vec2<int> vec)
+        private void OnTileSelected(Vec2<int>? vec)
         {
-            if (TileSelectedService.SelectedTile == null)
+            if (TileSelectedService.SelectedTiles == null || TileSelectedService.SelectedTiles.Count == 0 || vec == null)
                 return;
 
-            CurrentTilemap.SetTile(vec, TileSelectedService.SelectedTile.TilesetIndex, TileSelectedService.SelectedTile.TilesetName);
-            //TileGridVM.TileImages[TileGridVM.InitialSelectedTile.X + TileGridVM.InitialSelectedTile.Y * TileGridVM.NrTiles.X] = TileSelectedService.SelectedTileImage;
+            TileData referenceTile = TileSelectedService.SelectedTiles[0].Item1;
+
+            foreach (Tuple<TileData, CroppedBitmap?> tileData in TileSelectedService.SelectedTiles)
+            {
+                Vec2<int> tilemapTileIndex = vec + tileData.Item1.TilesetIndex - referenceTile.TilesetIndex;
+                if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
+                    continue;
+
+                CurrentTilemap.SetTile(tilemapTileIndex, tileData.Item1.TilesetIndex, tileData.Item1.TilesetName);
+                TileGridVM.TileImages[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = tileData.Item2;
+            }
         }
     }
 }

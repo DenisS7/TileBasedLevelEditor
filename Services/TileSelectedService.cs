@@ -10,32 +10,20 @@ namespace TileBasedLevelEditor.Services
 {
     public static class TileSelectedService
     {
-        private static TileData? _selectedTile;
-        public static TileData? SelectedTile
+        private static List<Tuple<TileData, CroppedBitmap?>>? _selectedTiles;
+        public static List<Tuple<TileData, CroppedBitmap?>>? SelectedTiles
         {
-            get => _selectedTile;
+            get => _selectedTiles;
             set
             {
-                if (_selectedTile != value)
+                if (_selectedTiles != value)
                 {
-                    _selectedTile = value;
+                    _selectedTiles = value;
                     SelectedTileChanged?.Invoke(null, EventArgs.Empty);
                 }
             }
         }
 
-        private static CroppedBitmap? _selectedTileImage;
-        public static CroppedBitmap? SelectedTileImage
-        {
-            get => _selectedTileImage;
-            set
-            {
-                if (_selectedTileImage != value)
-                {
-                    _selectedTileImage = value;
-                }
-            }
-        }
 
         public static EventHandler? SelectedTileChanged; 
     }

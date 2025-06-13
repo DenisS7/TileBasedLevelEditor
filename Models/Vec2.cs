@@ -48,7 +48,7 @@ namespace TileBasedLevelEditor.Models
 
         public static bool operator <(Vec2<T> a, Vec2<T> b)
         {
-            return a.X < b.X && a.Y < b.Y;
+            return a.X < b.X || a.Y < b.Y;
         }
 
         public static bool operator >(Vec2<T> a, Vec2<T> b)
@@ -58,12 +58,12 @@ namespace TileBasedLevelEditor.Models
 
         public static bool operator <=(Vec2<T> a, Vec2<T> b)
         {
-            return !(a > b);
+            return a.X <= b.X || a.Y <= b.Y;
         }
 
         public static bool operator >=(Vec2<T> a, Vec2<T> b)
         {
-            return !(a < b);
+            return b <= a;
         }
     }
 }
