@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NotesApp.Commands;
+using NotesApp.ViewModel;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using System.Windows;
-using System.Windows.Shapes;
-using NotesApp.ViewModel;
+using TileBasedLevelEditor.CustomArgs;
+using TileBasedLevelEditor.Misc;
 using TileBasedLevelEditor.Models;
-using TileBasedLevelEditor.Views;
-using NotesApp.Commands;
 
 namespace TileBasedLevelEditor.ViewModels
 {
@@ -137,53 +132,22 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private bool _isTileSelected = false;
+        public bool IsTileSelected => SelectionAreas.Count > 0;
 
-        public bool IsTileSelected
+        private Vec2<int>? _initialSelectedTile = new Vec2<int>(-1);
+
+        public Vec2<int>? InitialSelectedTile
         {
-            get => _isTileSelected;
+            get => _initialSelectedTile;
             set
             {
-                _isTileSelected = value;
-                OnPropertyChanged(nameof(IsTileSelected));
+                _initialSelectedTile = value;
+                OnPropertyChanged(nameof(InitialSelectedTile));
+                OnPropertyChanged(nameof(IsTileSelected));            
             }
         }
 
-        private Vec2<int>? _selectedTileIndex = new Vec2<int>(-1);
-
-        public Vec2<int>? SelectedTileIndex
-        {
-            get => _selectedTileIndex;
-            set
-            {
-                _selectedTileIndex = value;
-                OnPropertyChanged(nameof(SelectedTileIndex));
-                if (_selectedTileIndex != null && _selectedTileIndex.X >= 0 && _selectedTileIndex.Y >= 0)
-                {
-                    IsTileSelected = true;
-                    SelectedTileLocation = HoveredTileLocation;
-                }
-                else
-                {
-                    IsTileSelected = false;
-                    SelectedTileLocation = new Vec2<double>(0.0, 0.0);
-                }
-                OnPropertyChanged(nameof(IsTileSelected));
-                OnPropertyChanged(nameof(SelectedTileLocation));
-            }
-        }
-
-        private Vec2<double> _selectedTileLocation = new Vec2<double>(0.0);
-
-        public Vec2<double> SelectedTileLocation
-        {
-            get => _selectedTileLocation;
-            set
-            {
-                _selectedTileLocation = value;
-                OnPropertyChanged(nameof(SelectedTileLocation));
-            }
-        }
+        public ObservableCollection<SelectionArea> SelectionAreas { get; private set; } = [];
 
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
@@ -198,20 +162,50 @@ namespace TileBasedLevelEditor.ViewModels
 
             HoverTileCommand = new RelayCommand(p => 
             {
-                if (p is not Vec2<int>)
+                if (p == null || p is not Vec2<int> Index)
+                {
+                    HoveredTileIndex = null;
                     return;
+                }
 
-                HoveredTileIndex = p as Vec2<int>;
+                HoveredTileIndex = Index;
                 OnHover?.Invoke(HoveredTileIndex);
             });
 
             SelectTileCommand = new RelayCommand(p =>
             {
-                if (p is not Vec2<int>)
+                if (p is not TileSelectionArgs args)
                     return;
 
-                SelectedTileIndex = p as Vec2<int>;
-                OnSelect?.Invoke(SelectedTileIndex);
+                if (args.CurrentDragStage == DragStage.Start)
+                {
+                    if (!args.Add)
+                        SelectionAreas.Clear();
+
+                    InitialSelectedTile = args.Index;
+                    if (args.Index != null)
+                        SelectionAreas.Add(GetSelectionArea(args.Index, args.Index));
+                }
+                else if (args.Index != null && InitialSelectedTile != null)
+                {                    
+                    Debug.Assert(SelectionAreas.Count > 0);
+                    
+                    SelectionArea LastArea = SelectionAreas.Last();
+                    LastArea = GetSelectionArea(InitialSelectedTile, args.Index);
+
+                    if (!args.Add)
+                    { 
+                        SelectionAreas.Clear(); 
+                        SelectionAreas.Add(LastArea);
+                    }
+                    else if (SelectionAreas.Count > 0)
+                    {
+                        SelectionAreas[SelectionAreas.Count - 1] = LastArea;
+                    }
+                }
+
+                //InitialSelectedTile = args.Index;
+                //OnSelect?.Invoke(InitialSelectedTile);
             });
 
             if (tileImages != null)
@@ -254,6 +248,36 @@ namespace TileBasedLevelEditor.ViewModels
                 bool isEdge = i == 0 || i == NrTiles.Y;
                 GridLines.Add(new LineInfo(0, y, GridSize.X, y, isEdge));
             }
+        }
+
+        private SelectionArea GetSelectionArea(Vec2<int> PointA, Vec2<int> PointB)
+        {
+            Vec2<int> StartTile = new Vec2<int>(-1);
+            Vec2<int> EndTile = new Vec2<int>(-1);
+
+            if(PointA.X > PointB.X)
+            {
+                StartTile.X = PointB.X;
+                EndTile.X = PointA.X;
+            }
+            else
+            {
+                StartTile.X = PointA.X;
+                EndTile.X = PointB.X;
+            }
+
+            if(PointA.Y > PointB.Y)
+            {
+                StartTile.Y = PointB.Y;
+                EndTile.Y = PointA.Y;
+            }
+            else
+            {
+                StartTile.Y = PointA.Y;
+                EndTile.Y = PointB.Y;
+            }
+
+            return new SelectionArea(StartTile, EndTile, TileSize, TileMargin);
         }
     }
 }

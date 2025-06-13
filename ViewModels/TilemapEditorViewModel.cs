@@ -50,7 +50,7 @@ namespace TileBasedLevelEditor.ViewModels
                 return;
 
             CurrentTilemap.SetTile(vec, TileSelectedService.SelectedTile.TilesetIndex, TileSelectedService.SelectedTile.TilesetName);
-            TileGridVM.TileImages[TileGridVM.SelectedTileIndex.X + TileGridVM.SelectedTileIndex.Y * TileGridVM.NrTiles.X] = TileSelectedService.SelectedTileImage;
+            //TileGridVM.TileImages[TileGridVM.InitialSelectedTile.X + TileGridVM.InitialSelectedTile.Y * TileGridVM.NrTiles.X] = TileSelectedService.SelectedTileImage;
         }
     }
 }

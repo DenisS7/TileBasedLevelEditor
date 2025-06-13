@@ -22,10 +22,11 @@
                       HorizontalScrollBarVisibility="Auto" 
                       Padding="1, 1, 0 , 0"
                       Name="TilesetBorder">
-            <Border BorderThickness="0">
-                <Canvas misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
-                        misc:TileSelector.SelectCommand="{Binding SelectTileCommand}">
-
+            <Grid>
+               
+                <Canvas 
+                        Width="{Binding ViewportWidth, ElementName=TilesetBorder}"
+                        Height="{Binding ViewportHeight, ElementName=TilesetBorder}">
                     <ItemsControl ItemsSource="{Binding TileImages}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -89,22 +90,38 @@
                                Canvas.Left="{Binding HoveredTileLocation.X}"
                                Canvas.Top="{Binding HoveredTileLocation.Y}"/>
 
-                    <Rectangle Width="{Binding TileSize.X}"
-                               Height="{Binding TileSize.Y}"
-                               Opacity="0.3"
-                               Fill="DeepSkyBlue"
-                               IsHitTestVisible="False"
-                               Canvas.Left="{Binding SelectedTileLocation.X}"
-                               Canvas.Top="{Binding SelectedTileLocation.Y}">
-                        <Rectangle.Visibility>
-                            <MultiBinding Converter="{StaticResource BoolAndToVis}">
-                                <Binding Path="IsTileSelected"/>
-                                <Binding Path="CanHighlightSelectedTile"/>
-                            </MultiBinding>
-                        </Rectangle.Visibility>
-                    </Rectangle>
+                    <ItemsControl ItemsSource="{Binding SelectionAreas}"
+                                  Visibility="{Binding CanHighlightSelectedTile, Converter={StaticResource BoolToVis}}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Rectangle Stroke="DodgerBlue"
+                                           StrokeThickness="2"
+                                           Fill="DodgerBlue"
+                                           Opacity="0.5"
+                                           Width="{Binding RectArea.Width}"
+                                           Height="{Binding RectArea.Height}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left"  Value="{Binding RectArea.X}" />
+                                <Setter Property="Canvas.Top"   Value="{Binding RectArea.Y}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ItemsControl>
                 </Canvas>
-            </Border>
+
+                <Rectangle Fill="Transparent"
+            misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
+         misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"/>
+            </Grid>
         </ScrollViewer>
     </Grid>
 </UserControl>

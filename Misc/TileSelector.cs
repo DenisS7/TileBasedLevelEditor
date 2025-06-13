@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 using NotesApp.Commands;
+using TileBasedLevelEditor.CustomArgs;
 using TileBasedLevelEditor.Models;
 using TileBasedLevelEditor.ViewModels;
 using TileBasedLevelEditor.Views;
@@ -15,6 +17,8 @@ namespace TileBasedLevelEditor.Misc
 {
     public static class TileSelector
     {
+        public static bool IsDragging = false;
+
         public static readonly DependencyProperty HoverCommandProperty =
             DependencyProperty.RegisterAttached(
                 "HoverCommand",
@@ -22,6 +26,25 @@ namespace TileBasedLevelEditor.Misc
                 typeof(TileSelector),
                 new PropertyMetadata(null, OnHoverCommandChanged)
                 );
+        public static Vec2<int>? GetHoveredTile(Rectangle rectangle, Point mousePosition)
+        {
+            if (rectangle.DataContext is not TileGridViewModel vm)
+                return null;
+
+            Vec2<int> tilesMargin = vm.TileMargin;
+            Vec2<int> tileSize = vm.TileSize;
+            Vec2<int> rectangleSize = vm.NrTiles;
+
+            if (tileSize <= 0)
+                return null;
+
+            Vec2<int> hoveredTile = new Vec2<int>((int)(mousePosition.X / (tileSize.X + tilesMargin.X)), (int)(mousePosition.Y / (tileSize.Y + tilesMargin.Y)));
+
+            if (hoveredTile < 0 || hoveredTile >= vm.NrTiles)
+                return null;
+
+            return hoveredTile;
+        }
 
         public static void SetHoverCommand(DependencyObject d, CommandBase cmd) =>
             d.SetValue(HoverCommandProperty, cmd);
@@ -31,63 +54,42 @@ namespace TileBasedLevelEditor.Misc
 
         private static void OnHoverCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is not Canvas canvas) 
+            if (d is not Rectangle rectangle) 
                 return;
 
             if (e.OldValue == null && e.NewValue != null)
-            {
-                canvas.MouseMove += Canvas_MouseMove;
-                canvas.MouseLeave += Canvas_MouseLeave;
+            { 
+                rectangle.MouseMove += Rectangle_MouseMove;
+                rectangle.MouseLeave += Rectangle_MouseLeave;
             }
             else if (e.OldValue != null && e.NewValue == null)
             {
-                canvas.MouseMove -= Canvas_MouseMove;
-                canvas.MouseLeave -= Canvas_MouseLeave;
+                rectangle.MouseMove -= Rectangle_MouseMove;
+                rectangle.MouseLeave -= Rectangle_MouseLeave;
             }
         }
 
-        private static void Canvas_MouseMove(object sender, MouseEventArgs e)
+        private static void Rectangle_MouseMove(object sender, MouseEventArgs e)
         {
-            Canvas canvas = (Canvas)sender;
-            CommandBase cmd = GetHoverCommand(canvas);
+            Rectangle rectangle = (Rectangle)sender;
+            CommandBase cmd = GetHoverCommand(rectangle);
 
             if (cmd == null)
                 return;
 
-            if (canvas.DataContext is not TileGridViewModel vm)
+            if (rectangle.DataContext is not TileGridViewModel vm)
             {
                 cmd.Execute(null);
                 return;
             }
 
-            Point p = e.GetPosition(canvas);
-
-            Vec2<int> tilesMargin = vm.TileMargin;
-            Vec2<int> tileSize = vm.TileSize;
-            Vec2<int> gridSize = vm.NrTiles;
-
-            if (tileSize.X <= 0 || tileSize.Y <= 0)
-            {
-                cmd.Execute(null);
-                return;
-            }
-
-            Vec2<int> hoveredTileIndex = new Vec2<int>((int)(p.X / (tileSize.X + tilesMargin.X)), (int)(p.Y / (tileSize.Y + tilesMargin.Y)));
-            if (hoveredTileIndex.X < 0 || hoveredTileIndex.X >= gridSize.X || hoveredTileIndex.Y < 0 ||
-                hoveredTileIndex.Y >= gridSize.Y)
-            {
-                cmd.Execute(null);
-            }
-            else
-            {
-                cmd.Execute(hoveredTileIndex);
-            }
+            cmd.Execute(GetHoveredTile(rectangle, e.GetPosition(rectangle)));
         }
 
-        private static void Canvas_MouseLeave(object sender, MouseEventArgs e)
+        private static void Rectangle_MouseLeave(object sender, MouseEventArgs e)
         {
-            Canvas canvas = (Canvas)sender;
-            CommandBase cmd = GetHoverCommand(canvas);
+            Rectangle rectangle = (Rectangle)sender;
+            CommandBase cmd = GetHoverCommand(rectangle);
             cmd?.Execute(null);
         }
 
@@ -107,36 +109,91 @@ namespace TileBasedLevelEditor.Misc
 
         private static void OnSelectCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is not Canvas canvas)
+            if (d is not Rectangle rectangle)
                 return;
 
             if (e.OldValue == null && e.NewValue != null)
             {
-                canvas.MouseLeftButtonDown += Canvas_MouseLeftButtonDown;
+                rectangle.MouseLeftButtonDown += Rectangle_MouseLeftButtonDown;
+                rectangle.MouseMove += Rectangle_MouseDragMove;
+                rectangle.MouseLeftButtonUp += Rectangle_MouseLeftButtonUp;
             }
             else if (e.OldValue != null && e.NewValue == null)
             {
-                canvas.MouseLeftButtonDown -= Canvas_MouseLeftButtonDown;
+                rectangle.MouseLeftButtonDown -= Rectangle_MouseLeftButtonDown;
+                rectangle.MouseMove -= Rectangle_MouseDragMove;
+                rectangle.MouseLeftButtonUp -= Rectangle_MouseLeftButtonUp;
             }
         }
 
-        private static void Canvas_MouseLeftButtonDown(object sender, MouseEventArgs e)
+        private static void Rectangle_MouseLeftButtonDown(object sender, MouseEventArgs e)
         {
-            Canvas canvas = (Canvas)sender;
-            CommandBase cmd = GetSelectCommand(canvas);
+            if (sender is not Rectangle rectangle)
+                return;
+
+            CommandBase cmd = GetSelectCommand(rectangle);
 
             if (cmd == null)
                 return;
 
-            if (canvas.DataContext is TileGridViewModel vm)
+            rectangle.CaptureMouse();
+            bool isAdd = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+
+            if (rectangle.DataContext is TileGridViewModel vm)
             {
-                cmd.Execute(vm.HoveredTileIndex);
-            }
-            else
-            {
-                cmd.Execute(null);
+                IsDragging = true;
+
+                Vec2<int>? hoveredTile = GetHoveredTile(rectangle, e.GetPosition(rectangle));
+                //if (hoveredTile != null)
+                cmd.Execute(new TileSelectionArgs(hoveredTile, isAdd, DragStage.Start));
             }
         }
 
+        private static void Rectangle_MouseDragMove(object sender, MouseEventArgs e)
+        {
+            if (!IsDragging)
+                return;
+
+            if (sender is not Rectangle rectangle)
+                return;
+
+            CommandBase cmd = GetSelectCommand(rectangle);
+
+            if (cmd == null)
+                return;
+
+            bool isAdd = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+            if (rectangle.DataContext is TileGridViewModel vm)
+            {
+                Vec2<int>? hoveredTile = GetHoveredTile(rectangle, e.GetPosition(rectangle));
+                if (hoveredTile != null)
+                    cmd.Execute(new TileSelectionArgs(hoveredTile, isAdd, DragStage.Dragging));
+            }
+        }
+
+        private static void Rectangle_MouseLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            if (!IsDragging)
+                return;
+
+            if (sender is not Rectangle rectangle)
+                return;
+
+            rectangle.ReleaseMouseCapture();
+            CommandBase cmd = GetSelectCommand(rectangle);
+
+            if (cmd == null)
+                return;
+
+            bool isAdd = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+            if (rectangle.DataContext is TileGridViewModel vm)
+            {
+                IsDragging = false;
+
+                Vec2<int>? hoveredTile = GetHoveredTile(rectangle, e.GetPosition(rectangle));
+                if (hoveredTile != null)
+                    cmd.Execute(new TileSelectionArgs(hoveredTile, isAdd, DragStage.End));
+            }
+        }
     }
 }

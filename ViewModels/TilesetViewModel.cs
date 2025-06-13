@@ -171,15 +171,14 @@ namespace TileBasedLevelEditor.ViewModels
 
         private void OnTileSelected(Vec2<int> vec)
         {
-            if (CurrentTileset == null)
+            if (CurrentTileset == null || TileGridVM.InitialSelectedTile == null)
                 return;
 
-            if (TileGridVM.SelectedTileIndex.X < 0 || TileGridVM.SelectedTileIndex.Y < 0 ||
-                TileGridVM.SelectedTileIndex.X >= NrTiles.X || TileGridVM.SelectedTileIndex.Y >= NrTiles.Y)
+            if (TileGridVM.InitialSelectedTile < 0 || TileGridVM.InitialSelectedTile >= NrTiles)
                 return;
 
-            TileSelectedService.SelectedTileImage = TileGridVM.TileImages[TileGridVM.SelectedTileIndex.X + TileGridVM.SelectedTileIndex.Y * NrTiles.X];
-            TileSelectedService.SelectedTile = new TileData(TileGridVM.SelectedTileIndex, CurrentTileset.Name);
+            TileSelectedService.SelectedTileImage = TileGridVM.TileImages[TileGridVM.InitialSelectedTile.X + TileGridVM.InitialSelectedTile.Y * NrTiles.X];
+            TileSelectedService.SelectedTile = new TileData(TileGridVM.InitialSelectedTile, CurrentTileset.Name);
         }
     }
 }
