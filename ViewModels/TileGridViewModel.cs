@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TileBasedLevelEditor.CustomArgs;
 using TileBasedLevelEditor.Misc;
@@ -147,7 +148,32 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        public ObservableCollection<SelectionArea> SelectionAreas { get; private set; } = [];
+        public List<SelectionArea> SelectionAreas { get; private set; } = [];
+        public Geometry SelectionGeometry
+        {
+            get
+            {
+                Geometry? combined = null;
+                Vec2<int> TileSizeMargin = TileSize + TileMargin;
+
+                foreach (SelectionArea area in SelectionAreas)
+                {
+                    RectangleGeometry rectGeom = new RectangleGeometry(area.RectArea);
+                    if(combined == null)
+                        combined = rectGeom;
+                    else
+                    {
+                        combined = Geometry.Combine(
+                            combined,
+                            rectGeom,
+                            GeometryCombineMode.Union,
+                            null);
+                    }
+                }
+
+                return combined ?? Geometry.Empty;
+            }
+        }
 
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
@@ -203,9 +229,7 @@ namespace TileBasedLevelEditor.ViewModels
                         SelectionAreas[SelectionAreas.Count - 1] = LastArea;
                     }
                 }
-
-                //InitialSelectedTile = args.Index;
-                //OnSelect?.Invoke(InitialSelectedTile);
+                OnPropertyChanged(nameof(SelectionGeometry));
             });
 
             if (tileImages != null)
