@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -177,25 +178,24 @@ namespace TileBasedLevelEditor.ViewModels
             if (TileGridVM.InitialSelectedTile < 0 || TileGridVM.InitialSelectedTile >= NrTiles)
                 return;
 
-            HashSet<TileData> SelectedTiles = [];
+            Debug.WriteLine("NEW /n /n /n");
+            HashSet<Vec2<int>> SelectedTiles = [];
+            List<Tuple<TileData, CroppedBitmap?>> SelectedTilesFull = [];
             foreach (SelectionArea selectionArea in TileGridVM.SelectionAreas)
             {
                 for (int i = selectionArea.StartTile.X; i <= selectionArea.EndTile.X; i++)
                 {
                     for (int j = selectionArea.StartTile.Y; j <= selectionArea.EndTile.Y; j++)
                     {
-                        SelectedTiles.Add(new TileData(new Vec2<int>(i, j), CurrentTileset.Name));
+                        if(SelectedTiles.Add(new Vec2<int>(i, j)))
+                        {
+                            CroppedBitmap? tileImage = TileGridVM.TileImages[SelectedTiles.Last().X + SelectedTiles.Last().Y * NrTiles.X];
+                            SelectedTilesFull.Add(new Tuple<TileData, CroppedBitmap?>(new TileData(SelectedTiles.Last(), CurrentTileset.Name), tileImage));
+                        }
+                        
                     }
                 }
             }
-
-            List<Tuple<TileData, CroppedBitmap?>>? SelectedTilesFull = [];
-            foreach (TileData tileData in SelectedTiles)
-            {
-                CroppedBitmap? tileImage = TileGridVM.TileImages[tileData.TilesetIndex.X + tileData.TilesetIndex.Y * NrTiles.X];
-                SelectedTilesFull.Add(new Tuple<TileData, CroppedBitmap?>(tileData, tileImage));
-            }
-
             TileSelectedService.SelectedTiles = SelectedTilesFull;
         }
     }

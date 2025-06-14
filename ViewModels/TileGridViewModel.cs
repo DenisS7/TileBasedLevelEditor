@@ -178,7 +178,7 @@ namespace TileBasedLevelEditor.ViewModels
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
 
-        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tileImages = null, Action<Vec2<int>>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
+        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tileImages = null, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
         {
             _tileSize = tileSize;
             _nrTiles = nrTiles;
@@ -189,12 +189,9 @@ namespace TileBasedLevelEditor.ViewModels
             HoverTileCommand = new RelayCommand(p => 
             {
                 if (p == null || p is not Vec2<int> Index)
-                {
                     HoveredTileIndex = null;
-                    return;
-                }
-
-                HoveredTileIndex = Index;
+                else
+                    HoveredTileIndex = Index;
                 OnHover?.Invoke(HoveredTileIndex);
             });
 

@@ -65,5 +65,18 @@ namespace TileBasedLevelEditor.Models
         {
             return b <= a;
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is not Vec2<T> other)
+                return false;
+
+            return X.Equals(other.X) && Y.Equals(other.Y);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(X, Y);
+        }
     }
 }
