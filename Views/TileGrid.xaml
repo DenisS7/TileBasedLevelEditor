@@ -23,9 +23,7 @@
                       Padding="1, 1, 0 , 0"
                       Name="TilesetBorder">
             <Grid>
-               
-                <Canvas 
-                        Width="{Binding ViewportWidth, ElementName=TilesetBorder}"
+                <Canvas Width="{Binding ViewportWidth, ElementName=TilesetBorder}"
                         Height="{Binding ViewportHeight, ElementName=TilesetBorder}">
                     <ItemsControl ItemsSource="{Binding TileImages}">
                         <ItemsControl.ItemsPanel>
@@ -81,8 +79,6 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     
-                    
-
                     <Rectangle Width="{Binding TileSize.X}"
                                Height="{Binding TileSize.Y}"
                                Visibility="{Binding IsTileHovered, Converter={StaticResource BoolToVis}}"
@@ -100,8 +96,8 @@
                 </Canvas>
 
                 <Rectangle Fill="Transparent"
-            misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
-         misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"/>
+                           misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
+                           misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"/>
             </Grid>
         </ScrollViewer>
     </Grid>
