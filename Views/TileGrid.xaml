@@ -18,87 +18,87 @@
 
     <Grid>
         <ScrollViewer Background="White"
+                      CanContentScroll="false"
                       VerticalScrollBarVisibility="Auto" 
                       HorizontalScrollBarVisibility="Auto" 
                       Padding="1, 1, 0 , 0"
-                      Name="TilesetBorder">
-            <Grid>
-                <Canvas Width="{Binding ViewportWidth, ElementName=TilesetBorder}"
-                        Height="{Binding ViewportHeight, ElementName=TilesetBorder}">
-                    <ItemsControl ItemsSource="{Binding TileImages}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="{Binding NrTiles.X}"
-                                             Rows="{Binding NrTiles.Y}"
-                                             Background="Transparent"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Image Source="{Binding}"
-                                           Margin="{Binding DataContext.ThicknessTileMargin, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                      Name="TilesetScrollViewer">
+            <Canvas Width="{Binding ViewportWidth, ElementName=TilesetScrollViewer}"
+                    Height="{Binding ViewportHeight, ElementName=TilesetScrollViewer}"
+                    misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
+                    misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
+                    misc:ZoomBehavior.IsEnabled="True"
+                    misc:ZoomBehavior.ZoomFactor="0.1"
+                    misc:ZoomBehavior.ScrollViewer="{Binding ElementName=TilesetScrollViewer}">
+                <ItemsControl ItemsSource="{Binding TileImages}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="{Binding NrTiles.X}"
+                                         Rows="{Binding NrTiles.Y}"
+                                         Background="Transparent"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Image Source="{Binding}"
+                                       Margin="{Binding DataContext.ThicknessTileMargin, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-                    <ItemsControl ItemsSource="{Binding GridLines}"
-                                  Visibility="{Binding GridLinesVisibility, Converter={StaticResource BoolToVis}}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <Canvas x:Name="OverlayCanvas"
-                                        Background="Transparent"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Top"
-                                        Width="{Binding GridSize.X}"
-                                        Height="{Binding GridSize.Y}"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                <ItemsControl ItemsSource="{Binding GridLines}"
+                              Visibility="{Binding GridLinesVisibility, Converter={StaticResource BoolToVis}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas x:Name="OverlayCanvas"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Width="{Binding GridSize.X}"
+                                    Height="{Binding GridSize.Y}"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Line X1="{Binding X1}"
-                                      Y1="{Binding Y1}"
-                                      X2="{Binding X2}"
-                                      Y2="{Binding Y2}"
-                                      Stroke="Black"
-                                      StrokeThickness="0.5">
-                                    <Line.Style>
-                                        <Style TargetType="Line">
-                                            <Setter Property="StrokeDashArray" Value="4, 4"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsEdge}" Value="True">
-                                                    <Setter Property="StrokeDashArray" Value="{x:Null}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Line.Style>
-                                </Line>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    
-                    <Rectangle Width="{Binding TileSize.X}"
-                               Height="{Binding TileSize.Y}"
-                               Visibility="{Binding IsTileHovered, Converter={StaticResource BoolToVis}}"
-                               Opacity="0.3"
-                               Fill="Aqua"
-                               IsHitTestVisible="False"
-                               Canvas.Left="{Binding HoveredTileLocation.X}"
-                               Canvas.Top="{Binding HoveredTileLocation.Y}"/>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Line X1="{Binding X1}"
+                                  Y1="{Binding Y1}"
+                                  X2="{Binding X2}"
+                                  Y2="{Binding Y2}"
+                                  Stroke="Black"
+                                  StrokeThickness="0.5">
+                                <Line.Style>
+                                    <Style TargetType="Line">
+                                        <Setter Property="StrokeDashArray" Value="4, 4"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEdge}" Value="True">
+                                                <Setter Property="StrokeDashArray" Value="{x:Null}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Line.Style>
+                            </Line>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-                    <Path Data="{Binding SelectionGeometry}"
-                          Fill="DodgerBlue"
-                          Opacity="0.5"
-                          IsHitTestVisible="False"
-                          Visibility="{Binding CanHighlightSelectedTile, Converter={StaticResource BoolToVis}}"/>
-                </Canvas>
+                <Rectangle Width="{Binding TileSize.X}"
+                           Height="{Binding TileSize.Y}"
+                           Visibility="{Binding IsTileHovered, Converter={StaticResource BoolToVis}}"
+                           Opacity="0.3"
+                           Fill="Aqua"
+                           IsHitTestVisible="False"
+                           Canvas.Left="{Binding HoveredTileLocation.X}"
+                           Canvas.Top="{Binding HoveredTileLocation.Y}"/>
 
-                <Rectangle Fill="Transparent"
-                           misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
-                           misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"/>
-            </Grid>
+                <Path Data="{Binding SelectionGeometry}"
+                      Fill="DodgerBlue"
+                      Opacity="0.5"
+                      IsHitTestVisible="False"
+                      Visibility="{Binding CanHighlightSelectedTile, Converter={StaticResource BoolToVis}}"/>
+            </Canvas>
         </ScrollViewer>
     </Grid>
 </UserControl>
