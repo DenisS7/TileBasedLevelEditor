@@ -21,8 +21,10 @@ using TileBasedLevelEditor.Views;
 
 namespace TileBasedLevelEditor.ViewModels
 {
-    class TilesetViewModel : ViewModelBase
+    public class TilesetViewModel : ViewModelBase
     {
+        private ICustomNavigationService _navigationService;
+        private List<Tileset> _tilesets = [];
         private Tileset? _currentTileset;
 
         public Tileset? CurrentTileset
@@ -51,6 +53,50 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
+        private string _newTilesetName = "";
+        public string NewTilesetName
+        {
+            get => _newTilesetName;
+            set
+            {
+                _newTilesetName = value;
+                OnPropertyChanged(nameof(NewTilesetName));
+            }
+        }
+
+        private string _newTilesetPath = "";
+        public string NewTilesetPath
+        {
+            get => _newTilesetPath;
+            set
+            {
+                _newTilesetPath = value;
+                OnPropertyChanged(nameof(NewTilesetPath));
+            }
+        }
+
+        private string _newTilesetTileWidth = "";
+        public string NewTilesetTileWidth
+        {
+            get => _newTilesetTileWidth;
+            set
+            {
+                _newTilesetTileWidth = value;
+                OnPropertyChanged(nameof(NewTilesetTileWidth));
+            }
+        }
+
+        private string _newTilesetTileHeight = "";
+        public string NewTilesetTileHeight
+        {
+            get => _newTilesetTileHeight;
+            set
+            {
+                _newTilesetTileHeight = value;
+                OnPropertyChanged(nameof(NewTilesetTileHeight));
+            }
+        }
+
         public Vec2<int> TileSize => CurrentTileset?.TileSize ?? new Vec2<int>(0);
 
         public Vec2<int> ImageSize => CurrentTileset?.ImageSize ?? new Vec2<int>(0);
@@ -70,26 +116,74 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        public ICommand LoadTilesetCommand { get; }
+        public event Action? RequestCloseNewTilesetDialog;
+        public ICommand CreateNewTilesetCommand { get; }
+        public ICommand AddNewTilesetCommand { get; }
+        public ICommand CancelNewTilesetCommand { get; }
+        public ICommand ChooseTilesetImageCommand { get; }
 
         public TileGridViewModel TileGridVM { get; }
 
-        public TilesetViewModel()
+        public TilesetViewModel(ICustomNavigationService navigationService)
         {
+            _navigationService = navigationService;
             _currentTileset = null;
-            LoadTilesetCommand = new RelayCommand(OnLoadTileset);
+            CreateNewTilesetCommand = new RelayCommand(OnCreateNewTileset);
+            AddNewTilesetCommand = new RelayCommand(OnAddNewTileset);
+            ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
+            CancelNewTilesetCommand = new RelayCommand(OnCancelNewTileset);
             TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), null, OnTileSelected);
         }
 
-        public TilesetViewModel(Tileset currentTileset)
+        public TilesetViewModel(Tileset currentTileset, ICustomNavigationService navigationService)
         {
+            _navigationService = navigationService;
             _currentTileset = currentTileset;
             GetTilesetImage();
+            CreateNewTilesetCommand = new RelayCommand(OnCreateNewTileset);
+            AddNewTilesetCommand = new RelayCommand(OnAddNewTileset);
+            ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
+            CancelNewTilesetCommand = new RelayCommand(OnCancelNewTileset);
             TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2));
-            LoadTilesetCommand = new RelayCommand(OnLoadTileset);
+            ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
         }
 
-        private void OnLoadTileset(object? parameter)
+        private void OnCreateNewTileset(object? parameter)
+        {
+            _navigationService.OpenNewTilesetDialog(this);
+        }
+
+        private void OnAddNewTileset(object? parameter)
+        {
+            if (NewTilesetName.Length < 3 || NewTilesetPath.Length == 0 ||
+                NewTilesetTileHeight.Length == 0 || NewTilesetTileWidth.Length == 0)
+                return;
+
+            try
+            {
+                Vec2<int> NewTilesetTileSize = new Vec2<int>(Int32.Parse(NewTilesetTileWidth), Int32.Parse(NewTilesetTileHeight));
+                CurrentTileset = new Tileset(NewTilesetName, NewTilesetTileSize, NewTilesetPath);
+                TileGridVM.TileSize = TileSize;
+                TileGridVM.NrTiles = NrTiles;
+                _tilesets.Add(CurrentTileset);
+                RequestCloseNewTilesetDialog?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error loading tileset:\n{ex.Message}",
+                    "Load Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void OnCancelNewTileset(object? parameter)
+        {
+            RequestCloseNewTilesetDialog?.Invoke();
+        }
+
+        private void OnChooseTilesetImage(object? parameter)
         {
             var dlg = new OpenFileDialog
             {
@@ -105,25 +199,27 @@ namespace TileBasedLevelEditor.ViewModels
             if (!File.Exists(path)) 
                 return;
 
-            string name = System.IO.Path.GetFileNameWithoutExtension(path);
-
-            //hardcoded size for now
-            Vec2<int> tileSize = new Vec2<int>(32, 32);
-
-            try
-            {
-                CurrentTileset = new Tileset(name, tileSize, path);
-                TileGridVM.TileSize = tileSize;
-                TileGridVM.NrTiles = NrTiles;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Error loading tileset:\n{ex.Message}",
-                    "Load Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
+            NewTilesetPath = path;
+            //NewTilesetPath = System.IO.Path.GetFileNameWithoutExtension(path);
+            //
+            ////hardcoded size for now
+            //Vec2<int> tileSize = new Vec2<int>(32, 32);
+            //
+            //try
+            //{
+            //    CurrentTileset = new Tileset(name, tileSize, path);
+            //    TileGridVM.TileSize = tileSize;
+            //    TileGridVM.NrTiles = NrTiles;
+            //    _tilesets.Add(CurrentTileset);
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(
+            //        $"Error loading tileset:\n{ex.Message}",
+            //        "Load Error",
+            //        MessageBoxButton.OK,
+            //        MessageBoxImage.Error);
+            //}
         }
 
         private void GetTilesetImage()

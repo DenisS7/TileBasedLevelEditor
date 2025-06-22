@@ -6,12 +6,9 @@
              xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
              xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
              xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
+             d:DataContext="{d:DesignInstance Type=vm:TilesetViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="500">
-
-    <UserControl.DataContext>
-        <vm:TilesetViewModel/>
-    </UserControl.DataContext>
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -28,7 +25,7 @@
 
             <Grid Grid.Row="0">
                 <Button Content="Load Tileset"
-                        Command="{Binding LoadTilesetCommand}"
+                        Command="{Binding CreateNewTilesetCommand}"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         FontSize="15"   

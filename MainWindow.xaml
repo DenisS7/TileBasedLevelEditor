@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TileBasedLevelEditor"
         xmlns:views="clr-namespace:TileBasedLevelEditor.Views"
+        xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
+        d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="1000">
     <Grid>
@@ -14,6 +16,7 @@
         </Grid.ColumnDefinitions>
 
         <views:TilemapEditorView Grid.Column="0"/>
-        <views:TilesetView Grid.Column="1"/>
+        <views:TilesetView Grid.Column="1"
+                           DataContext="{Binding TilesetViewModel}"/>
     </Grid>
 </Window>

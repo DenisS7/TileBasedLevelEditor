@@ -1,6 +1,10 @@
 ﻿using System.Configuration;
 using System.Data;
 using System.Windows;
+using System.Windows.Navigation;
+using TileBasedLevelEditor.Services;
+using TileBasedLevelEditor.ViewModels;
+using TileBasedLevelEditor.Views;
 
 namespace TileBasedLevelEditor
 {
@@ -9,6 +13,16 @@ namespace TileBasedLevelEditor
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            CustomNavigationService navigationService = new CustomNavigationService();
+            MainWindow = new MainWindow()
+            {
+                DataContext = new MainWindowViewModel(navigationService)
+            };
+            MainWindow.Show();
+            base.OnStartup(e);
+        }
     }
 
 }

@@ -12,7 +12,7 @@ using TileBasedLevelEditor.Models;
 
 namespace TileBasedLevelEditor.ViewModels
 {
-    class TileGridViewModel : ViewModelBase
+    public class TileGridViewModel : ViewModelBase
     {
         private Vec2<int> _tileSize;
         public Vec2<int> TileSize
