@@ -29,7 +29,8 @@
                     misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
                     misc:ZoomBehavior.IsEnabled="True"
                     misc:ZoomBehavior.ZoomFactor="0.1"
-                    misc:ZoomBehavior.ScrollViewer="{Binding ElementName=TilesetScrollViewer}">
+                    misc:ZoomBehavior.ScrollViewer="{Binding ElementName=TilesetScrollViewer}"
+                    misc:DragBehavior.Drag="True">
                 <ItemsControl ItemsSource="{Binding TileImages}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
