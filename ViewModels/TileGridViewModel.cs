@@ -175,6 +175,64 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
+        private double _scrollViewerZoom = 1.0;
+        public double ScrollViewerZoom
+        {
+            get => _scrollViewerZoom;
+            set
+            {
+                double oldZoom = _scrollViewerZoom;
+                _scrollViewerZoom = value;
+                //ScrollViewerWidth *= _scrollViewerZoom / oldZoom;
+                //ScrollViewerHeight *= _scrollViewerZoom / oldZoom;
+                OnPropertyChanged(nameof(ScrollViewerZoom));
+                OnPropertyChanged(nameof(ScaledViewportWidth));
+                OnPropertyChanged(nameof(ScaledViewportHeight));
+            }
+        }
+
+        private double _scrollViewerWidth;
+        public double ScrollViewerWidth
+        {
+            get => _scrollViewerWidth;
+            set
+            {
+                _scrollViewerWidth = value;
+                OnPropertyChanged(nameof(ScrollViewerWidth));
+                OnPropertyChanged(nameof(ScaledViewportWidth));
+            }
+        }
+
+        private double _scrollViewerHeight;
+        public double ScrollViewerHeight
+        {
+            get => _scrollViewerHeight;
+            set
+            {
+                _scrollViewerHeight = value;
+                OnPropertyChanged(nameof(ScrollViewerHeight));
+                OnPropertyChanged(nameof(ScaledViewportHeight));
+            }
+        }
+
+        private Size _canvasSize;
+        public Size CanvasSize
+        {
+            get => _canvasSize;
+            set
+            {
+                _canvasSize = value;
+                OnPropertyChanged(nameof(CanvasSize));
+                OnPropertyChanged(nameof(ScaledViewportWidth));
+                OnPropertyChanged(nameof(ScaledViewportHeight));
+            }
+        }
+
+        public double ScaledViewportWidth => (TileSize.X + TileMargin.X) * NrTiles.X * ScrollViewerZoom + 2.0 * TileMargin.X;
+        public double ScaledViewportHeight => (TileSize.Y + TileMargin.Y) * NrTiles.Y * ScrollViewerZoom + 2.0 * TileMargin.Y;
+
+        public Vec2<double> DragLimits => new Vec2<double>(Math.Max(0.0, ScrollViewerWidth - ScaledViewportWidth), Math.Max(0.0, ScrollViewerHeight - ScaledViewportHeight));
+
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
 

@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using TileBasedLevelEditor.ViewModels;
 
 namespace TileBasedLevelEditor.Misc
 {
@@ -38,6 +40,14 @@ namespace TileBasedLevelEditor.Misc
           DependencyProperty.RegisterAttached("Drag",
           typeof(bool), typeof(DragBehavior),
           new PropertyMetadata(false, OnDragChanged));
+
+        // Optional
+        public static readonly DependencyProperty DragScrollViewerProperty = DependencyProperty.RegisterAttached(
+          "DragScrollViewer", typeof(ScrollViewer), typeof(DragBehavior), new PropertyMetadata(default(ScrollViewer)));
+
+        public static void SetDragScrollViewer(DependencyObject attachingElement, ScrollViewer value) => attachingElement.SetValue(DragScrollViewerProperty, value);
+
+        public static ScrollViewer GetDragScrollViewer(DependencyObject attachingElement) => (ScrollViewer)attachingElement.GetValue(DragScrollViewerProperty);
 
         private static void OnDragChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -87,7 +97,17 @@ namespace TileBasedLevelEditor.Misc
             var diff = (mousePos - _mouseStartPosition2);
             Transform.X = _elementStartPosition2.X + diff.X;
             Transform.Y = _elementStartPosition2.Y + diff.Y;
-            Debug.WriteLine("Transform: {0}, {1}", Transform.X, Transform.Y);
+
+            if (sender is FrameworkElement f && GetDragScrollViewer(f) is ScrollViewer scrollViewer && f.DataContext is TileGridViewModel vm)
+            {
+                ;
+                //Transform.X = Math.Clamp(Transform.X, -vm.DragLimits.X, vm.DragLimits.X);
+                //Transform.Y = Math.Clamp(Transform.Y, -vm.DragLimits.Y, vm.DragLimits.Y);
+                //Debug.WriteLine("Transform: {0}, {1}", Transform.X, Transform.Y);
+                //Debug.WriteLine("Scroll Viewer: {0}, {1}, {2}", vm.ScrollViewerWidth, vm.ScrollViewerHeight, vm.ScrollViewerZoom);
+                //Debug.WriteLine("Scaled Size: {0}, {1}", vm.ScaledViewportWidth, vm.ScaledViewportHeight);
+               // Debug.WriteLine("Limits: {0}, {1}", scrollViewer.ViewportWidth * (1.0 - vm.ScrollViewerZoom), scrollViewer.ViewportHeight * (1.0 - vm.ScrollViewerZoom));
+            }
         }
     }
 }

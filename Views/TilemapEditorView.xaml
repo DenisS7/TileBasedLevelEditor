@@ -13,6 +13,5 @@
     </UserControl.DataContext>
 
     <Grid>
-        <local:TileGrid DataContext="{Binding TileGridVM}"/>
     </Grid>
 </UserControl>
