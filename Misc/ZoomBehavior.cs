@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace TileBasedLevelEditor.Misc
 {
-    //from https://stackoverflow.com/questions/62714559/wpf-canvas-zoom-and-children-position/62715838#62715838
+    //modified from https://stackoverflow.com/questions/62714559/wpf-canvas-zoom-and-children-position/62715838#62715838
     public class ZoomBehavior
     {
         // Required
@@ -32,50 +32,78 @@ namespace TileBasedLevelEditor.Misc
         public static double GetZoomFactor(DependencyObject attachingElement) => (double)attachingElement.GetValue(ZoomFactorProperty);
 
         // Optional
-        public static readonly DependencyProperty ScrollViewerProperty = DependencyProperty.RegisterAttached(
-          "ScrollViewer", typeof(ScrollViewer), typeof(ZoomBehavior), new PropertyMetadata(default(ScrollViewer)));
+        public static readonly DependencyProperty ChildElementProperty = DependencyProperty.RegisterAttached(
+          "ChildElement", typeof(FrameworkElement), typeof(ZoomBehavior), new PropertyMetadata(null, OnChildElementChanged));
 
-        public static void SetScrollViewer(DependencyObject attachingElement, ScrollViewer value) => attachingElement.SetValue(ScrollViewerProperty, value);
+        public static void SetChildElement(DependencyObject attachingElement, FrameworkElement value)
+        {
+            attachingElement.SetValue(ChildElementProperty, value);
+        }
 
-        public static ScrollViewer GetScrollViewer(DependencyObject attachingElement) => (ScrollViewer)attachingElement.GetValue(ScrollViewerProperty);
+        public static FrameworkElement GetChildElement(DependencyObject attachingElement) => (FrameworkElement)attachingElement.GetValue(ChildElementProperty);
         private static void OnIsEnabledChanged(DependencyObject attachingElement, DependencyPropertyChangedEventArgs e)
         {
-            if (!(attachingElement is FrameworkElement frameworkElement))
+            if (attachingElement is not ScrollViewer scrollViewer)
             {
-                throw new ArgumentException("Attaching element must be of type FrameworkElement");
+                throw new ArgumentException("Attaching element must be of type Scroll Viewer");
             }
 
             bool isEnabled = (bool)e.NewValue;
+            FrameworkElement childElement = GetChildElement(scrollViewer);
+            if (childElement == null || TryGetScaleTransform(childElement, out _))
+                return;
+            
             if (isEnabled)
             {
-                frameworkElement.PreviewMouseWheel += Zoom_OnMouseWheel;
-                if (TryGetScaleTransform(frameworkElement, out _))
-                {
-                    return;
-                }
+                scrollViewer.PreviewMouseWheel += Zoom_OnMouseWheel;
 
-                if (frameworkElement.LayoutTransform is TransformGroup transformGroup)
+                if (childElement.LayoutTransform is TransformGroup transformGroup)
                 {
                     transformGroup.Children.Add(new ScaleTransform());
                 }
                 else
                 {
-                    frameworkElement.LayoutTransform = new ScaleTransform();
+                    childElement.LayoutTransform = new ScaleTransform();
                 }
             }
             else
             {
-                frameworkElement.PreviewMouseWheel -= Zoom_OnMouseWheel;
+                scrollViewer.PreviewMouseWheel -= Zoom_OnMouseWheel;
+            }
+        }
+
+        private static void OnChildElementChanged(DependencyObject attachingObject, DependencyPropertyChangedEventArgs e)
+        {
+            if (attachingObject is not ScrollViewer scrollViewer)
+            {
+                throw new ArgumentException("Attaching element must be of type Scroll Viewer");
+            }
+
+            if (GetIsEnabled(scrollViewer) && e.NewValue is FrameworkElement f)
+            {
+                scrollViewer.PreviewMouseWheel += Zoom_OnMouseWheel;
+
+                if (f.LayoutTransform is TransformGroup transformGroup)
+                {
+                    transformGroup.Children.Add(new ScaleTransform());
+                }
+                else
+                {
+                    f.LayoutTransform = new ScaleTransform();
+                }
+            }
+            else
+            {
+                scrollViewer.PreviewMouseWheel -= Zoom_OnMouseWheel;
             }
         }
 
         private static void Zoom_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var zoomTargetElement = sender as FrameworkElement;
-
-            if (zoomTargetElement == null)
+            if (sender is not ScrollViewer scrollViewer)
                 return;
 
+            FrameworkElement zoomTargetElement = GetChildElement(scrollViewer);
             Point mouseCanvasPosition = e.GetPosition(zoomTargetElement);
             double scaleFactor = e.Delta > 0
               ? GetZoomFactor(zoomTargetElement)
@@ -83,7 +111,7 @@ namespace TileBasedLevelEditor.Misc
 
             ApplyZoomToAttachedElement(mouseCanvasPosition, scaleFactor, zoomTargetElement);
 
-            AdjustScrollViewer(mouseCanvasPosition, scaleFactor, zoomTargetElement);
+            AdjustScrollViewer(scrollViewer, mouseCanvasPosition, scaleFactor, zoomTargetElement);
         }
 
         private static void ApplyZoomToAttachedElement(Point mouseCanvasPosition, double scaleFactor, FrameworkElement zoomTargetElement)
@@ -105,14 +133,8 @@ namespace TileBasedLevelEditor.Misc
             scaleTransform.ScaleY = Math.Max(0.1, scaleTransform.ScaleY + scaleFactor);
         }
 
-        private static void AdjustScrollViewer(Point mouseCanvasPosition, double scaleFactor, FrameworkElement zoomTargetElement)
+        private static void AdjustScrollViewer(ScrollViewer scrollViewer, Point mouseCanvasPosition, double scaleFactor, FrameworkElement zoomTargetElement)
         {
-            ScrollViewer scrollViewer = GetScrollViewer(zoomTargetElement);
-            if (scrollViewer == null)
-            {
-                return;
-            }
-
             scrollViewer.ScrollToHorizontalOffset(scrollViewer.HorizontalOffset + mouseCanvasPosition.X * scaleFactor);
             scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + mouseCanvasPosition.Y * scaleFactor);
 
@@ -121,8 +143,6 @@ namespace TileBasedLevelEditor.Misc
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
                 vm.ScrollViewerZoom = scaleTransform.ScaleX;
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
-                Debug.WriteLine("Original: {0}, {1}", vm.CanvasSize.Width, vm.CanvasSize.Height);
-                Debug.WriteLine("Scaled: {0}, {1}", vm.ScaledViewportWidth, vm.ScaledViewportHeight);
             }
         }
 

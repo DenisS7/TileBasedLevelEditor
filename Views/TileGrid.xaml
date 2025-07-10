@@ -21,6 +21,10 @@
                       CanContentScroll="false"
                       VerticalScrollBarVisibility="Auto" 
                       HorizontalScrollBarVisibility="Auto" 
+                      misc:ZoomBehavior.IsEnabled="True"
+                      misc:ZoomBehavior.ZoomFactor="0.1"
+                      misc:ZoomBehavior.ChildElement="{Binding ElementName=TileCanvas}"
+                      misc:DragBehavior.IsEnabled="True"
                       Padding="0, 0, 0, 0"
                       Name="TilesetScrollViewer">
             <Grid Width="{Binding ScaledViewportWidth, Mode=OneWay}"
@@ -28,18 +32,9 @@
                   VerticalAlignment="Top"
                   HorizontalAlignment="Left"
                   Background="Blue">
-                <Canvas
-                    Width="Auto"
-                    Height="Auto"
+                <Canvas Name="TileCanvas"
                     misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
                     misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
-                    misc:ZoomBehavior.IsEnabled="True"
-                    misc:ZoomBehavior.ZoomFactor="0.1"
-                    misc:ZoomBehavior.ScrollViewer="{Binding ElementName=TilesetScrollViewer}"
-                    misc:DragBehavior.Drag="True"
-                    misc:DragBehavior.DragScrollViewer="{Binding ElementName=TilesetScrollViewer}"
-                    misc:SizeChangedBehavior.IsObserved="True"
-                    misc:SizeChangedBehavior.ObservedSize="{Binding CanvasSize, Mode=OneWayToSource}"
                     Background="Red">
                     <ItemsControl ItemsSource="{Binding TileImages}">
                         <ItemsControl.ItemsPanel>
