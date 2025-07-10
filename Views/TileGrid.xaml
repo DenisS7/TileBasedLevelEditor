@@ -29,9 +29,21 @@
                       Name="TilesetScrollViewer">
             <Grid Width="{Binding ScaledViewportWidth, Mode=OneWay}"
                   Height="{Binding ScaledViewportHeight, Mode=OneWay}"
-                  VerticalAlignment="Top"
-                  HorizontalAlignment="Left"
                   Background="Blue">
+                
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="VerticalAlignment"   Value="Top"  />
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShouldBeCentered}" Value="True">
+                                <Setter Property="VerticalAlignment"   Value="Center" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                
                 <Canvas Name="TileCanvas"
                     misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
                     misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"

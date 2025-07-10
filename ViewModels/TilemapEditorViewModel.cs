@@ -38,13 +38,13 @@ namespace TileBasedLevelEditor.ViewModels
         public TilemapEditorViewModel()
         {
             _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(32, 32), new Vec2<int>(10, 15));
-            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, false);
+            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, true, false);
         }
 
         public TilemapEditorViewModel(Tilemap currentTilemap)
         {
             _currentTilemap = currentTilemap;
-            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, false);
+            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, true, false);
         }
 
         private void OnTileHovered(Vec2<int>? vec)

@@ -175,6 +175,17 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
+        private bool _shouldBeCentered;
+        public bool ShouldBeCentered
+        {
+            get => _shouldBeCentered;
+            set
+            {
+                _shouldBeCentered = value;
+                OnPropertyChanged(nameof(ShouldBeCentered));
+            }
+        }
+
         private double _scrollViewerZoom = 1.0;
         public double ScrollViewerZoom
         {
@@ -197,11 +208,12 @@ namespace TileBasedLevelEditor.ViewModels
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
 
-        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tileImages = null, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
+        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tileImages = null, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
         {
             _tileSize = tileSize;
             _nrTiles = nrTiles;
             _tileMargin = tileMargin;
+            _shouldBeCentered = shouldBeCentered;
             _gridLinesVisibility = gridLinesVisibility;
             _canHighlightSelectedTile = canHighlightSelectedTile;
 
