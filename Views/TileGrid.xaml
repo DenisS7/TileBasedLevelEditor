@@ -27,6 +27,7 @@
                       misc:DragBehavior.IsEnabled="True"
                       misc:SizeChangedBehavior.IsObserved="True"
                       misc:SizeChangedBehavior.ObservedSize="{Binding ScrollViewerSize, Mode=OneWayToSource}"
+                      misc:ScrollToCenterBehavior.ScrollToCenter="{Binding ShouldBeCentered}"
                       Padding="0, 0, 0, 0"
                       Name="TilesetScrollViewer">
 
