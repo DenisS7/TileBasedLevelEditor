@@ -25,29 +25,37 @@
                       misc:ZoomBehavior.ZoomFactor="0.1"
                       misc:ZoomBehavior.ChildElement="{Binding ElementName=TileCanvas}"
                       misc:DragBehavior.IsEnabled="True"
+                      misc:SizeChangedBehavior.IsObserved="True"
+                      misc:SizeChangedBehavior.ObservedSize="{Binding ScrollViewerSize, Mode=OneWayToSource}"
                       Padding="0, 0, 0, 0"
                       Name="TilesetScrollViewer">
-            <Grid Width="{Binding ScaledViewportWidth, Mode=OneWay}"
-                  Height="{Binding ScaledViewportHeight, Mode=OneWay}"
+
+            <Grid Width="{Binding ScaledViewportWidth}"
+                  Height="{Binding ScaledViewportHeight}"
+                  VerticalAlignment="Top"
+                  HorizontalAlignment="Left"
                   Background="Blue">
                 
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="VerticalAlignment"   Value="Top"  />
-                        <Setter Property="HorizontalAlignment" Value="Left" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShouldBeCentered}" Value="True">
-                                <Setter Property="VerticalAlignment"   Value="Center" />
-                                <Setter Property="HorizontalAlignment" Value="Center" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                
                 <Canvas Name="TileCanvas"
+                    Width="{Binding CanvasWidth}"
+                    Height="{Binding CanvasHeight}"
                     misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
                     misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
                     Background="Red">
+                    
+                    <Canvas.Style>
+                        <Style TargetType="Canvas">
+                            <Setter Property="VerticalAlignment"   Value="Top"  />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShouldBeCentered}" Value="True">
+                                    <Setter Property="VerticalAlignment"   Value="Center" />
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Canvas.Style>
+                    
                     <ItemsControl ItemsSource="{Binding TileImages}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>

@@ -186,6 +186,23 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
+        private Size _scrollViewerSize;
+        public Size ScrollViewerSize
+        {
+            get => _scrollViewerSize;  
+            set
+            {
+                _scrollViewerSize = value;
+                OnPropertyChanged(nameof(ScrollViewerSize));
+                OnPropertyChanged(nameof(CanvasWidth));
+                OnPropertyChanged(nameof(CanvasHeight));
+                OnPropertyChanged(nameof(ScaledViewportWidth));
+                OnPropertyChanged(nameof(ScaledViewportHeight));
+            }
+        }
+
+        private double _scrollAreaMultiplier = 2.0;
+
         private double _scrollViewerZoom = 1.0;
         public double ScrollViewerZoom
         {
@@ -194,16 +211,21 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 double oldZoom = _scrollViewerZoom;
                 _scrollViewerZoom = value;
-                //ScrollViewerWidth *= _scrollViewerZoom / oldZoom;
-                //ScrollViewerHeight *= _scrollViewerZoom / oldZoom;
                 OnPropertyChanged(nameof(ScrollViewerZoom));
+                OnPropertyChanged(nameof(CanvasWidth));
+                OnPropertyChanged(nameof(CanvasHeight));
                 OnPropertyChanged(nameof(ScaledViewportWidth));
                 OnPropertyChanged(nameof(ScaledViewportHeight));
             }
         }
 
-        public double ScaledViewportWidth => (TileSize.X + TileMargin.X) * NrTiles.X * ScrollViewerZoom + 2.0 * TileMargin.X;
-        public double ScaledViewportHeight => (TileSize.Y + TileMargin.Y) * NrTiles.Y * ScrollViewerZoom + 2.0 * TileMargin.Y;
+        public double CanvasWidth => TileSize.X * NrTiles.X + TileMargin.X * (NrTiles.X + 1);
+        public double CanvasHeight => TileSize.Y * NrTiles.Y + TileMargin.Y * (NrTiles.Y + 1);
+        public double ScaledViewportWidth => CanvasWidth * ScrollViewerZoom + Convert.ToDouble(ShouldBeCentered) * ScrollViewerSize.Width * _scrollAreaMultiplier * 0.9;
+        public double ScaledViewportHeight => CanvasHeight * ScrollViewerZoom + Convert.ToDouble(ShouldBeCentered) * ScrollViewerSize.Height * _scrollAreaMultiplier * 0.9;
+
+        //public double ScaledViewportWidth => (TileSize.X + TileMargin.X) * NrTiles.X * ScrollViewerZoom + 2.0 * TileMargin.X;
+        //public double ScaledViewportHeight => (TileSize.Y + TileMargin.Y) * NrTiles.Y * ScrollViewerZoom + 2.0 * TileMargin.Y;
 
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
