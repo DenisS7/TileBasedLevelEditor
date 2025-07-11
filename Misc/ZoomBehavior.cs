@@ -100,7 +100,7 @@ namespace TileBasedLevelEditor.Misc
 
         private static void Zoom_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (sender is not ScrollViewer scrollViewer)
+            if (sender is not ScrollViewer scrollViewer || (Keyboard.Modifiers & ModifierKeys.Control) != ModifierKeys.Control)
                 return;
 
             FrameworkElement zoomTargetElement = GetChildElement(scrollViewer);
@@ -112,6 +112,8 @@ namespace TileBasedLevelEditor.Misc
             ApplyZoomToAttachedElement(mouseCanvasPosition, scaleFactor, zoomTargetElement);
 
             AdjustScrollViewer(scrollViewer, mouseCanvasPosition, scaleFactor, zoomTargetElement);
+
+            e.Handled = true;
         }
 
         private static void ApplyZoomToAttachedElement(Point mouseCanvasPosition, double scaleFactor, FrameworkElement zoomTargetElement)
