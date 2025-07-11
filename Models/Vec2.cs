@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace TileBasedLevelEditor.Models
 {
@@ -12,6 +13,7 @@ namespace TileBasedLevelEditor.Models
         public T X { get; set; }
         public T Y { get; set; }
 
+        [JsonConstructor]
         public Vec2(T x, T y)
         {
             X = x;

@@ -16,9 +16,10 @@ namespace TileBasedLevelEditor
         protected override void OnStartup(StartupEventArgs e)
         {
             CustomNavigationService navigationService = new CustomNavigationService();
+            TilesetsService tilesetsService = new TilesetsService();
             MainWindow = new MainWindow()
             {
-                DataContext = new MainWindowViewModel(navigationService)
+                DataContext = new MainWindowViewModel(navigationService, tilesetsService)
             };
             MainWindow.Show();
             base.OnStartup(e);

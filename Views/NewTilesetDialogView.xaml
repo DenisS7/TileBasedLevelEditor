@@ -176,7 +176,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="1"
-                            Content="Add"
+                            Content="Save as"
                             FontSize="15"
                             Background="DarkGray"
                             BorderBrush="Gray"

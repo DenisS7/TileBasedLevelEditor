@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -11,23 +12,32 @@ namespace TileBasedLevelEditor.Models
 {
     public class Tileset
     {
-        public string Name { get; }
+        public string Name { get; private set;}
 
-        public Vec2<int> TileSize { get; }
+        public string FilePath { get; private set;}
 
-        public Vec2<int> NrTiles { get; }
+        public Vec2<int> TileSize { get; private set;}
 
-        public Vec2<int> ImageSize { get; }
+        public Vec2<int> NrTiles { get; private set;}
 
-        public byte[] ImageData { get; private set; }
+        public Vec2<int> ImageSize { get; private set;}
 
+        [JsonConstructor]
+        public Tileset(string name, string filePath,  Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> imageSize)
+        {
+            Name = name;
+            TileSize = tileSize;
+            NrTiles = nrTiles;
+            ImageSize = imageSize;
+            FilePath = filePath;
+        }
 
         public Tileset(string name, int tileHeight, int tileWidth, string path)
         {
             Name = name;
             TileSize = new Vec2<int>(tileHeight, tileWidth);
             ImageSize = new Vec2<int>(0);
-            ImageData = [];
+            FilePath = path; 
             GetImageData(path);
             NrTiles = ImageSize / TileSize;
         }
@@ -37,14 +47,14 @@ namespace TileBasedLevelEditor.Models
             Name = name;
             TileSize = tileSize;
             ImageSize = new Vec2<int>(0);
-            ImageData = [];
+            FilePath = path;
             GetImageData(path);
             NrTiles = ImageSize / TileSize;
         }
 
         private void GetImageData(string path)
         {
-            ImageData = File.ReadAllBytes(path);
+            byte[] ImageData = File.ReadAllBytes(path);
 
             if (ImageData.Length == 0)
                 return;

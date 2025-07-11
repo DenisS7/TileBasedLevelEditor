@@ -38,11 +38,11 @@
                   Background="Blue">
                 
                 <Canvas Name="TileCanvas"
-                    Width="{Binding CanvasWidth}"
-                    Height="{Binding CanvasHeight}"
-                    misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
-                    misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
-                    Background="Red">
+                        Width="{Binding CanvasWidth}"
+                        Height="{Binding CanvasHeight}"
+                        misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
+                        misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
+                        Background="Red">
                     
                     <Canvas.Style>
                         <Style TargetType="Canvas">

@@ -16,6 +16,7 @@ using Microsoft.Win32;
 using NotesApp.Commands;
 using NotesApp.ViewModel;
 using TileBasedLevelEditor.Models;
+using TileBasedLevelEditor.Serialization;
 using TileBasedLevelEditor.Services;
 using TileBasedLevelEditor.Views;
 
@@ -24,7 +25,7 @@ namespace TileBasedLevelEditor.ViewModels
     public class TilesetViewModel : ViewModelBase
     {
         private ICustomNavigationService _navigationService;
-        private List<Tileset> _tilesets = [];
+        private TilesetsService _tilesetsService;
         private Tileset? _currentTileset;
 
         public Tileset? CurrentTileset
@@ -32,28 +33,27 @@ namespace TileBasedLevelEditor.ViewModels
             get => _currentTileset;
             private set
             {
-                if (_currentTileset == value) return;
+                if (_currentTileset == value) 
+                    return;
+
                 _currentTileset = value;
                 OnPropertyChanged(nameof(CurrentTileset));
 
                 if (_currentTileset != null)
                 {
-                    GetTilesetImage();
-                    OnPropertyChanged(nameof(ImageSize));
-                    OnPropertyChanged(nameof(TileSize));
-                    OnPropertyChanged(nameof(NrTiles));
+                    TileGridVM.TileImages = new ObservableCollection<CroppedBitmap?>(GetTilesetTiles());
                 }
                 else
                 {
                     TilesetImage = null;
-                    OnPropertyChanged(nameof(ImageSize));
-                    OnPropertyChanged(nameof(TileSize));
-                    OnPropertyChanged(nameof(NrTiles));
                 }
+                OnPropertyChanged(nameof(ImageSize));
+                OnPropertyChanged(nameof(TileSize));
+                OnPropertyChanged(nameof(NrTiles));
             }
         }
 
-        private string _newTilesetName = "";
+        private string _newTilesetName = "Test";
         public string NewTilesetName
         {
             get => _newTilesetName;
@@ -64,7 +64,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private string _newTilesetPath = "";
+        private string _newTilesetPath = "D:\\GitHub\\TileBasedLevelEditor\\Resources\\Tileset.png";
         public string NewTilesetPath
         {
             get => _newTilesetPath;
@@ -75,7 +75,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private string _newTilesetTileWidth = "";
+        private string _newTilesetTileWidth = "32";
         public string NewTilesetTileWidth
         {
             get => _newTilesetTileWidth;
@@ -86,7 +86,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private string _newTilesetTileHeight = "";
+        private string _newTilesetTileHeight = "32";
         public string NewTilesetTileHeight
         {
             get => _newTilesetTileHeight;
@@ -110,7 +110,9 @@ namespace TileBasedLevelEditor.ViewModels
             get => _tilesetImage;
             private set
             {
-                if (_tilesetImage == value) return;
+                if (_tilesetImage == value) 
+                    return;
+
                 _tilesetImage = value;
                 OnPropertyChanged(nameof(TilesetImage));
             }
@@ -124,28 +126,23 @@ namespace TileBasedLevelEditor.ViewModels
 
         public TileGridViewModel TileGridVM { get; }
 
-        public TilesetViewModel(ICustomNavigationService navigationService)
+        public TilesetViewModel(ICustomNavigationService navigationService, TilesetsService tilesetsService)
         {
             _navigationService = navigationService;
-            _currentTileset = null;
+            _tilesetsService = tilesetsService;
+            if (_tilesetsService.Tilesets != null && _tilesetsService.Tilesets.Count > 0)
+            {                
+                _currentTileset = _tilesetsService.Tilesets[0];
+            }
+            else
+            {
+                _currentTileset = null;
+            }
+            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), GetTilesetTiles(), OnTileSelected);
             CreateNewTilesetCommand = new RelayCommand(OnCreateNewTileset);
             AddNewTilesetCommand = new RelayCommand(OnAddNewTileset);
             ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
             CancelNewTilesetCommand = new RelayCommand(OnCancelNewTileset);
-            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), null, OnTileSelected);
-        }
-
-        public TilesetViewModel(Tileset currentTileset, ICustomNavigationService navigationService)
-        {
-            _navigationService = navigationService;
-            _currentTileset = currentTileset;
-            GetTilesetImage();
-            CreateNewTilesetCommand = new RelayCommand(OnCreateNewTileset);
-            AddNewTilesetCommand = new RelayCommand(OnAddNewTileset);
-            ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
-            CancelNewTilesetCommand = new RelayCommand(OnCancelNewTileset);
-            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2));
-            ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
         }
 
         private void OnCreateNewTileset(object? parameter)
@@ -162,11 +159,14 @@ namespace TileBasedLevelEditor.ViewModels
             try
             {
                 Vec2<int> NewTilesetTileSize = new Vec2<int>(Int32.Parse(NewTilesetTileWidth), Int32.Parse(NewTilesetTileHeight));
-                CurrentTileset = new Tileset(NewTilesetName, NewTilesetTileSize, NewTilesetPath);
-                TileGridVM.TileSize = TileSize;
-                TileGridVM.NrTiles = NrTiles;
-                _tilesets.Add(CurrentTileset);
-                RequestCloseNewTilesetDialog?.Invoke();
+                Tileset newTileset = new Tileset(NewTilesetName, NewTilesetTileSize, NewTilesetPath);
+                if (Serializer.SaveTileset(newTileset))
+                {    
+                    CurrentTileset = newTileset;
+                    TileGridVM.TileSize = TileSize;
+                    TileGridVM.NrTiles = NrTiles;
+                    _tilesetsService.AddTileset(CurrentTileset);
+                }
             }
             catch (Exception ex)
             {
@@ -176,6 +176,7 @@ namespace TileBasedLevelEditor.ViewModels
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+            RequestCloseNewTilesetDialog?.Invoke();
         }
 
         private void OnCancelNewTileset(object? parameter)
@@ -222,19 +223,26 @@ namespace TileBasedLevelEditor.ViewModels
             //}
         }
 
-        private void GetTilesetImage()
+        private List<CroppedBitmap?> GetTilesetTiles()
         {
-            if (CurrentTileset?.ImageData == null)
+            List<CroppedBitmap?> TileImages= [];
+            if(CurrentTileset == null)
             {
                 TilesetImage = null;
-                return;
+                return TileImages;
             }
 
-            TileGridVM.TileImages.Clear();
+            byte[] ImageData = File.ReadAllBytes(CurrentTileset.FilePath);
+            if (ImageData.Length == 0)
+            {
+                TilesetImage = null;
+                return TileImages;
+            }
+
             try
             {
                 var bmp = new BitmapImage();
-                using (var ms = new MemoryStream(CurrentTileset.ImageData))
+                using (var ms = new MemoryStream(ImageData))
                 {
                     bmp.BeginInit();
                     bmp.CacheOption = BitmapCacheOption.OnLoad;
@@ -256,7 +264,7 @@ namespace TileBasedLevelEditor.ViewModels
                             TileSize.Y
                         );
                         var tileBmp = new CroppedBitmap(bmp, rect);
-                        TileGridVM.TileImages.Add(tileBmp);
+                        TileImages.Add(tileBmp);
                     }
                 }
             }
@@ -264,6 +272,8 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 TilesetImage = null;
             }
+
+            return TileImages;
         }
 
         private void OnTileSelected(Vec2<int>? vec)
@@ -274,7 +284,6 @@ namespace TileBasedLevelEditor.ViewModels
             if (TileGridVM.InitialSelectedTile < 0 || TileGridVM.InitialSelectedTile >= NrTiles)
                 return;
 
-            Debug.WriteLine("NEW /n /n /n");
             HashSet<Vec2<int>> SelectedTiles = [];
             List<Tuple<TileData, CroppedBitmap?>> SelectedTilesFull = [];
             foreach (SelectionArea selectionArea in TileGridVM.SelectionAreas)

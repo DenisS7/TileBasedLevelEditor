@@ -22,6 +22,10 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 _tileSize = value;
                 OnPropertyChanged(nameof(TileSize));
+                OnPropertyChanged(nameof(CanvasWidth));
+                OnPropertyChanged(nameof(CanvasHeight));
+                OnPropertyChanged(nameof(ScaledViewportWidth));
+                OnPropertyChanged(nameof(ScaledViewportHeight));
             }
         }
 
@@ -34,6 +38,10 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 _nrTiles = value;
                 OnPropertyChanged(nameof(NrTiles));
+                OnPropertyChanged(nameof(CanvasWidth));
+                OnPropertyChanged(nameof(CanvasHeight));
+                OnPropertyChanged(nameof(ScaledViewportWidth));
+                OnPropertyChanged(nameof(ScaledViewportHeight));
             }
         }
 
@@ -50,12 +58,25 @@ namespace TileBasedLevelEditor.ViewModels
                 _tileMargin = value;
                 OnPropertyChanged(nameof(TileMargin));
                 OnPropertyChanged(nameof(ThicknessTileMargin));
+                OnPropertyChanged(nameof(CanvasWidth));
+                OnPropertyChanged(nameof(CanvasHeight));
+                OnPropertyChanged(nameof(ScaledViewportWidth));
+                OnPropertyChanged(nameof(ScaledViewportHeight));
             }
         }
 
         public Vec2<int> GridSize => TileSize * NrTiles;
 
-        public ObservableCollection<CroppedBitmap?> TileImages { get; private set; }
+        private ObservableCollection<CroppedBitmap?> _tileImages;
+        public ObservableCollection<CroppedBitmap?> TileImages
+        {
+            get => _tileImages;
+            set
+            {
+                _tileImages = value;
+                OnPropertyChanged(nameof(TileImages));
+            }
+        }
 
         private bool _gridLinesVisibility;
 
@@ -284,15 +305,15 @@ namespace TileBasedLevelEditor.ViewModels
             });
 
             if (tileImages != null)
-                TileImages = new ObservableCollection<CroppedBitmap?>(tileImages); 
+                _tileImages = new ObservableCollection<CroppedBitmap?>(tileImages); 
             else
             {
-                TileImages = new ObservableCollection<CroppedBitmap?>();
+                _tileImages = new ObservableCollection<CroppedBitmap?>();
                 for (int i = 0; i < NrTiles.X; i++)
                 {
                     for (int j = 0; j < NrTiles.Y; j++)
                     {
-                        TileImages.Add(null);
+                        _tileImages.Add(null);
                     }
                 }
             }
