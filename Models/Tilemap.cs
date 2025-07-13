@@ -16,24 +16,36 @@ namespace TileBasedLevelEditor.Models
 
         public Vec2<int> TilemapSize { get; }
 
-        public Dictionary<Vec2<int>, TileData> Tiles { get; }
+        public TileData[] Tiles { get; }
+
+        public HashSet<string> TilesetsUsed { get; }
 
         public Tilemap(string name, Vec2<int> tileSize, Vec2<int> tilemapSize)
         {
             Name = name;
             TileSize = tileSize;
             TilemapSize = tilemapSize;
-            Tiles = new Dictionary<Vec2<int>, TileData>(tilemapSize.X * tilemapSize.Y);
+            Tiles = new TileData[tilemapSize.X * tilemapSize.Y];
+            TilesetsUsed = new HashSet<string>();
+        }
+
+        public int GetTilemapArrayIndex(Vec2<int> tilemapIndex)
+        {
+            return tilemapIndex.Y * TilemapSize.X + tilemapIndex.X;
         }
 
         public void SetTile(Vec2<int> tilemapIndex, Vec2<int> tilesetIndex, string tilesetName)
         {
             int tileIndex = tilemapIndex.Y * TilemapSize.X + tilemapIndex.X;
-            if (0 > tileIndex || tileIndex >= Tiles.Count)
+            if (0 > tileIndex || tileIndex >= Tiles.Length)
                 return;
 
-            Tiles[tilemapIndex].TilesetIndex = tilesetIndex;
-            Tiles[tilemapIndex].TilesetName = tilesetName;
+            int tilemapArrayIndex = GetTilemapArrayIndex(tilesetIndex);
+
+            Tiles[tilemapArrayIndex].TilesetIndex = tilesetIndex;
+            Tiles[tilemapArrayIndex].TilesetName = tilesetName;
+
+            TilesetsUsed.Add(tilesetName);
         }
     }
 }
