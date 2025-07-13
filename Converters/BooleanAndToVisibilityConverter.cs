@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
-namespace NotesApp.Converters
+namespace TileBasedLevelEditor.Converters
 {
-    class BooleanAndToVisibilityConverter : IMultiValueConverter
+    public class BooleanAndToVisibilityConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

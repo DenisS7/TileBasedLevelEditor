@@ -6,10 +6,11 @@
              xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
              xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
              xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
-             xmlns:converters="clr-namespace:NotesApp.Converters"
-             d:DataContext="{d:DesignInstance Type=vm:TileGridViewModel}"
+             xmlns:converters="clr-namespace:TileBasedLevelEditor.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DataContext="{d:DesignInstance Type=vm:TileGridViewModel}"
+             d:DesignHeight="450" d:DesignWidth="800"
+             Name="TileGridRoot">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -60,8 +61,8 @@
                     <ItemsControl ItemsSource="{Binding TileImages}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Columns="{Binding NrTiles.X}"
-                                             Rows="{Binding NrTiles.Y}"
+                                <UniformGrid Columns="{Binding DataContext.NrTiles.X, ElementName=TileGridRoot}"
+                                             Rows="{Binding DataContext.NrTiles.Y, ElementName=TileGridRoot}"
                                              Background="Transparent"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
@@ -69,7 +70,7 @@
                             <DataTemplate>
                                 <Grid>
                                     <Image Source="{Binding}"
-                                           Margin="{Binding DataContext.ThicknessTileMargin, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                           Margin="{Binding DataContext.ThicknessTileMargin, ElementName=TileGridRoot}"/>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
