@@ -15,7 +15,7 @@ namespace TileBasedLevelEditor.Serialization
     public static class Serializer
     {
         static string TilesetsFilesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Save");
-        static List<string> TilesetsPaths = [];
+        static HashSet<string> TilesetsPaths = [];
         public static List<Tileset> DeserializeTilesets()
         {
             List<Tileset> tilesets = [];
@@ -29,7 +29,7 @@ namespace TileBasedLevelEditor.Serialization
             };
 
             string tilesetsPathJson = File.ReadAllText(existingTilesetsPath);
-            List<string>? LoadedTilesetsPaths = JsonConvert.DeserializeObject<List<string>>(tilesetsPathJson, settings);
+            HashSet<string>? LoadedTilesetsPaths = JsonConvert.DeserializeObject<HashSet<string>>(tilesetsPathJson, settings);
 
             if (LoadedTilesetsPaths == null)
                 return tilesets;
