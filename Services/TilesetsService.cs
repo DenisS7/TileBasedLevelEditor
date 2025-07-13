@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace TileBasedLevelEditor.Services
     public class TilesetsService : ITilesetsService
     {
         private List<Tileset> _tilesets;
-        public IReadOnlyList<Tileset> Tilesets => _tilesets;
+        public ObservableCollection<Tileset> Tilesets => new ObservableCollection<Tileset>(_tilesets);
 
         public TilesetsService() 
         {

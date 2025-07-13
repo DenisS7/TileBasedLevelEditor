@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using NotesApp.Commands;
 using NotesApp.ViewModel;
+using TileBasedLevelEditor.CustomArgs;
 using TileBasedLevelEditor.Models;
 using TileBasedLevelEditor.Serialization;
 using TileBasedLevelEditor.Services;
@@ -26,30 +27,39 @@ namespace TileBasedLevelEditor.ViewModels
     {
         private ICustomNavigationService _navigationService;
         private TilesetsService _tilesetsService;
+        public ObservableCollection<Tileset> Tilesets => _tilesetsService.Tilesets;
         private Tileset? _currentTileset;
 
         public Tileset? CurrentTileset
         {
             get => _currentTileset;
-            private set
+            set
             {
                 if (_currentTileset == value) 
                     return;
 
                 _currentTileset = value;
                 OnPropertyChanged(nameof(CurrentTileset));
+                OnPropertyChanged(nameof(ImageSize));
+                OnPropertyChanged(nameof(TileSize));
+                OnPropertyChanged(nameof(NrTiles));
 
                 if (_currentTileset != null)
                 {
                     TileGridVM.TileImages = new ObservableCollection<CroppedBitmap?>(GetTilesetTiles());
+                    TileGridVM.TileSize = TileSize;
+                    TileGridVM.NrTiles = NrTiles;
+                    TileGridVM.IsTileHovered = false;
+                    TileGridVM.SelectTileCommand.Execute(new TileSelectionArgs(null, false, DragStage.Start));
+                     
+                    //TO DO
+                    //TileGridVM.TileMargin = ;
+                    //TileGridVM.ImagePadding = ;
                 }
                 else
                 {
-                    TilesetImage = null;
+                    TileGridVM.TileImages.Clear();
                 }
-                OnPropertyChanged(nameof(ImageSize));
-                OnPropertyChanged(nameof(TileSize));
-                OnPropertyChanged(nameof(NrTiles));
             }
         }
 
@@ -103,21 +113,6 @@ namespace TileBasedLevelEditor.ViewModels
 
         public Vec2<int> NrTiles => CurrentTileset?.NrTiles ?? new Vec2<int>(0);
 
-        private ImageSource? _tilesetImage;
-
-        public ImageSource? TilesetImage
-        {
-            get => _tilesetImage;
-            private set
-            {
-                if (_tilesetImage == value) 
-                    return;
-
-                _tilesetImage = value;
-                OnPropertyChanged(nameof(TilesetImage));
-            }
-        }
-
         public event Action? RequestCloseNewTilesetDialog;
         public ICommand CreateNewTilesetCommand { get; }
         public ICommand AddNewTilesetCommand { get; }
@@ -162,10 +157,9 @@ namespace TileBasedLevelEditor.ViewModels
                 Tileset newTileset = new Tileset(NewTilesetName, NewTilesetTileSize, NewTilesetPath);
                 if (Serializer.SaveTileset(newTileset))
                 {    
+                    _tilesetsService.AddTileset(newTileset);
+                    OnPropertyChanged(nameof(Tilesets));
                     CurrentTileset = newTileset;
-                    TileGridVM.TileSize = TileSize;
-                    TileGridVM.NrTiles = NrTiles;
-                    _tilesetsService.AddTileset(CurrentTileset);
                 }
             }
             catch (Exception ex)
@@ -228,14 +222,12 @@ namespace TileBasedLevelEditor.ViewModels
             List<CroppedBitmap?> TileImages= [];
             if(CurrentTileset == null)
             {
-                TilesetImage = null;
                 return TileImages;
             }
 
             byte[] ImageData = File.ReadAllBytes(CurrentTileset.FilePath);
             if (ImageData.Length == 0)
             {
-                TilesetImage = null;
                 return TileImages;
             }
 
@@ -251,7 +243,7 @@ namespace TileBasedLevelEditor.ViewModels
                     bmp.EndInit();
                     bmp.Freeze();
                 }
-                TilesetImage = bmp;
+                ImageSource TilesetImage = bmp;
 
                 for (int y = 0; y < NrTiles.Y; y++)
                 {
@@ -268,9 +260,13 @@ namespace TileBasedLevelEditor.ViewModels
                     }
                 }
             }
-            catch
+            catch (Exception ex) 
             {
-                TilesetImage = null;
+                MessageBox.Show(
+                    $"Error loading tileset image:\n{ex.Message}",
+                    "Load Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
 
             return TileImages;
