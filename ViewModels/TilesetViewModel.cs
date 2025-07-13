@@ -46,7 +46,7 @@ namespace TileBasedLevelEditor.ViewModels
 
                 if (_currentTileset != null)
                 {
-                    TileGridVM.TileImages = new ObservableCollection<CroppedBitmap?>(GetTilesetTiles());
+                    TileGridVM.TileImages = new ObservableCollection<CroppedBitmap?>(_currentTileset.TileImages);
                     TileGridVM.TileSize = TileSize;
                     TileGridVM.NrTiles = NrTiles;
                     TileGridVM.IsTileHovered = false;
@@ -133,7 +133,7 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 _currentTileset = null;
             }
-            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), GetTilesetTiles(), OnTileSelected);
+            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), CurrentTileset?.TileImages, OnTileSelected);
             CreateNewTilesetCommand = new RelayCommand(OnCreateNewTileset);
             AddNewTilesetCommand = new RelayCommand(OnAddNewTileset);
             ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
@@ -215,61 +215,6 @@ namespace TileBasedLevelEditor.ViewModels
             //        MessageBoxButton.OK,
             //        MessageBoxImage.Error);
             //}
-        }
-
-        private List<CroppedBitmap?> GetTilesetTiles()
-        {
-            List<CroppedBitmap?> TileImages= [];
-            if(CurrentTileset == null)
-            {
-                return TileImages;
-            }
-
-            byte[] ImageData = File.ReadAllBytes(CurrentTileset.FilePath);
-            if (ImageData.Length == 0)
-            {
-                return TileImages;
-            }
-
-            try
-            {
-                var bmp = new BitmapImage();
-                using (var ms = new MemoryStream(ImageData))
-                {
-                    bmp.BeginInit();
-                    bmp.CacheOption = BitmapCacheOption.OnLoad;
-                    bmp.StreamSource = ms;
-                    bmp.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                    bmp.EndInit();
-                    bmp.Freeze();
-                }
-                ImageSource TilesetImage = bmp;
-
-                for (int y = 0; y < NrTiles.Y; y++)
-                {
-                    for (int x = 0; x < NrTiles.X; x++)
-                    {
-                        var rect = new Int32Rect(
-                            x * TileSize.X,
-                            y * TileSize.Y,
-                            TileSize.X,
-                            TileSize.Y
-                        );
-                        var tileBmp = new CroppedBitmap(bmp, rect);
-                        TileImages.Add(tileBmp);
-                    }
-                }
-            }
-            catch (Exception ex) 
-            {
-                MessageBox.Show(
-                    $"Error loading tileset image:\n{ex.Message}",
-                    "Load Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-
-            return TileImages;
         }
 
         private void OnTileSelected(Vec2<int>? vec)

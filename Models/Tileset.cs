@@ -7,6 +7,9 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Shapes;
 
 namespace TileBasedLevelEditor.Models
 {
@@ -22,6 +25,9 @@ namespace TileBasedLevelEditor.Models
 
         public Vec2<int> ImageSize { get; private set;}
 
+        [JsonIgnore]
+        public List<CroppedBitmap?> TileImages { get; private set; }
+
         [JsonConstructor]
         public Tileset(string name, string filePath,  Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> imageSize)
         {
@@ -30,31 +36,85 @@ namespace TileBasedLevelEditor.Models
             NrTiles = nrTiles;
             ImageSize = imageSize;
             FilePath = filePath;
+            TileImages = GetTilesetTiles(filePath);
         }
 
-        public Tileset(string name, int tileHeight, int tileWidth, string path)
+        public Tileset(string name, int tileHeight, int tileWidth, string filePath)
         {
             Name = name;
             TileSize = new Vec2<int>(tileHeight, tileWidth);
             ImageSize = new Vec2<int>(0);
-            FilePath = path; 
-            GetImageData(path);
+            FilePath = filePath;
+            TileImages = GetTilesetTiles(filePath);
+            GetImageData(filePath);
             NrTiles = ImageSize / TileSize;
         }
 
-        public Tileset(string name, Vec2<int> tileSize, string path)
+        public Tileset(string name, Vec2<int> tileSize, string filePath)
         {
             Name = name;
             TileSize = tileSize;
             ImageSize = new Vec2<int>(0);
-            FilePath = path;
-            GetImageData(path);
+            FilePath = filePath;
+            TileImages = GetTilesetTiles(filePath);
+            GetImageData(filePath);
             NrTiles = ImageSize / TileSize;
         }
 
-        private void GetImageData(string path)
+        private List<CroppedBitmap?> GetTilesetTiles(string filePath)
         {
-            byte[] ImageData = File.ReadAllBytes(path);
+            List<CroppedBitmap?> TileImages = [];
+
+            byte[] ImageData = File.ReadAllBytes(filePath);
+            if (ImageData.Length == 0)
+            {
+                return TileImages;
+            }
+
+            try
+            {
+                var bmp = new BitmapImage();
+                using (var ms = new MemoryStream(ImageData))
+                {
+                    bmp.BeginInit();
+                    bmp.CacheOption = BitmapCacheOption.OnLoad;
+                    bmp.StreamSource = ms;
+                    bmp.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                    bmp.EndInit();
+                    bmp.Freeze();
+                }
+                ImageSource TilesetImage = bmp;
+
+                for (int y = 0; y < NrTiles.Y; y++)
+                {
+                    for (int x = 0; x < NrTiles.X; x++)
+                    {
+                        var rect = new Int32Rect(
+                            x * TileSize.X,
+                            y * TileSize.Y,
+                            TileSize.X,
+                            TileSize.Y
+                        );
+                        var tileBmp = new CroppedBitmap(bmp, rect);
+                        TileImages.Add(tileBmp);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error loading tileset image:\n{ex.Message}",
+                    "Load Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+
+            return TileImages;
+        }
+
+        private void GetImageData(string filePath)
+        {
+            byte[] ImageData = File.ReadAllBytes(filePath);
 
             if (ImageData.Length == 0)
                 return;
