@@ -195,26 +195,8 @@ namespace TileBasedLevelEditor.ViewModels
                 return;
 
             NewTilesetPath = path;
-            //NewTilesetPath = System.IO.Path.GetFileNameWithoutExtension(path);
-            //
-            ////hardcoded size for now
-            //Vec2<int> tileSize = new Vec2<int>(32, 32);
-            //
-            //try
-            //{
-            //    CurrentTileset = new Tileset(name, tileSize, path);
-            //    TileGridVM.TileSize = tileSize;
-            //    TileGridVM.NrTiles = NrTiles;
-            //    _tilesets.Add(CurrentTileset);
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(
-            //        $"Error loading tileset:\n{ex.Message}",
-            //        "Load Error",
-            //        MessageBoxButton.OK,
-            //        MessageBoxImage.Error);
-            //}
+            if(NewTilesetName == String.Empty)
+                NewTilesetName = System.IO.Path.GetFileNameWithoutExtension(path);
         }
 
         private void OnTileSelected(Vec2<int>? vec)
