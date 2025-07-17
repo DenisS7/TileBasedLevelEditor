@@ -418,6 +418,8 @@
         </Style>
 
         <Style TargetType="{x:Type ScrollViewer}">
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ScrollViewer}">
@@ -430,7 +432,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            
+
                             <ScrollContentPresenter Grid.Column="0" 
                                                     Content="{TemplateBinding Content}" 
                                                     CanContentScroll="{TemplateBinding CanContentScroll}" 
@@ -438,68 +440,44 @@
                                                     Margin="{TemplateBinding Padding}" 
                                                     Grid.RowSpan="2" 
                                                     Grid.Row="0"/>
-                            
+
                             <ScrollBar x:Name="PART_VerticalScrollBar" 
                                        Orientation="Vertical"
                                        Grid.Column="1" 
-                                       Grid.Row="0"/>
-                                        
+                                       Grid.Row="0"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Value="{TemplateBinding VerticalOffset}"/>
+
                             <ScrollBar x:Name="PART_HorizontalScrollBar" 
                                        Orientation="Horizontal"
                                        Grid.Column="0" 
-                                       Grid.Row="1"/>
-                            
+                                       Grid.Row="1"
+                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                       Value="{TemplateBinding HorizontalOffset}"/>
+
                             <Rectangle x:Name="Corner" 
                                        Grid.Column="1" 
                                        Grid.Row="1" 
                                        Fill="{StaticResource BackgroundBrush}" />
                         </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="ComputedVerticalScrollBarVisibility" Value="Collapsed">
+                                <Setter TargetName="PART_VerticalScrollBar" Property="Visibility" Value="Collapsed"/>
+                                <Setter TargetName="Corner"                Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="ComputedHorizontalScrollBarVisibility" Value="Collapsed">
+                                <Setter TargetName="PART_HorizontalScrollBar" Property="Visibility" Value="Collapsed"/>
+                                <Setter TargetName="Corner"                   Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                        
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <!--ControlTemplate x:Key="ScrollViewerControlTemplate.Default"
-                    TargetType="{x:Type ScrollViewer}">
-            <Grid x:Name="Grid" Background="{TemplateBinding Background}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Rectangle x:Name="Corner"
-                    Grid.Column="1" Grid.Row="1"
-                    Fill="Red"/>
-                <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
-                                Grid.Column="0" Grid.Row="0"
-                                CanContentScroll="{TemplateBinding CanContentScroll}"
-                                CanHorizontallyScroll="False" CanVerticallyScroll="False"
-                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                Content="{TemplateBinding Content}"
-                                Margin="{TemplateBinding Padding}"/>
-                <ScrollBar x:Name="PART_VerticalScrollBar"
-                    Grid.Column="1" Grid.Row="0"
-                    AutomationProperties.AutomationId="VerticalScrollBar"
-                    Cursor="Arrow"
-                    Maximum="{TemplateBinding ScrollableHeight}" Minimum="0"
-                    Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
-                    Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
-                    ViewportSize="{TemplateBinding ViewportHeight}"/>
-                <ScrollBar x:Name="PART_HorizontalScrollBar"
-                    AutomationProperties.AutomationId="HorizontalScrollBar"
-                    Cursor="Arrow"
-                    Grid.Column="0" Grid.Row="1"
-                    Maximum="{TemplateBinding ScrollableWidth}"
-                    Minimum="0"
-                    Orientation="Horizontal"
-                    Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
-                    Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
-                    ViewportSize="{TemplateBinding ViewportWidth}"/>
-            </Grid>
-        </ControlTemplate-->
 
     </Application.Resources>
 </Application>
