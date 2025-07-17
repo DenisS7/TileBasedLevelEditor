@@ -36,11 +36,10 @@ namespace TileBasedLevelEditor.Models
 
         public void SetTile(Vec2<int> tilemapIndex, Vec2<int> tilesetIndex, string tilesetName)
         {
-            int tileIndex = tilemapIndex.Y * TilemapSize.X + tilemapIndex.X;
-            if (0 > tileIndex || tileIndex >= Tiles.Length)
+            int tilemapArrayIndex = GetTilemapArrayIndex(tilesetIndex);
+            if (0 > tilemapArrayIndex || tilemapArrayIndex >= Tiles.Length)
                 return;
 
-            int tilemapArrayIndex = GetTilemapArrayIndex(tilesetIndex);
 
             Tiles[tilemapArrayIndex].TilesetIndex = tilesetIndex;
             Tiles[tilemapArrayIndex].TilesetName = tilesetName;

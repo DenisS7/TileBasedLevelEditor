@@ -45,9 +45,9 @@ namespace TileBasedLevelEditor.Models
             TileSize = new Vec2<int>(tileHeight, tileWidth);
             ImageSize = new Vec2<int>(0);
             FilePath = filePath;
-            TileImages = GetTilesetTiles(filePath);
             GetImageData(filePath);
             NrTiles = ImageSize / TileSize;
+            TileImages = GetTilesetTiles(filePath);
         }
 
         public Tileset(string name, Vec2<int> tileSize, string filePath)
@@ -56,9 +56,9 @@ namespace TileBasedLevelEditor.Models
             TileSize = tileSize;
             ImageSize = new Vec2<int>(0);
             FilePath = filePath;
-            TileImages = GetTilesetTiles(filePath);
             GetImageData(filePath);
             NrTiles = ImageSize / TileSize;
+            TileImages = GetTilesetTiles(filePath);
         }
 
         private List<CroppedBitmap?> GetTilesetTiles(string filePath)
