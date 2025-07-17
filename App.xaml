@@ -124,12 +124,11 @@
         </Style>
 
         <Style TargetType="TabControl">
-            <Setter Property="Background"  Value="{StaticResource ButtonBackgroundBrush}"/>
+            <Setter Property="Background"  Value="{StaticResource BackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource DarkBackgroundBrush}"/>
             <Setter Property="Foreground"  Value="{StaticResource ForegroundBrush}"/>
         </Style>
 
-        <!-- ► TabItem style -->
         <Style TargetType="TabItem">
             <Setter Property="Background"  Value="{StaticResource ButtonBackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
