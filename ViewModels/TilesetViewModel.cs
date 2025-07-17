@@ -63,7 +63,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private string _newTilesetName = "Test";
+        private string _newTilesetName = "";
         public string NewTilesetName
         {
             get => _newTilesetName;
@@ -74,7 +74,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private string _newTilesetPath = "D:\\GitHub\\TileBasedLevelEditor\\Resources\\Tileset.png";
+        private string _newTilesetPath = "";
         public string NewTilesetPath
         {
             get => _newTilesetPath;
@@ -85,7 +85,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private string _newTilesetTileWidth = "32";
+        private string _newTilesetTileWidth = "";
         public string NewTilesetTileWidth
         {
             get => _newTilesetTileWidth;
@@ -96,7 +96,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        private string _newTilesetTileHeight = "32";
+        private string _newTilesetTileHeight = "";
         public string NewTilesetTileHeight
         {
             get => _newTilesetTileHeight;

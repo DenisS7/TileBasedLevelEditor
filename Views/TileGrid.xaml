@@ -17,9 +17,8 @@
         <converters:BooleanAndToVisibilityConverter x:Key="BoolAndToVis"/>
     </UserControl.Resources>
 
-    <Grid>
-        <ScrollViewer Background="Green"
-                      CanContentScroll="false"
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <ScrollViewer CanContentScroll="false"
                       VerticalScrollBarVisibility="Auto" 
                       HorizontalScrollBarVisibility="Auto" 
                       misc:ZoomBehavior.IsEnabled="True"
@@ -29,21 +28,20 @@
                       misc:SizeChangedBehavior.IsObserved="True"
                       misc:SizeChangedBehavior.ObservedSize="{Binding ScrollViewerSize, Mode=OneWayToSource}"
                       misc:ScrollToCenterBehavior.ScrollToCenter="{Binding ShouldBeCentered}"
-                      Padding="0, 0, 0, 0"
                       Name="TilesetScrollViewer">
 
             <Grid Width="{Binding ScaledViewportWidth}"
                   Height="{Binding ScaledViewportHeight}"
                   VerticalAlignment="Top"
                   HorizontalAlignment="Left"
-                  Background="Blue">
+                  Background="Transparent">
                 
                 <Canvas Name="TileCanvas"
                         Width="{Binding CanvasWidth}"
                         Height="{Binding CanvasHeight}"
                         misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
                         misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
-                        Background="Red">
+                        Background="Transparent">
                     
                     <Canvas.Style>
                         <Style TargetType="Canvas">
@@ -95,8 +93,8 @@
                                       Y1="{Binding Y1}"
                                       X2="{Binding X2}"
                                       Y2="{Binding Y2}"
-                                      Stroke="Black"
-                                      StrokeThickness="0.5">
+                                      Stroke="{StaticResource ForegroundBrush}"
+                                      StrokeThickness="0.2">
                                     <Line.Style>
                                         <Style TargetType="Line">
                                             <Setter Property="StrokeDashArray" Value="4, 4"/>
