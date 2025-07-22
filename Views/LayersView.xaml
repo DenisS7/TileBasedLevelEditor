@@ -11,12 +11,30 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=vm:TilemapEditorViewModel}"
              x:Name="Root">
-    
-    <Grid>
-        <ListView ItemsSource="{Binding Layers}"
+
+    <Grid Background="{StaticResource DarkBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0"
+                   Text="Layers"
+                   FontSize="20"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center"
+                   TextAlignment="Left"
+                   Margin="5 0 0 0"/>
+        
+        <ListView Grid.Row="1"
+                  ItemsSource="{Binding Layers}"
                   Background="{StaticResource BackgroundBrush}"
                   MaxWidth="{Binding ActualWidth, ElementName=Root}"
-                  misc:ListViewFillColumnBehavior.IsListViewObserved="True">
+                  BorderBrush="{StaticResource DarkBackgroundBrush}"
+                  BorderThickness="5 0 2 2"
+                  Padding="0"
+                  misc:ListViewFillColumnBehavior.IsListViewObserved="True"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.View>
                 <GridView AllowsColumnReorder="False"
                           ColumnHeaderContainerStyle="{StaticResource LayersColumnHeader}">
