@@ -15,7 +15,8 @@
     <Grid>
         <ListView ItemsSource="{Binding Layers}"
                   Background="{StaticResource BackgroundBrush}"
-                  MaxWidth="{Binding ActualWidth, ElementName=Root}">
+                  MaxWidth="{Binding ActualWidth, ElementName=Root}"
+                  misc:ListViewFillColumnBehavior.IsListViewObserved="True">
             <ListView.View>
                 <GridView AllowsColumnReorder="False"
                           ColumnHeaderContainerStyle="{StaticResource LayersColumnHeader}">

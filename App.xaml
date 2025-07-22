@@ -478,6 +478,7 @@
             <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource LightBackgroundBrush}"/>
             <Setter Property="BorderThickness" Value="0 0 1 0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Padding" Value="3,0,3,0"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -490,11 +491,11 @@
                                     Width="Auto"
                                     Padding="{TemplateBinding Padding}">
                                 <ContentPresenter Name="HeaderContent"
-                                                      Margin="0,0,0,1"
-                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                      RecognizesAccessKey="True"
-                                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                  Margin="0,0,0,1"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  RecognizesAccessKey="True"
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                             </Border>
                            
                         </Grid>
