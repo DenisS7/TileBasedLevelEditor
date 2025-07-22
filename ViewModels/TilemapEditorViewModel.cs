@@ -15,7 +15,7 @@ using System.Diagnostics;
 
 namespace TileBasedLevelEditor.ViewModels
 {
-    class TilemapEditorViewModel : ViewModelBase
+    public class TilemapEditorViewModel : ViewModelBase
     {
         private Tilemap _currentTilemap;
 
@@ -31,13 +31,14 @@ namespace TileBasedLevelEditor.ViewModels
 
         private Vec2<int> TilemapSize => CurrentTilemap.TilemapSize;
         public Vec2<int> TileSize => CurrentTilemap.TileSize;
+        public ObservableCollection<Layer> Layers => new ObservableCollection<Layer>(CurrentTilemap.Layers);
 
         public TileGridViewModel TileGridVM { get; }
         public List<Tuple<Vec2<int>, CroppedBitmap?>> HoveredOverTiles = [];
 
         public TilemapEditorViewModel()
         {
-            _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(16, 16), new Vec2<int>(40, 30));
+            _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(32, 32), new Vec2<int>(20, 15));
             TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, true, false);
         }
 

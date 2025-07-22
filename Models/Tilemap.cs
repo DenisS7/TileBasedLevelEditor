@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace TileBasedLevelEditor.Models
 {
-    class Tilemap
+    public class Tilemap
     {
         public string Name { get; }
 
@@ -19,6 +19,12 @@ namespace TileBasedLevelEditor.Models
         public TileData[] Tiles { get; }
 
         public HashSet<string> TilesetsUsed { get; }
+
+        public List<Layer> Layers { get; } = [
+            new Layer("Layer 1"), 
+            new Layer("Layer 2"), 
+            new Layer("Layer 3"), 
+            new Layer("Layer 4")];
 
         public Tilemap(string name, Vec2<int> tileSize, Vec2<int> tilemapSize)
         {

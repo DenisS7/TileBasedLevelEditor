@@ -8,13 +8,14 @@
         xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
         d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="Tile Based Level Editor" Height="800" Width="1500">
+        Title="Tile Based Level Editor" Height="900" Width="1600">
     <Grid>
         <Grid.RowDefinitions>
-            <!--RowDefinition Height="32"/-->
+            <RowDefinition Height="0"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        
         <Grid Grid.Row="0">
             <!--views:MainToolbar/-->
         </Grid>
@@ -25,9 +26,21 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <views:TilemapEditorView Grid.Column="0"/>
-            <views:TilesetView Grid.Column="1"
-                               DataContext="{Binding TilesetViewModel}"/>
+            <views:TilemapEditorView Grid.Column="0"
+                                     DataContext="{Binding TilemapViewModel}"/>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+
+                <views:LayersView Grid.Row="0"
+                                  DataContext="{Binding TilemapViewModel}"/>
+                <views:TilesetView Grid.Row="1"
+                                   DataContext="{Binding TilesetViewModel}"/>
+                    
+            </Grid>
     
         </Grid>
     </Grid>

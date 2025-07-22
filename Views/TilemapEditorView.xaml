@@ -8,10 +8,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <UserControl.DataContext>
-        <vm:TilemapEditorViewModel/>
-    </UserControl.DataContext>
-
     <Grid>
         <local:TileGrid DataContext="{Binding TileGridVM}"/>
     </Grid>
