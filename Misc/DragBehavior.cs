@@ -35,7 +35,7 @@ namespace TileBasedLevelEditor.Misc
 
         private static void OnIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if(sender is not ScrollViewer scrollViewer)
+            if (sender is not ScrollViewer scrollViewer)
             {
                 throw new ArgumentException("Attaching element must be of type Scroll Viewer");
             }

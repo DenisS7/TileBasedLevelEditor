@@ -71,6 +71,7 @@ namespace TileBasedLevelEditor.ViewModels
                 Vec2<int> tilemapTileIndex = vec + tileData.Item1.TilesetIndex - referenceTile.TilesetIndex;
                 if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
                     continue;
+                
                 HoveredOverTiles.Add(new Tuple<Vec2<int>, CroppedBitmap?>(tilemapTileIndex, TileGridVM.TileImages[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X]));
                 TileGridVM.TileImages[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = tileData.Item2;
             }

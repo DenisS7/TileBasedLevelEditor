@@ -180,8 +180,10 @@ namespace TileBasedLevelEditor.ViewModels
                 foreach (SelectionArea area in SelectionAreas)
                 {
                     RectangleGeometry rectGeom = new RectangleGeometry(area.RectArea);
-                    if(combined == null)
+                    if (combined == null)
+                    {
                         combined = rectGeom;
+                    }
                     else
                     {
                         combined = Geometry.Combine(
@@ -262,10 +264,15 @@ namespace TileBasedLevelEditor.ViewModels
 
             HoverTileCommand = new RelayCommand(p => 
             {
-                if (p == null || p is not Vec2<int> Index)
-                    HoveredTileIndex = null;
+                if (p is not Vec2<int> Index)
+                { 
+                    HoveredTileIndex = null; 
+                }
                 else
+                {
                     HoveredTileIndex = Index;
+                }
+
                 OnHover?.Invoke(HoveredTileIndex);
             });
 
@@ -277,11 +284,15 @@ namespace TileBasedLevelEditor.ViewModels
                 if (args.CurrentDragStage == DragStage.Start)
                 {
                     if (!args.Add)
-                        SelectionAreas.Clear();
+                    { 
+                        SelectionAreas.Clear(); 
+                    }
 
                     InitialSelectedTile = args.Index;
                     if (args.Index != null)
-                        SelectionAreas.Add(GetSelectionArea(args.Index, args.Index));
+                    { 
+                        SelectionAreas.Add(GetSelectionArea(args.Index, args.Index)); 
+                    }
                 }
                 else if (args.Index != null && InitialSelectedTile != null)
                 {                    
@@ -305,7 +316,9 @@ namespace TileBasedLevelEditor.ViewModels
             });
 
             if (tileImages != null)
+            { 
                 _tileImages = new ObservableCollection<CroppedBitmap?>(tileImages); 
+            }
             else
             {
                 _tileImages = new ObservableCollection<CroppedBitmap?>();
@@ -329,7 +342,9 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 double x = i * TileSize.X;
                 if (i == 0)
-                    x += 1.0;
+                {
+                    x += 1.0; 
+                }
 
                 bool isEdge = i == 0 || i == NrTiles.X;
                 GridLines.Add(new LineInfo(x, 0, x, GridSize.Y, isEdge));
@@ -339,7 +354,9 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 double y = i * TileSize.Y;
                 if (i == 0)
+                {
                     y += 1.0;
+                }
 
                 bool isEdge = i == 0 || i == NrTiles.Y;
                 GridLines.Add(new LineInfo(0, y, GridSize.X, y, isEdge));
@@ -351,7 +368,7 @@ namespace TileBasedLevelEditor.ViewModels
             Vec2<int> StartTile = new Vec2<int>(-1);
             Vec2<int> EndTile = new Vec2<int>(-1);
 
-            if(PointA.X > PointB.X)
+            if (PointA.X > PointB.X)
             {
                 StartTile.X = PointB.X;
                 EndTile.X = PointA.X;
@@ -362,7 +379,7 @@ namespace TileBasedLevelEditor.ViewModels
                 EndTile.X = PointB.X;
             }
 
-            if(PointA.Y > PointB.Y)
+            if (PointA.Y > PointB.Y)
             {
                 StartTile.Y = PointB.Y;
                 EndTile.Y = PointA.Y;

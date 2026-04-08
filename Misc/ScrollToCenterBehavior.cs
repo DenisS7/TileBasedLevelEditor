@@ -25,9 +25,13 @@ namespace TileBasedLevelEditor.Misc
             if ((bool)e.NewValue)
             {
                 if (scrollViewer.IsLoaded)
+                {
                     ScrollToCenterRequest(scrollViewer, new RoutedEventArgs());
+                }
                 else
+                {
                     scrollViewer.Loaded += ScrollToCenterRequest;
+                }
             }
             else
             {

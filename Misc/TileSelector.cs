@@ -166,7 +166,9 @@ namespace TileBasedLevelEditor.Misc
             {
                 Vec2<int>? hoveredTile = GetHoveredTile(canvas, e.GetPosition(canvas));
                 if (hoveredTile != null)
+                {
                     cmd.Execute(new TileSelectionArgs(hoveredTile, isAdd, DragStage.Dragging));
+                }
             }
         }
 
@@ -191,7 +193,9 @@ namespace TileBasedLevelEditor.Misc
 
                 Vec2<int>? hoveredTile = GetHoveredTile(canvas, e.GetPosition(canvas));
                 if (hoveredTile != null)
+                {
                     cmd.Execute(new TileSelectionArgs(hoveredTile, isAdd, DragStage.End));
+                }
             }
         }
     }

@@ -17,25 +17,25 @@ namespace TileBasedLevelEditor.Misc
         public static void SetIsListViewObserved(DependencyObject obj, bool value) => obj.SetValue(IsListViewObservedProperty, value);
         public static void OnIsListViewObservedChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            if (sender is not ListView l || e.NewValue is not bool newValue)
+            if (sender is not ListView list || e.NewValue is not bool newValue)
                 return;
-
+            
             if (newValue)
             {
-                l.SizeChanged += OnElementSizeChanged;
+                list.SizeChanged += OnElementSizeChanged;
             }
             else
             {
-                l.SizeChanged -= OnElementSizeChanged;
+                list.SizeChanged -= OnElementSizeChanged;
             }
         }
 
         public static void OnElementSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (sender is not ListView l)
+            if (sender is not ListView list)
                 return;
 
-            if (l.View is not GridView view)
+            if (list.View is not GridView view)
                 return;
 
             int nameColumnIndex = -1;
@@ -45,12 +45,16 @@ namespace TileBasedLevelEditor.Misc
             {
                 GridViewColumn item = view.Columns[i];
                 if (item.Header.ToString() == "Name")
+                {
                     nameColumnIndex = i;
+                }
                 else
+                {
                     otherColumnsWidthSum += item.ActualWidth;
+                }
             }
 
-            view.Columns[nameColumnIndex].Width = l.ActualWidth - otherColumnsWidthSum;
+            view.Columns[nameColumnIndex].Width = list.ActualWidth - otherColumnsWidthSum;
         }
     }
 }

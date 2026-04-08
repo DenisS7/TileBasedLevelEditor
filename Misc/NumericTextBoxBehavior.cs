@@ -63,7 +63,9 @@ namespace TileBasedLevelEditor.Misc
             {
                 string text = (string)e.DataObject.GetData(typeof(string));
                 if (!IsTextNumeric(text))
+                {
                     e.CancelCommand();
+                }
             }
             else
             {

@@ -15,7 +15,8 @@ namespace TileBasedLevelEditor.Converters
         {
             foreach (var booleanValue in values)
             {
-                if (booleanValue is bool and false) return Visibility.Collapsed;
+                if (booleanValue is bool b && !b) 
+                    return Visibility.Collapsed;
             }
 
             return Visibility.Visible;

@@ -195,7 +195,7 @@ namespace TileBasedLevelEditor.ViewModels
                 return;
 
             NewTilesetPath = path;
-            if(NewTilesetName == String.Empty)
+            if (NewTilesetName == String.Empty)
                 NewTilesetName = System.IO.Path.GetFileNameWithoutExtension(path);
         }
 
@@ -215,7 +215,7 @@ namespace TileBasedLevelEditor.ViewModels
                 {
                     for (int j = selectionArea.StartTile.Y; j <= selectionArea.EndTile.Y; j++)
                     {
-                        if(SelectedTiles.Add(new Vec2<int>(i, j)))
+                        if (SelectedTiles.Add(new Vec2<int>(i, j)))
                         {
                             CroppedBitmap? tileImage = TileGridVM.TileImages[SelectedTiles.Last().X + SelectedTiles.Last().Y * NrTiles.X];
                             SelectedTilesFull.Add(new Tuple<TileData, CroppedBitmap?>(new TileData(SelectedTiles.Last(), CurrentTileset.Name), tileImage));

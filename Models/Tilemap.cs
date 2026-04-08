@@ -46,7 +46,6 @@ namespace TileBasedLevelEditor.Models
             if (0 > tilemapArrayIndex || tilemapArrayIndex >= Tiles.Length)
                 return;
 
-
             Tiles[tilemapArrayIndex].TilesetIndex = tilesetIndex;
             Tiles[tilemapArrayIndex].TilesetName = tilesetName;
 

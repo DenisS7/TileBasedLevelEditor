@@ -19,7 +19,7 @@ namespace NotesApp.Commands
 
         public override bool CanExecute(object? parameter)
         {
-            if (canExecute is not null)
+            if (canExecute != null)
                 return canExecute(parameter);
 
             return base.CanExecute(parameter);
