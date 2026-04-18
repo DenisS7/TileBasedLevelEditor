@@ -1,4 +1,4 @@
-﻿<Window x:Class="TileBasedLevelEditor.Views.NewTilesetDialogView"
+﻿<Window x:Class="TileBasedLevelEditor.Views.NewTilemapDialogView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,24 +6,24 @@
         xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
         xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc" 
         xmlns:viewmodels="clr-namespace:TileBasedLevelEditor.ViewModels" 
-        d:DataContext="{d:DesignInstance Type=viewmodels:TilesetViewModel}"
+        d:DataContext="{d:DesignInstance Type=viewmodels:TilemapEditorViewModel}"
         mc:Ignorable="d"
-        Title="New Tileset" Height="400" Width="500">
-    
+        Title="New Tilemap" Height="400" Width="500">
+
     <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
+        
         <TextBlock Grid.Row="0"
-                   Text="New Tileset"
+                   Text="New Tilemap"
                    Margin="11 10 0 0"
                    FontSize="20"
                    FontWeight="SemiBold"
                    VerticalAlignment="Center"
                    HorizontalAlignment="Left"/>
-
+        
         <Border Grid.Row="1"
                 CornerRadius="3"
                 Background="{StaticResource LightBackgroundBrush}"
@@ -34,7 +34,6 @@
             <Grid Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="40"/>
                     <RowDefinition Height="80"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="30"/>
@@ -50,45 +49,17 @@
                                Text="Name: "
                                FontSize="16"
                                VerticalAlignment="Center"/>
-                    
+
                     <TextBox Grid.Column="1"
                              Height="30"
                              VerticalAlignment="Center"
                              FontSize="15"
                              VerticalContentAlignment="Center"
                              HorizontalContentAlignment="Left"
-                             Text="{Binding NewTilesetName}"/>
+                             Text="{Binding NewTilemapName}"/>
                 </Grid>
 
                 <Grid Grid.Row="1"
-                      Margin="0 10 0 0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="80"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0"
-                               Text="Source: "
-                               FontSize="16"
-                               VerticalAlignment="Center"/>
-                    
-                    <TextBox Grid.Column="1"
-                             Height="30"
-                             VerticalAlignment="Center"
-                             FontSize="15"
-                             VerticalContentAlignment="Center"
-                             HorizontalContentAlignment="Left"
-                             Text="{Binding NewTilesetPath, Mode=TwoWay}"/>
-
-                    <Button Grid.Column="2"
-                            Content="Browse"
-                            Height="30"
-                            Margin="5 0 0 0"
-                            Command="{Binding ChooseTilesetImageCommand}"/>
-                </Grid>
-
-                <Grid Grid.Row="2"
                       Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" MinWidth="170" MaxWidth="250"/>
@@ -109,9 +80,9 @@
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0"
-                                       Text="Tile Width: "
-                                       FontSize="16"
-                                       VerticalAlignment="Center"/>
+                                   Text="Tile Width: "
+                                   FontSize="16"
+                                   VerticalAlignment="Center"/>
 
                             <TextBox Grid.Column="1"
                                      Height="30"
@@ -120,9 +91,9 @@
                                      VerticalContentAlignment="Center"
                                      HorizontalContentAlignment="Left"
                                      misc:NumericTextBoxBehavior.IsNumericOnly="True"
-                                     Text="{Binding NewTilesetTileWidth}"/>
+                                     Text="{Binding NewTilemapTileWidth}"/>
                         </Grid>
-
+                        
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="TileSizeNameFields"/>
@@ -130,9 +101,9 @@
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0"
-                                       Text="Tile Height: "
-                                       FontSize="16"
-                                       VerticalAlignment="Center"/>
+                                   Text="Tile Height: "
+                                   FontSize="16"
+                                   VerticalAlignment="Center"/>
 
                             <TextBox Grid.Column="1"
                                      Height="30"
@@ -141,7 +112,7 @@
                                      VerticalContentAlignment="Center"
                                      HorizontalContentAlignment="Left"
                                      misc:NumericTextBoxBehavior.IsNumericOnly="True"
-                                     Text="{Binding NewTilesetTileHeight}"/>
+                                     Text="{Binding NewTilemapTileHeight}"/>
                         </Grid>
                     </Grid>
 
@@ -160,9 +131,9 @@
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0"
-                                       Text="Tile Spacing: "
-                                       FontSize="16"
-                                       VerticalAlignment="Center"/>
+                                   Text="Tilemap Width: "
+                                   FontSize="16"
+                                   VerticalAlignment="Center"/>
 
                             <TextBox Grid.Column="1"
                                      Height="30"
@@ -170,7 +141,8 @@
                                      FontSize="15"
                                      VerticalContentAlignment="Center"
                                      HorizontalContentAlignment="Left"
-                                     misc:NumericTextBoxBehavior.IsNumericOnly="True"/>
+                                     misc:NumericTextBoxBehavior.IsNumericOnly="True"
+                                     Text="{Binding NewTilemapWidth}"/>
                         </Grid>
 
                         <Grid Grid.Row="1">
@@ -180,9 +152,9 @@
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.Column="0"
-                                       Text="Image Margin: "
-                                       FontSize="16"
-                                       VerticalAlignment="Center"/>
+                                   Text="Tilemap Height: "
+                                   FontSize="16"
+                                   VerticalAlignment="Center"/>
 
                             <TextBox Grid.Column="1"
                                      Height="30"
@@ -190,12 +162,13 @@
                                      FontSize="15"
                                      VerticalContentAlignment="Center"
                                      HorizontalContentAlignment="Left"
-                                     misc:NumericTextBoxBehavior.IsNumericOnly="True"/>
+                                     misc:NumericTextBoxBehavior.IsNumericOnly="True"
+                                     Text="{Binding NewTilemapHeight}"/>
                         </Grid>
                     </Grid>
                 </Grid>
 
-                <Grid Grid.Row="4">
+                <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="100"/>
@@ -203,14 +176,14 @@
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="1"
-                            Content="Save as"
-                            Margin="5 0 0 0"
-                            Command="{Binding AddNewTilesetCommand}"/>
-                    
+                                    Content="Save as"
+                                    Margin="5 0 0 0"
+                                    Command="{Binding AddNewTilemapCommand}"/>
+
                     <Button Grid.Column="2"
-                            Content="Cancel"
-                            Margin="5 0 0 0"
-                            Command="{Binding CancelNewTilesetCommand}"/>
+                                    Content="Cancel"
+                                    Margin="5 0 0 0"
+                                    Command="{Binding CancelNewTilemapCommand}"/>
                 </Grid>
             </Grid>
         </Border>

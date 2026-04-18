@@ -22,7 +22,7 @@ namespace TileBasedLevelEditor.ViewModels
             _navigationService = navigationService;
             _tilesetsService = tilesetsService;
             TilesetViewModel = new TilesetViewModel(_navigationService, tilesetsService);
-            TilemapViewModel = new TilemapEditorViewModel();
+            TilemapViewModel = new TilemapEditorViewModel(_navigationService);
         }
     }
 }

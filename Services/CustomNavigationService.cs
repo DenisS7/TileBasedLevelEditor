@@ -25,5 +25,19 @@ namespace TileBasedLevelEditor.Services
             };
             newTilesetDialogView.Show();
         }
+
+        public void OpenNewTilemapDialog(TilemapEditorViewModel tilemapEditorViewModel)
+        {
+            NewTilemapDialogView newTilemapDialogView = new NewTilemapDialogView()
+            {
+                DataContext = tilemapEditorViewModel
+            };
+
+            tilemapEditorViewModel.RequestCloseNewTilemapDialog += () =>
+            {
+                newTilemapDialogView.Close();
+            };
+            newTilemapDialogView.Show();
+        }
     }
 }

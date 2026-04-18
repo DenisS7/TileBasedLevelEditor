@@ -18,15 +18,6 @@ namespace TileBasedLevelEditor.ViewModels
         public Vec2<int> TileSize
         {
             get => _tileSize;
-            set
-            {
-                _tileSize = value;
-                OnPropertyChanged(nameof(TileSize));
-                OnPropertyChanged(nameof(CanvasWidth));
-                OnPropertyChanged(nameof(CanvasHeight));
-                OnPropertyChanged(nameof(ScaledViewportWidth));
-                OnPropertyChanged(nameof(ScaledViewportHeight));
-            }
         }
 
         private Vec2<int> _nrTiles;
@@ -34,15 +25,6 @@ namespace TileBasedLevelEditor.ViewModels
         public Vec2<int> NrTiles
         {
             get => _nrTiles;
-            set
-            {
-                _nrTiles = value;
-                OnPropertyChanged(nameof(NrTiles));
-                OnPropertyChanged(nameof(CanvasWidth));
-                OnPropertyChanged(nameof(CanvasHeight));
-                OnPropertyChanged(nameof(ScaledViewportWidth));
-                OnPropertyChanged(nameof(ScaledViewportHeight));
-            }
         }
 
         //Right & Bottom should always be 0
@@ -247,9 +229,6 @@ namespace TileBasedLevelEditor.ViewModels
         public double ScaledViewportWidth => CanvasWidth * ScrollViewerZoom + Convert.ToDouble(ShouldBeCentered) * ScrollViewerSize.Width * _scrollAreaMultiplier * 0.9;
         public double ScaledViewportHeight => CanvasHeight * ScrollViewerZoom + Convert.ToDouble(ShouldBeCentered) * ScrollViewerSize.Height * _scrollAreaMultiplier * 0.9;
 
-        //public double ScaledViewportWidth => (TileSize.X + TileMargin.X) * NrTiles.X * ScrollViewerZoom + 2.0 * TileMargin.X;
-        //public double ScaledViewportHeight => (TileSize.Y + TileMargin.Y) * NrTiles.Y * ScrollViewerZoom + 2.0 * TileMargin.Y;
-
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
 
@@ -315,23 +294,48 @@ namespace TileBasedLevelEditor.ViewModels
                 OnSelect?.Invoke(args.Index);
             });
 
+            SetTileImages(tileImages);
+
+            GenerateGridLines();
+        }
+
+        public void SetNewGridValues(Vec2<int> tileSize, Vec2<int> nrTiles, List<CroppedBitmap?>? tileImages = null)
+        {
+            _tileSize = tileSize;
+            _nrTiles = nrTiles;
+
+            SetTileImages(tileImages);
+            GenerateGridLines();
+            NotifyGridUpdates();
+        }
+
+        private void NotifyGridUpdates()
+        {
+            OnPropertyChanged(nameof(CanvasWidth));
+            OnPropertyChanged(nameof(CanvasHeight));
+            OnPropertyChanged(nameof(ScaledViewportWidth));
+            OnPropertyChanged(nameof(ScaledViewportHeight));
+            OnPropertyChanged(nameof(TileSize));
+            OnPropertyChanged(nameof(NrTiles));
+        }
+
+        private void SetTileImages(List<CroppedBitmap?>? tileImages = null)
+        {
             if (tileImages != null)
-            { 
-                _tileImages = new ObservableCollection<CroppedBitmap?>(tileImages); 
+            {
+                TileImages = new ObservableCollection<CroppedBitmap?>(tileImages);
             }
             else
             {
-                _tileImages = new ObservableCollection<CroppedBitmap?>();
+                TileImages = new ObservableCollection<CroppedBitmap?>();
                 for (int i = 0; i < NrTiles.X; i++)
                 {
                     for (int j = 0; j < NrTiles.Y; j++)
                     {
-                        _tileImages.Add(null);
+                        TileImages.Add(null);
                     }
                 }
             }
-
-            GenerateGridLines();
         }
 
         private void GenerateGridLines()

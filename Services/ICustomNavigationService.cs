@@ -10,5 +10,6 @@ namespace TileBasedLevelEditor.Services
     public interface ICustomNavigationService
     {
         void OpenNewTilesetDialog(TilesetViewModel tilesetViewModel);
+        void OpenNewTilemapDialog(TilemapEditorViewModel tilemapEditorViewModel);
     }
 }

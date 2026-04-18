@@ -46,9 +46,7 @@ namespace TileBasedLevelEditor.ViewModels
 
                 if (_currentTileset != null)
                 {
-                    TileGridVM.TileImages = new ObservableCollection<CroppedBitmap?>(_currentTileset.TileImages);
-                    TileGridVM.TileSize = TileSize;
-                    TileGridVM.NrTiles = NrTiles;
+                    TileGridVM.SetNewGridValues(TileSize, NrTiles, _currentTileset.TileImages);
                     TileGridVM.IsTileHovered = false;
                     TileGridVM.SelectTileCommand.Execute(new TileSelectionArgs(null, false, DragStage.Start));
                      
