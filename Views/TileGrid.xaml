@@ -32,6 +32,8 @@
 
             <Grid Width="{Binding ScaledViewportWidth}"
                   Height="{Binding ScaledViewportHeight}"
+                  misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
+                  misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
                   VerticalAlignment="Top"
                   HorizontalAlignment="Left"
                   Background="Transparent">
@@ -39,8 +41,6 @@
                 <Canvas Name="TileCanvas"
                         Width="{Binding CanvasWidth}"
                         Height="{Binding CanvasHeight}"
-                        misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
-                        misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
                         Background="Transparent">
                     
                     <Canvas.Style>
