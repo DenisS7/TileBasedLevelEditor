@@ -16,9 +16,9 @@ namespace TileBasedLevelEditor.Serialization
     {
         static string TilesetsFilesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Save");
         static HashSet<string> TilesetsPaths = [];
-        public static List<Tileset> DeserializeTilesets()
+        public static Dictionary<Guid, Tileset> DeserializeTilesets()
         {
-            List<Tileset> tilesets = [];
+            Dictionary<Guid, Tileset> tilesets = [];
             string existingTilesetsPath = Path.Combine(TilesetsFilesPath, "Tilesets.json");
             if (!File.Exists(existingTilesetsPath))
                 return tilesets;
@@ -47,7 +47,7 @@ namespace TileBasedLevelEditor.Serialization
                 if (tileset == null)
                     continue;
 
-                tilesets.Add(tileset);
+                tilesets.Add(tileset.ID, tileset);
             }
 
             return tilesets;

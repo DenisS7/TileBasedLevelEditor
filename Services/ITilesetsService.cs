@@ -10,7 +10,7 @@ namespace TileBasedLevelEditor.Services
 {
     public interface ITilesetsService
     {
-        ObservableCollection<Tileset> Tilesets { get; }
+        Dictionary<Guid, Tileset> Tilesets { get; }
         void Reload();
         void AddTileset(Tileset tileset);
     }

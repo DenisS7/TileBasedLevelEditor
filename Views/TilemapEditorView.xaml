@@ -15,13 +15,28 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0"
-                FontSize="16"
-                Content="New tilemap"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Margin="10 0 0 0"
-                Command="{Binding CreateNewTilemapCommand}"/>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    FontSize="16"
+                    Content="New tilemap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Margin="10 0 0 0"
+                    Command="{Binding CreateNewTilemapCommand}"/>
+
+            <Button Grid.Column="1"
+                    FontSize="16"
+                    Content="Edit tilemap"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Margin="10 0 0 0"
+                    Command="{Binding EditCurrentTilemapCommand}"/>
+        </Grid>
 
         <local:TileGrid Grid.Row="1"
                         DataContext="{Binding TileGridVM}"/>

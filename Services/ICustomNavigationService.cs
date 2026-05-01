@@ -11,5 +11,6 @@ namespace TileBasedLevelEditor.Services
     {
         void OpenNewTilesetDialog(TilesetViewModel tilesetViewModel);
         void OpenNewTilemapDialog(TilemapEditorViewModel tilemapEditorViewModel);
+        void OpenEditTilemapDialog(TilemapEditorViewModel tilemapEditorViewModel);
     }
 }

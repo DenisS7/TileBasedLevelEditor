@@ -10,19 +10,18 @@ namespace TileBasedLevelEditor.Models
     public struct TileData
     {
         public Vec2<int> TilesetIndex { get; set; }
-        //public CroppedBitmap TileImage { get; set; }
-        public string TilesetName { get; set; }
+        public Guid TilesetID { get; set; }
 
         public TileData()
         {
             TilesetIndex = new Vec2<int>(-1);
-            TilesetName = "";
+            TilesetID = Guid.Empty;
         }
 
-        public TileData(Vec2<int> tilesetIndex, string tilesetName = "")
+        public TileData(Vec2<int> tilesetIndex, Guid tilesetID)
         {
             TilesetIndex = tilesetIndex;
-            TilesetName = tilesetName;
+            TilesetID = tilesetID;
         }
     }
 

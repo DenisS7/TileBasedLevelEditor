@@ -15,6 +15,7 @@ namespace TileBasedLevelEditor.Models
 {
     public class Tileset
     {
+        public Guid ID { get; private set; }
         public string Name { get; private set;}
 
         public string FilePath { get; private set;}
@@ -29,7 +30,7 @@ namespace TileBasedLevelEditor.Models
         public List<CroppedBitmap?> TileImages { get; private set; }
 
         [JsonConstructor]
-        public Tileset(string name, string filePath,  Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> imageSize)
+        public Tileset(string name, string filePath, Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> imageSize, Guid? id = null)
         {
             Name = name;
             TileSize = tileSize;
@@ -37,9 +38,10 @@ namespace TileBasedLevelEditor.Models
             ImageSize = imageSize;
             FilePath = filePath;
             TileImages = GetTilesetTiles(filePath);
+            ID = id ?? Guid.NewGuid();
         }
 
-        public Tileset(string name, int tileHeight, int tileWidth, string filePath)
+        public Tileset(string name, int tileHeight, int tileWidth, string filePath, Guid? id = null)
         {
             Name = name;
             TileSize = new Vec2<int>(tileHeight, tileWidth);
@@ -48,9 +50,10 @@ namespace TileBasedLevelEditor.Models
             GetImageData(filePath);
             NrTiles = ImageSize / TileSize;
             TileImages = GetTilesetTiles(filePath);
+            ID = id ?? Guid.NewGuid();
         }
 
-        public Tileset(string name, Vec2<int> tileSize, string filePath)
+        public Tileset(string name, Vec2<int> tileSize, string filePath, Guid? id = null)
         {
             Name = name;
             TileSize = tileSize;
@@ -59,6 +62,7 @@ namespace TileBasedLevelEditor.Models
             GetImageData(filePath);
             NrTiles = ImageSize / TileSize;
             TileImages = GetTilesetTiles(filePath);
+            ID = id ?? Guid.NewGuid();
         }
 
         private List<CroppedBitmap?> GetTilesetTiles(string filePath)

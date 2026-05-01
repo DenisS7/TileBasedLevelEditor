@@ -27,7 +27,7 @@ namespace TileBasedLevelEditor.ViewModels
     {
         private ICustomNavigationService _navigationService;
         private TilesetsService _tilesetsService;
-        public ObservableCollection<Tileset> Tilesets => _tilesetsService.Tilesets;
+        public ObservableCollection<Tileset> Tilesets => new ObservableCollection<Tileset>(_tilesetsService.Tilesets.Values);
         private Tileset? _currentTileset;
 
         public Tileset? CurrentTileset
@@ -125,7 +125,7 @@ namespace TileBasedLevelEditor.ViewModels
             _tilesetsService = tilesetsService;
             if (_tilesetsService.Tilesets != null && _tilesetsService.Tilesets.Count > 0)
             {                
-                _currentTileset = _tilesetsService.Tilesets[0];
+                _currentTileset = _tilesetsService.Tilesets.First().Value;
             }
             else
             {
@@ -152,7 +152,7 @@ namespace TileBasedLevelEditor.ViewModels
             try
             {
                 Vec2<int> NewTilesetTileSize = new Vec2<int>(Int32.Parse(NewTilesetTileWidth), Int32.Parse(NewTilesetTileHeight));
-                Tileset newTileset = new Tileset(NewTilesetName, NewTilesetTileSize, NewTilesetPath);
+                Tileset newTileset = new Tileset(NewTilesetName, NewTilesetTileSize, NewTilesetPath, Guid.NewGuid());
                 if (Serializer.SaveTileset(newTileset))
                 {    
                     _tilesetsService.AddTileset(newTileset);
@@ -216,7 +216,7 @@ namespace TileBasedLevelEditor.ViewModels
                         if (SelectedTiles.Add(new Vec2<int>(i, j)))
                         {
                             CroppedBitmap? tileImage = TileGridVM.TileImages[SelectedTiles.Last().X + SelectedTiles.Last().Y * NrTiles.X];
-                            SelectedTilesFull.Add(new Tuple<TileData, CroppedBitmap?>(new TileData(SelectedTiles.Last(), CurrentTileset.Name), tileImage));
+                            SelectedTilesFull.Add(new Tuple<TileData, CroppedBitmap?>(new TileData(SelectedTiles.Last(), CurrentTileset.ID), tileImage));
                         }
                         
                     }

@@ -11,8 +11,8 @@ namespace TileBasedLevelEditor.Services
 {
     public class TilesetsService : ITilesetsService
     {
-        private List<Tileset> _tilesets;
-        public ObservableCollection<Tileset> Tilesets => new ObservableCollection<Tileset>(_tilesets);
+        private Dictionary<Guid, Tileset> _tilesets;
+        public Dictionary<Guid, Tileset> Tilesets => _tilesets;
 
         public TilesetsService() 
         {
@@ -26,7 +26,7 @@ namespace TileBasedLevelEditor.Services
 
         public void AddTileset(Tileset tileset)
         {
-            _tilesets.Add(tileset);
+            _tilesets.Add(tileset.ID, tileset);
         }
     }
 }

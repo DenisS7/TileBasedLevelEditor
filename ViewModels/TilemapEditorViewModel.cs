@@ -15,12 +15,14 @@ using System.Diagnostics;
 using System.Windows.Navigation;
 using System.Windows;
 using TileBasedLevelEditor.Serialization;
+using Newtonsoft.Json.Bson;
 
 namespace TileBasedLevelEditor.ViewModels
 {
     public class TilemapEditorViewModel : ViewModelBase
     {
         private ICustomNavigationService _navigationService;
+        private ITilesetsService _tilesetsService;
 
         private Tilemap _currentTilemap;
 
@@ -96,6 +98,7 @@ namespace TileBasedLevelEditor.ViewModels
         public Vec2<int> TileSize => CurrentTilemap.TileSize;
 
         public event Action? RequestCloseNewTilemapDialog;
+        public event Action? RequestCloseEditTilemapDialog;
 
         public ObservableCollection<Layer> Layers => new ObservableCollection<Layer>(CurrentTilemap.Layers);
         public TileGridViewModel TileGridVM { get; }
@@ -104,27 +107,69 @@ namespace TileBasedLevelEditor.ViewModels
         public ICommand CreateNewTilemapCommand { get; }
         public ICommand AddNewTilemapCommand { get; }
         public ICommand CancelNewTilemapCommand { get; }
+        public ICommand EditCurrentTilemapCommand { get; }
+        public ICommand SaveEditedCurrentTilemapCommand { get; }
+        public ICommand CancelEditingTilemapCommand { get; }
 
-        public TilemapEditorViewModel(ICustomNavigationService navigationService)
+        public TilemapEditorViewModel(ICustomNavigationService navigationService, ITilesetsService tilesetsService)
         {
             _navigationService = navigationService;
+            _tilesetsService = tilesetsService;
             _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(32, 32), new Vec2<int>(20, 15));
             TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, true, false);
 
             CreateNewTilemapCommand = new RelayCommand(OnCreateNewTilemap);
             AddNewTilemapCommand = new RelayCommand(OnAddNewTilemap);
             CancelNewTilemapCommand = new RelayCommand(OnCancelNewTileset);
+            EditCurrentTilemapCommand = new RelayCommand(OnEditCurrentTilemap);
+            SaveEditedCurrentTilemapCommand = new RelayCommand(OnSaveEditedCurrentTilemap);
+            CancelEditingTilemapCommand = new RelayCommand(OnCancelEditingTilemap);
         }
 
-        public TilemapEditorViewModel(ICustomNavigationService navigationService, Tilemap currentTilemap)
+        public TilemapEditorViewModel(ICustomNavigationService navigationService, ITilesetsService tilesetsService, Tilemap currentTilemap)
         {
             _navigationService = navigationService;
+            _tilesetsService = tilesetsService;
             _currentTilemap = currentTilemap;
             TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, true, false);
 
             CreateNewTilemapCommand = new RelayCommand(OnCreateNewTilemap);
             AddNewTilemapCommand = new RelayCommand(OnAddNewTilemap);
             CancelNewTilemapCommand = new RelayCommand(OnCancelNewTileset);
+            EditCurrentTilemapCommand = new RelayCommand(OnEditCurrentTilemap);
+            SaveEditedCurrentTilemapCommand = new RelayCommand(OnSaveEditedCurrentTilemap);
+            CancelEditingTilemapCommand = new RelayCommand(OnCancelEditingTilemap);
+        }
+
+        private List<CroppedBitmap?>? EditTilemapSize(Vec2<int> newTilemapSize)
+        {
+            if (CurrentTilemap.TilesetsUsed.Count == 0)
+                return null;
+
+            int newTilemapArraySize = newTilemapSize.X * newTilemapSize.Y;
+            List<CroppedBitmap?> TilemapImages = Enumerable.Repeat<CroppedBitmap?>(null, newTilemapArraySize).ToList();
+            TileData[] Copy = (TileData[])CurrentTilemap.Tiles.Clone();
+            
+            CurrentTilemap.Tiles = new TileData[newTilemapArraySize];
+            Vec2<int> UnusedTile = new Vec2<int>(-1);
+            Vec2<int> MinTilemapSize = new Vec2<int>(Math.Min(CurrentTilemap.TilemapSize.X, newTilemapSize.X), Math.Min(CurrentTilemap.TilemapSize.Y, newTilemapSize.Y));
+            for (int y = 0; y < MinTilemapSize.Y; y++)
+            {
+                for (int x = 0; x < MinTilemapSize.X; x++)
+                {
+                    int oldTileArrayIndex = x + y * CurrentTilemap.TilemapSize.X;
+
+                    if (Copy[oldTileArrayIndex].TilesetIndex == null || Copy[oldTileArrayIndex].TilesetIndex == UnusedTile)
+                        continue;
+
+                    int newTileArrayIndex = x + y * newTilemapSize.X;
+                    CurrentTilemap.Tiles[newTileArrayIndex] = Copy[oldTileArrayIndex];
+                    Tileset tileset = _tilesetsService.Tilesets[Copy[oldTileArrayIndex].TilesetID];
+                    TilemapImages[newTileArrayIndex] = tileset.TileImages[Copy[oldTileArrayIndex].TilesetIndex.X + tileset.NrTiles.X * Copy[oldTileArrayIndex].TilesetIndex.Y];
+                }
+            }
+
+            return TilemapImages;
         }
 
         private void OnCreateNewTilemap(object? parameter)
@@ -166,6 +211,43 @@ namespace TileBasedLevelEditor.ViewModels
         private void OnCancelNewTileset(object? parameter)
         {
             RequestCloseNewTilemapDialog?.Invoke();
+        }
+
+        private void OnEditCurrentTilemap(object? parameter)
+        {
+            _navigationService.OpenEditTilemapDialog(this);
+
+            NewTilemapName = CurrentTilemap.Name;
+            NewTilemapTileWidth = CurrentTilemap.TileSize.X.ToString();
+            NewTilemapTileHeight = CurrentTilemap.TileSize.Y.ToString();
+            NewTilemapWidth = CurrentTilemap.TilemapSize.X.ToString();
+            NewTilemapHeight = CurrentTilemap.TilemapSize.Y.ToString();
+        }
+
+        private void OnSaveEditedCurrentTilemap(object? parameter)
+        {
+            if (NewTilemapName.Length < 3
+                || NewTilemapTileHeight.Length == 0 || NewTilemapTileWidth.Length == 0
+                || NewTilemapWidth.Length == 0 || NewTilemapHeight.Length == 0)
+                return;
+
+            Vec2<int> NewTilemapTileSize = new Vec2<int>(Int32.Parse(NewTilemapTileWidth), Int32.Parse(NewTilemapTileHeight));
+            Vec2<int> NewTilemapSize = new Vec2<int>(Int32.Parse(NewTilemapWidth), Int32.Parse(NewTilemapHeight));
+
+            List<CroppedBitmap?>? NewTileImages = EditTilemapSize(NewTilemapSize);
+
+            CurrentTilemap.Name = NewTilemapName;
+            CurrentTilemap.TileSize = NewTilemapTileSize;
+            CurrentTilemap.TilemapSize = NewTilemapSize;
+
+            TileGridVM.SetNewGridValues(NewTilemapTileSize, NewTilemapSize, NewTileImages);
+
+            RequestCloseEditTilemapDialog?.Invoke();
+        }
+
+        private void OnCancelEditingTilemap(object? parameter)
+        {
+            RequestCloseEditTilemapDialog?.Invoke();
         }
 
         private void OnTileHovered(Vec2<int>? vec)
@@ -210,7 +292,7 @@ namespace TileBasedLevelEditor.ViewModels
                 if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
                     continue;
 
-                CurrentTilemap.SetTile(tilemapTileIndex, tileData.Item1.TilesetIndex, tileData.Item1.TilesetName);
+                CurrentTilemap.SetTile(tilemapTileIndex, tileData.Item1.TilesetIndex, tileData.Item1.TilesetID);
                 TileGridVM.TileImages[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = tileData.Item2;
             }
             HoveredOverTiles.Clear();
