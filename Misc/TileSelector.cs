@@ -30,16 +30,14 @@ namespace TileBasedLevelEditor.Misc
 
             if (tileSize <= 0)
                 return null;
-
-            
             
             if (vm.ShouldBeCentered)
             {
-                mousePosition.X -= (grid.ActualWidth - vm.CanvasWidth) / 2;
-                mousePosition.Y -= (grid.ActualHeight - vm.CanvasHeight) / 2;
+                mousePosition.X -= (grid.ActualWidth - vm.CanvasWidth * vm.ScrollViewerZoom) / 2.0;
+                mousePosition.Y -= (grid.ActualHeight - vm.CanvasHeight * vm.ScrollViewerZoom) / 2.0;
             }
 
-            Vec2<int> hoveredTile = new Vec2<int>((int)(mousePosition.X / (tileSize.X + tilesMargin.X)), (int)(mousePosition.Y / (tileSize.Y + tilesMargin.Y)));
+            Vec2<int> hoveredTile = new Vec2<int>((int)(mousePosition.X / ((tileSize.X + tilesMargin.X) * vm.ScrollViewerZoom)), (int)(mousePosition.Y / ((tileSize.Y + tilesMargin.Y) * vm.ScrollViewerZoom)));
             System.Diagnostics.Debug.WriteLine($"HoveredTile: {hoveredTile.X} {hoveredTile.Y}");
 
             if (hoveredTile >= vm.NrTiles)
