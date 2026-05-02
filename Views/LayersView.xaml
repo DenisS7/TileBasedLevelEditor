@@ -14,20 +14,40 @@
 
     <Grid Background="{StaticResource DarkBackgroundBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <TextBlock Grid.Row="0"
-                   Text="Layers"
-                   FontSize="20"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Center"
-                   TextAlignment="Left"
-                   Margin="5 0 0 0"/>
-        
+
+        <Grid Grid.Row="0"
+              Margin="5 0 2 2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="Layers"
+                       FontSize="20"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       TextAlignment="Left"/>
+
+            <Button Grid.Column="2"
+                    Content="Delete Layer"
+                    IsEnabled="{Binding CanDeleteLayer}"
+                    Command="{Binding DeleteLayerCommand}"/>
+
+            <Button Grid.Column="3"
+                    Content="Add Layer"
+                    Margin="10 0 0 0"
+                    Command="{Binding AddLayerCommand}"/>
+        </Grid>
+
         <ListView Grid.Row="1"
                   ItemsSource="{Binding Layers}"
+                  SelectedItem="{Binding SelectedLayer}"
                   Background="{StaticResource BackgroundBrush}"
                   MaxWidth="{Binding ActualWidth, ElementName=Root}"
                   BorderBrush="{StaticResource DarkBackgroundBrush}"
