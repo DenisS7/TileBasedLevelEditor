@@ -16,10 +16,11 @@ using System.Windows.Navigation;
 using System.Windows;
 using TileBasedLevelEditor.Serialization;
 using Newtonsoft.Json.Bson;
+using TileBasedLevelEditor.Interfaces;
 
 namespace TileBasedLevelEditor.ViewModels
 {
-    public class TilemapEditorViewModel : ViewModelBase
+    public class TilemapEditorViewModel : ViewModelBase, ITilemapLayersParent
     {
         private ICustomNavigationService _navigationService;
         private ITilesetsService _tilesetsService;
@@ -100,7 +101,6 @@ namespace TileBasedLevelEditor.ViewModels
         public event Action? RequestCloseNewTilemapDialog;
         public event Action? RequestCloseEditTilemapDialog;
 
-        public ObservableCollection<Layer> Layers => new ObservableCollection<Layer>(CurrentTilemap.Layers);
         public TileGridViewModel TileGridVM { get; }
         public List<Tuple<Vec2<int>, CroppedBitmap?>> HoveredOverTiles = [];
 

@@ -36,7 +36,7 @@
                 </Grid.RowDefinitions>
 
                 <views:LayersView Grid.Row="0"
-                                  DataContext="{Binding TilemapViewModel}"/>
+                                  DataContext="{Binding LayersViewModel}"/>
                 <views:TilesetView Grid.Row="1"
                                    DataContext="{Binding TilesetViewModel}"/>
                     

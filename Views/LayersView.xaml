@@ -9,7 +9,7 @@
              xmlns:converters="clr-namespace:TileBasedLevelEditor.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=vm:TilemapEditorViewModel}"
+             d:DataContext="{d:DesignInstance Type=vm:LayersViewModel}"
              x:Name="Root">
 
     <Grid Background="{StaticResource DarkBackgroundBrush}">
