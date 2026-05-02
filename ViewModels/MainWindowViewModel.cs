@@ -17,14 +17,13 @@ namespace TileBasedLevelEditor.ViewModels
 
         public TilesetViewModel TilesetViewModel { get; private set; }
         public TilemapEditorViewModel TilemapViewModel { get; private set; }
-        public LayersViewModel LayersViewModel { get; private set; }
+        public LayersViewModel LayersViewModel => TilemapViewModel.LayersViewModel;
         public MainWindowViewModel(ICustomNavigationService navigationService, TilesetsService tilesetsService) 
         { 
             _navigationService = navigationService;
             _tilesetsService = tilesetsService;
             TilesetViewModel = new TilesetViewModel(_navigationService, tilesetsService);
             TilemapViewModel = new TilemapEditorViewModel(_navigationService, tilesetsService);
-            LayersViewModel = new LayersViewModel(TilemapViewModel, _navigationService);
         }
     }
 }

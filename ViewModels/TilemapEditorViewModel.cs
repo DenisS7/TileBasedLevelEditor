@@ -24,6 +24,9 @@ namespace TileBasedLevelEditor.ViewModels
     {
         private ICustomNavigationService _navigationService;
         private ITilesetsService _tilesetsService;
+        
+        private LayersViewModel _layersViewModel;
+        public LayersViewModel LayersViewModel => _layersViewModel;
 
         private Tilemap _currentTilemap;
 
@@ -94,9 +97,9 @@ namespace TileBasedLevelEditor.ViewModels
                 OnPropertyChanged(nameof(NewTilemapHeight));
             }
         }
-
         private Vec2<int> TilemapSize => CurrentTilemap.TilemapSize;
         public Vec2<int> TileSize => CurrentTilemap.TileSize;
+        private Layer? SelectedLayer => _layersViewModel.SelectedLayer;
 
         public event Action? RequestCloseNewTilemapDialog;
         public event Action? RequestCloseEditTilemapDialog;
@@ -115,6 +118,7 @@ namespace TileBasedLevelEditor.ViewModels
         {
             _navigationService = navigationService;
             _tilesetsService = tilesetsService;
+            _layersViewModel = new LayersViewModel(this, _navigationService);
             _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(32, 32), new Vec2<int>(20, 15));
             TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, true, false);
 
@@ -130,6 +134,7 @@ namespace TileBasedLevelEditor.ViewModels
         {
             _navigationService = navigationService;
             _tilesetsService = tilesetsService;
+            _layersViewModel = new LayersViewModel(this, _navigationService);
             _currentTilemap = currentTilemap;
             TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, true, false);
 
@@ -148,24 +153,28 @@ namespace TileBasedLevelEditor.ViewModels
 
             int newTilemapArraySize = newTilemapSize.X * newTilemapSize.Y;
             List<CroppedBitmap?> TilemapImages = Enumerable.Repeat<CroppedBitmap?>(null, newTilemapArraySize).ToList();
-            TileData[] Copy = (TileData[])CurrentTilemap.Tiles.Clone();
-            
-            CurrentTilemap.Tiles = new TileData[newTilemapArraySize];
-            Vec2<int> UnusedTile = new Vec2<int>(-1);
-            Vec2<int> MinTilemapSize = new Vec2<int>(Math.Min(CurrentTilemap.TilemapSize.X, newTilemapSize.X), Math.Min(CurrentTilemap.TilemapSize.Y, newTilemapSize.Y));
-            for (int y = 0; y < MinTilemapSize.Y; y++)
+
+            foreach (Layer layer in CurrentTilemap.Layers)
             {
-                for (int x = 0; x < MinTilemapSize.X; x++)
+                TileData[] Copy = (TileData[])layer.Tiles.Clone();
+
+                layer.Tiles = new TileData[newTilemapArraySize];
+                Vec2<int> UnusedTile = new Vec2<int>(-1);
+                Vec2<int> MinTilemapSize = new Vec2<int>(Math.Min(CurrentTilemap.TilemapSize.X, newTilemapSize.X), Math.Min(CurrentTilemap.TilemapSize.Y, newTilemapSize.Y));
+                for (int y = 0; y < MinTilemapSize.Y; y++)
                 {
-                    int oldTileArrayIndex = x + y * CurrentTilemap.TilemapSize.X;
+                    for (int x = 0; x < MinTilemapSize.X; x++)
+                    {
+                        int oldTileArrayIndex = x + y * CurrentTilemap.TilemapSize.X;
 
-                    if (Copy[oldTileArrayIndex].TilesetIndex == null || Copy[oldTileArrayIndex].TilesetIndex == UnusedTile)
-                        continue;
+                        if (Copy[oldTileArrayIndex].TilesetIndex == null || Copy[oldTileArrayIndex].TilesetIndex == UnusedTile)
+                            continue;
 
-                    int newTileArrayIndex = x + y * newTilemapSize.X;
-                    CurrentTilemap.Tiles[newTileArrayIndex] = Copy[oldTileArrayIndex];
-                    Tileset tileset = _tilesetsService.Tilesets[Copy[oldTileArrayIndex].TilesetID];
-                    TilemapImages[newTileArrayIndex] = tileset.TileImages[Copy[oldTileArrayIndex].TilesetIndex.X + tileset.NrTiles.X * Copy[oldTileArrayIndex].TilesetIndex.Y];
+                        int newTileArrayIndex = x + y * newTilemapSize.X;
+                        layer.Tiles[newTileArrayIndex] = Copy[oldTileArrayIndex];
+                        Tileset tileset = _tilesetsService.Tilesets[Copy[oldTileArrayIndex].TilesetID];
+                        TilemapImages[newTileArrayIndex] = tileset.TileImages[Copy[oldTileArrayIndex].TilesetIndex.X + tileset.NrTiles.X * Copy[oldTileArrayIndex].TilesetIndex.Y];
+                    }
                 }
             }
 
@@ -250,11 +259,21 @@ namespace TileBasedLevelEditor.ViewModels
             RequestCloseEditTilemapDialog?.Invoke();
         }
 
-        private void OnTileHovered(Vec2<int>? vec)
+        private Layer? GetUsedLayerForTileAt(int tileArrayIndex, int layerPosition = 0)
         {
-            if (TileSelectedService.SelectedTiles == null || TileSelectedService.SelectedTiles.Count == 0)
-                return;
+            int currentLayerPosition = 0;
+            foreach (Layer layer in CurrentTilemap.Layers)
+            {
+                if (layer.Tiles[tileArrayIndex].TilesetID != Guid.Empty &&
+                    ++currentLayerPosition > layerPosition)
+                    return layer;
+            }
 
+            return null;
+        }
+
+        private void ClearPreviousHoveredTiles()
+        {
             foreach (Tuple<Vec2<int>, CroppedBitmap?> previousHovered in HoveredOverTiles)
             {
                 Vec2<int> tilemapTileIndex = previousHovered.Item1;
@@ -262,6 +281,14 @@ namespace TileBasedLevelEditor.ViewModels
             }
 
             HoveredOverTiles.Clear();
+        }
+
+        private void OnTileHovered(Vec2<int>? vec)
+        {
+            if (TileSelectedService.SelectedTiles == null || TileSelectedService.SelectedTiles.Count == 0)
+                return;
+
+            ClearPreviousHoveredTiles();
 
             if (vec == null)
                 return;
@@ -284,6 +311,13 @@ namespace TileBasedLevelEditor.ViewModels
             if (TileSelectedService.SelectedTiles == null || TileSelectedService.SelectedTiles.Count == 0 || vec == null)
                 return;
 
+            if (SelectedLayer == null)
+            {
+                _layersViewModel.SelectedLayer = CurrentTilemap.Layers.Last();
+            }
+
+            ClearPreviousHoveredTiles();
+
             TileData referenceTile = TileSelectedService.SelectedTiles[0].Item1;
 
             foreach (Tuple<TileData, CroppedBitmap?> tileData in TileSelectedService.SelectedTiles)
@@ -292,10 +326,39 @@ namespace TileBasedLevelEditor.ViewModels
                 if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
                     continue;
 
-                CurrentTilemap.SetTile(tilemapTileIndex, tileData.Item1.TilesetIndex, tileData.Item1.TilesetID);
-                TileGridVM.TileImages[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = tileData.Item2;
+                CurrentTilemap.SetTile(tilemapTileIndex, tileData.Item1.TilesetIndex, SelectedLayer, tileData.Item1.TilesetID);
+                int tilemapTileArrayIndex = tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X;
+                Layer? topMostLayer = GetUsedLayerForTileAt(tilemapTileArrayIndex);
+                if (topMostLayer == null || topMostLayer == SelectedLayer)
+                {
+                    TileGridVM.TileImages[tilemapTileArrayIndex] = tileData.Item2;
+                }
             }
             HoveredOverTiles.Clear();
+        }
+
+        public void OnLayerDeleted(Layer layer)
+        {
+            for(int i = 0; i < layer.Tiles.Length; i++)
+            {
+                if (layer.Tiles[i].TilesetID == Guid.Empty)
+                    continue;
+
+                Layer? topMostLayer = GetUsedLayerForTileAt(i, 0);
+
+                if(topMostLayer == null)
+                {
+                    TileGridVM.TileImages[i] = null;
+                    continue;
+                }
+
+                if (topMostLayer.VisibilityIndex < layer.VisibilityIndex)
+                    continue;
+
+                Tileset tileset = _tilesetsService.Tilesets[topMostLayer.Tiles[i].TilesetID];
+                int tilesetTileArrayIndex = topMostLayer.Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topMostLayer.Tiles[i].TilesetIndex.Y;
+                TileGridVM.TileImages[i] = tileset.TileImages[tilesetTileArrayIndex];
+            }
         }
     }
 }

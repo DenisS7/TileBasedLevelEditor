@@ -16,23 +16,21 @@ namespace TileBasedLevelEditor.Models
 
         public Vec2<int> TilemapSize { get; set; }
 
-        public TileData[] Tiles { get; set; }
-
         public HashSet<Guid> TilesetsUsed { get; }
 
-        public List<Layer> Layers { get; } = [
-            new Layer("Layer 1"), 
-            new Layer("Layer 2"), 
-            new Layer("Layer 3"), 
-            new Layer("Layer 4")];
+        public List<Layer> Layers { get; }
 
         public Tilemap(string name, Vec2<int> tileSize, Vec2<int> tilemapSize)
         {
             Name = name;
             TileSize = tileSize;
             TilemapSize = tilemapSize;
-            Tiles = new TileData[tilemapSize.X * tilemapSize.Y];
             TilesetsUsed = new HashSet<Guid>();
+            int tilemapArraySize = tilemapSize.X * tilemapSize.Y;
+            Layers = [  new Layer("Layer 1", tilemapArraySize, 0),
+                        new Layer("Layer 2", tilemapArraySize, 1),
+                        new Layer("Layer 3", tilemapArraySize, 2),
+                        new Layer("Layer 4", tilemapArraySize, 3)];
         }
 
         public int GetTilemapArrayIndex(Vec2<int> tilemapIndex)
@@ -40,14 +38,17 @@ namespace TileBasedLevelEditor.Models
             return tilemapIndex.Y * TilemapSize.X + tilemapIndex.X;
         }
 
-        public void SetTile(Vec2<int> tilemapIndex, Vec2<int> tilesetIndex, Guid tilesetID)
+        public void SetTile(Vec2<int> tilemapIndex, Vec2<int> tilesetIndex, Layer layer, Guid tilesetID)
         {
-            int tilemapArrayIndex = GetTilemapArrayIndex(tilemapIndex);
-            if (0 > tilemapArrayIndex || tilemapArrayIndex >= Tiles.Length)
+            if (!Layers.Contains(layer))
                 return;
 
-            Tiles[tilemapArrayIndex].TilesetIndex = tilesetIndex;
-            Tiles[tilemapArrayIndex].TilesetID = tilesetID;
+            int tilemapArrayIndex = GetTilemapArrayIndex(tilemapIndex);
+            if (0 > tilemapArrayIndex || tilemapArrayIndex >= layer.Tiles.Length)
+                return;
+
+            layer.Tiles[tilemapArrayIndex].TilesetIndex = tilesetIndex;
+            layer.Tiles[tilemapArrayIndex].TilesetID = tilesetID;
 
             TilesetsUsed.Add(tilesetID);
         }

@@ -10,5 +10,7 @@ namespace TileBasedLevelEditor.Interfaces
     public interface ITilemapLayersParent
     {
         public Tilemap CurrentTilemap { get; }
+
+        public void OnLayerDeleted(Layer layer);
     }
 }

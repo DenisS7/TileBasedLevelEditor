@@ -15,7 +15,7 @@ namespace TileBasedLevelEditor.ViewModels
 {
     public class LayersViewModel : ViewModelBase
     {
-        private readonly ITilemapLayersParent _parent;
+        private ITilemapLayersParent _parent;
         private ICustomNavigationService _navigationService;
 
         private Layer? _selectedLayer;
@@ -53,8 +53,12 @@ namespace TileBasedLevelEditor.ViewModels
             if (SelectedLayer != null)
                 newLayerIndex = _layers.IndexOf(SelectedLayer) + 1;
 
-            Layer newLayer = new Layer("New Layer");
+            Layer newLayer = new Layer("New Layer", CurrentTilemap.TilemapSize.X * CurrentTilemap.TilemapSize.Y, newLayerIndex - 1);
             _layers.Insert(newLayerIndex, newLayer);
+            for(int i = newLayer.VisibilityIndex + 1; i < _layers.Count; i++)
+            {
+                ++_layers[i].VisibilityIndex;
+            }
 
             SelectedLayer = newLayer;
             OnPropertyChanged(nameof(SelectedLayer));
@@ -71,6 +75,7 @@ namespace TileBasedLevelEditor.ViewModels
             if (layerIndex >= _layers.Count)
                 --layerIndex;
 
+            _parent.OnLayerDeleted(SelectedLayer);
             SelectedLayer = _layers[layerIndex];
 
             OnPropertyChanged(nameof(SelectedLayer));
