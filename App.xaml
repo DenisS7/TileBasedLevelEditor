@@ -479,7 +479,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource LightBackgroundBrush}"/>
             <Setter Property="BorderThickness" Value="0 0 1 0"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Padding" Value="6 0 0 0"/>
+            <Setter Property="Padding" Value="3 0 0 0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
@@ -491,7 +491,7 @@
                                     Width="Auto"
                                     Padding="{TemplateBinding Padding}">
                                 <ContentPresenter Name="HeaderContent"
-                                                  Margin="0,0,0,1"
+                                                  Margin="0 0 0 1"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   RecognizesAccessKey="True"
@@ -509,7 +509,7 @@
                                 <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource ButtonPressedBackgroundBrush}"/>
                                 <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{StaticResource DarkBackgroundBrush}"/>
                                 <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="1"/>
-                                <Setter TargetName="HeaderContent" Property="Margin" Value="0,0,0,0"/>
+                                <Setter TargetName="HeaderContent" Property="Margin" Value="0 0 0 0"/>
                             </Trigger>
                             <Trigger Property="Height" Value="Auto">
                                 <Setter Property="MinHeight" Value="20"/>
@@ -542,7 +542,7 @@
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
                                 <Border Name="HeaderBorder"
-                                        BorderThickness="0,1,0,1"
+                                        BorderThickness="0 1 0 1"
                                         BorderBrush="{TemplateBinding BorderBrush}"
                                         Background="{TemplateBinding Background}"/>
                                 <ControlTemplate.Triggers>
@@ -562,8 +562,8 @@
             <Setter Property="MinHeight" Value="22" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Margin" Value="0" />
-            <Setter Property="Padding" Value="3 0 0 0" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -579,7 +579,7 @@
                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         </Border>
-                        
+
                         <ControlTemplate.Triggers>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
@@ -587,8 +587,8 @@
                                     <Condition Property="IsMouseOver" Value="True" />
                                 </MultiTrigger.Conditions>
                                 <Setter TargetName="Border" Property="Background" Value="{StaticResource LightBackgroundBrush}" />
-
                             </MultiTrigger>
+                            
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource DarkBlueBrush}" />
                             </Trigger>

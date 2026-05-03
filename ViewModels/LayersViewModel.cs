@@ -37,6 +37,7 @@ namespace TileBasedLevelEditor.ViewModels
 
         public ICommand AddLayerCommand { get; }
         public ICommand DeleteLayerCommand { get; }
+        public ICommand ChangeLayerVisibilityCommand { get; }
 
         public LayersViewModel(ITilemapLayersParent parent, ICustomNavigationService navigationService)
         {
@@ -45,6 +46,7 @@ namespace TileBasedLevelEditor.ViewModels
 
             AddLayerCommand = new RelayCommand(AddLayer);
             DeleteLayerCommand = new RelayCommand(DeleteLayer);
+            ChangeLayerVisibilityCommand = new RelayCommand(ChangeLayerVisibility);
         }
 
         private void AddLayer(object? parameter)
@@ -79,6 +81,16 @@ namespace TileBasedLevelEditor.ViewModels
             SelectedLayer = _layers[layerIndex];
 
             OnPropertyChanged(nameof(SelectedLayer));
+            OnPropertyChanged(nameof(Layers));
+        }
+
+        private void ChangeLayerVisibility(object? parameter)
+        {
+            if (parameter is not Layer layer)
+                return;
+
+            layer.Visible = !layer.Visible;
+            _parent.OnLayerVisibilityChange(layer);
             OnPropertyChanged(nameof(Layers));
         }
     }

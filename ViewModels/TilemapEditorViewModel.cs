@@ -259,17 +259,22 @@ namespace TileBasedLevelEditor.ViewModels
             RequestCloseEditTilemapDialog?.Invoke();
         }
 
-        private Layer? GetUsedLayerForTileAt(int tileArrayIndex, int layerPosition = 0)
+        private List<Layer> GetTopLayersForTileAt(int tileArrayIndex, int n = 1)
         {
+            List<Layer> topLayers = new List<Layer>();
             int currentLayerPosition = 0;
             foreach (Layer layer in CurrentTilemap.Layers)
             {
-                if (layer.Tiles[tileArrayIndex].TilesetID != Guid.Empty &&
-                    ++currentLayerPosition > layerPosition)
-                    return layer;
+                if (layer.Tiles[tileArrayIndex].TilesetID != Guid.Empty)
+                {
+                    topLayers.Add(layer);
+                    currentLayerPosition++;
+                    if (currentLayerPosition >= n)
+                        return topLayers;
+                }
             }
 
-            return null;
+            return topLayers;
         }
 
         private void ClearPreviousHoveredTiles()
@@ -328,8 +333,8 @@ namespace TileBasedLevelEditor.ViewModels
 
                 CurrentTilemap.SetTile(tilemapTileIndex, tileData.Item1.TilesetIndex, SelectedLayer, tileData.Item1.TilesetID);
                 int tilemapTileArrayIndex = tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X;
-                Layer? topMostLayer = GetUsedLayerForTileAt(tilemapTileArrayIndex);
-                if (topMostLayer == null || topMostLayer == SelectedLayer)
+                List<Layer> topLayers = GetTopLayersForTileAt(tilemapTileArrayIndex);
+                if (topLayers.Count == 0 || topLayers[0] == SelectedLayer)
                 {
                     TileGridVM.TileImages[tilemapTileArrayIndex] = tileData.Item2;
                 }
@@ -344,20 +349,63 @@ namespace TileBasedLevelEditor.ViewModels
                 if (layer.Tiles[i].TilesetID == Guid.Empty)
                     continue;
 
-                Layer? topMostLayer = GetUsedLayerForTileAt(i, 0);
+                List<Layer> topLayers = GetTopLayersForTileAt(i);
 
-                if(topMostLayer == null)
+                if(topLayers.Count == 0)
                 {
                     TileGridVM.TileImages[i] = null;
                     continue;
                 }
 
-                if (topMostLayer.VisibilityIndex < layer.VisibilityIndex)
+                if (topLayers[0].VisibilityIndex < layer.VisibilityIndex)
                     continue;
 
-                Tileset tileset = _tilesetsService.Tilesets[topMostLayer.Tiles[i].TilesetID];
-                int tilesetTileArrayIndex = topMostLayer.Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topMostLayer.Tiles[i].TilesetIndex.Y;
+                Tileset tileset = _tilesetsService.Tilesets[topLayers[0].Tiles[i].TilesetID];
+                int tilesetTileArrayIndex = topLayers[0].Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topLayers[0].Tiles[i].TilesetIndex.Y;
                 TileGridVM.TileImages[i] = tileset.TileImages[tilesetTileArrayIndex];
+            }
+        }
+        public void OnLayerVisibilityChange(Layer layer)
+        {
+            if (layer.Visible)
+            {
+                for (int i = 0; i < layer.Tiles.Length; i++)
+                {
+                    if (layer.Tiles[i].TilesetID == Guid.Empty)
+                        continue;
+
+                    List<Layer> topLayers = GetTopLayersForTileAt(i);
+
+                    if (topLayers.Count == 0 || topLayers[0] != layer)
+                        continue;
+
+                    Tileset tileset = _tilesetsService.Tilesets[topLayers[0].Tiles[i].TilesetID];
+                    int tilesetTileArrayIndex = topLayers[0].Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topLayers[0].Tiles[i].TilesetIndex.Y;
+                    TileGridVM.TileImages[i] = tileset.TileImages[tilesetTileArrayIndex];
+                }
+            }
+            else
+            {
+                for (int i = 0; i < layer.Tiles.Length; i++)
+                {
+                    if (layer.Tiles[i].TilesetID == Guid.Empty)
+                        continue;
+
+                    List<Layer> topLayers = GetTopLayersForTileAt(i, 2);
+
+                    if (topLayers.Count > 0 && topLayers[0] != layer)
+                        continue;
+
+                    if (topLayers.Count == 1)
+                    {
+                        TileGridVM.TileImages[i] = null;
+                        continue;
+                    }
+
+                    Tileset tileset = _tilesetsService.Tilesets[topLayers[1].Tiles[i].TilesetID];
+                    int tilesetTileArrayIndex = topLayers[1].Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topLayers[1].Tiles[i].TilesetIndex.Y;
+                    TileGridVM.TileImages[i] = tileset.TileImages[tilesetTileArrayIndex];
+                }
             }
         }
     }

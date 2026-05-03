@@ -46,6 +46,7 @@
         </Grid>
 
         <ListView Grid.Row="1"
+                  x:Name="LayerList"
                   ItemsSource="{Binding Layers}"
                   SelectedItem="{Binding SelectedLayer}"
                   Background="{StaticResource BackgroundBrush}"
@@ -58,9 +59,51 @@
             <ListView.View>
                 <GridView AllowsColumnReorder="False"
                           ColumnHeaderContainerStyle="{StaticResource LayersColumnHeader}">
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Opacity" DisplayMemberBinding="{Binding Opacity}" Width="55"/>
-                    <GridViewColumn Header="Visible" DisplayMemberBinding="{Binding Visible}" Width="55"/>
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"
+                                           Margin="3 0 0 0"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Opacity" DisplayMemberBinding="{Binding Opacity}" 
+                                    Width="55"/>
+                    <GridViewColumn Header="Visible" 
+                                    Width="55">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.ChangeLayerVisibilityCommand, ElementName=LayerList}"
+                                        CommandParameter="{Binding}"
+                                        Padding="0"
+                                        Margin="0"
+                                        Background="Transparent"
+                                        BorderThickness="0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                    <Image Width="16"
+                                           Height="16">
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Setter Property="Source" Value="/Resources/Visible.png"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Visible}" Value="False">
+                                                        <Setter Property="Source" Value="/Resources/Hidden.png"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </Button>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
