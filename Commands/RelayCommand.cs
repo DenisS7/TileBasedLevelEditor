@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NotesApp.Commands
+namespace TileBasedLevelEditor.Commands
 {
     public class RelayCommand : CommandBase
     {

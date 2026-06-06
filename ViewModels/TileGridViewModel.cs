@@ -1,5 +1,5 @@
-﻿using NotesApp.Commands;
-using NotesApp.ViewModel;
+﻿using TileBasedLevelEditor.Commands;
+using TileBasedLevelEditor.ViewModel;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
