@@ -13,6 +13,5 @@ namespace TileBasedLevelEditor.Interfaces
         public Tilemap CurrentTilemap { get; }
 
         public void OnLayerDeleted(LayerViewModel layer);
-        public void OnLayerVisibilityChange(LayerViewModel layer);
     }
 }

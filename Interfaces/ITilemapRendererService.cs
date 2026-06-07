@@ -16,5 +16,6 @@ namespace TileBasedLevelEditor.Interfaces
 
         public void ApplyTile(TilemapCellViewModel cell, int tileIndex, LayerViewModel layer);
         public void EraseTile(TilemapCellViewModel cell, LayerViewModel layer);
+        public void RemoveLayer(List<TilemapCellViewModel> cells, LayerViewModel layer);
     }
 }

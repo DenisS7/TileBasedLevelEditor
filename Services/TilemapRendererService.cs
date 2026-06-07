@@ -68,6 +68,12 @@ namespace TileBasedLevelEditor.Services
             TileData tile = layer.Tiles[tileIndex];
             CroppedBitmap? tileImage = _tilesetsService.GetTileImageAt(tile.TilesetID, tile.TilesetIndex);
 
+            if (cell.Tiles.Count == 0)
+            {
+                cell.Tiles.Add(new TilemapCellTileViewModel(tile, tileImage, layer));
+                return;
+            }
+
             for (int i = 0; i < cell.Tiles.Count; i++)
             {
                 if (cell.Tiles[i].LayerVM.VisibilityIndex == layer.VisibilityIndex)
@@ -82,8 +88,6 @@ namespace TileBasedLevelEditor.Services
                     return;
                 }
             }
-
-            cell.Tiles.Add(new TilemapCellTileViewModel(tile, tileImage, layer));
         }
 
         public void EraseTile(TilemapCellViewModel cell, LayerViewModel layer)
@@ -95,6 +99,17 @@ namespace TileBasedLevelEditor.Services
                     cell.Tiles.RemoveAt(i);
                     break;
                 }
+            }
+        }
+
+        public void RemoveLayer(List<TilemapCellViewModel> cells, LayerViewModel layer)
+        {
+            for (int i = 0; i < cells.Count; i++)
+            {
+                if (layer.Tiles[i].TilesetID == Guid.Empty)
+                    continue;
+
+                EraseTile(cells[i], layer);
             }
         }
     }
