@@ -16,8 +16,8 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Image Source="{Binding Image}"
-                           Opacity="{Binding Layer.Opacity}"
-                           Visibility="{Binding Layer.Visible, Converter={StaticResource BoolToVis}}"
+                           Opacity="{Binding LayerVM.Opacity}"
+                           Visibility="{Binding LayerVM.Visible, Converter={StaticResource BoolToVis}}"
                            RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

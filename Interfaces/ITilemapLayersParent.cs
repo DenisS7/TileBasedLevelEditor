@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TileBasedLevelEditor.Models;
+using TileBasedLevelEditor.ViewModels;
 
 namespace TileBasedLevelEditor.Interfaces
 {
@@ -11,7 +12,7 @@ namespace TileBasedLevelEditor.Interfaces
     {
         public Tilemap CurrentTilemap { get; }
 
-        public void OnLayerDeleted(Layer layer);
-        public void OnLayerVisibilityChange(Layer layer);
+        public void OnLayerDeleted(LayerViewModel layer);
+        public void OnLayerVisibilityChange(LayerViewModel layer);
     }
 }

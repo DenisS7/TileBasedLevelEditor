@@ -318,7 +318,7 @@ namespace TileBasedLevelEditor.ViewModels
 
             if (SelectedLayer == null)
             {
-                LayersViewModel.SelectedLayer = LayersViewModel.SelectedLayer;//CurrentTilemap.Layers.Last();
+                LayersViewModel.SelectedLayer = LayersViewModel.Layers.Last();//CurrentTilemap.Layers.Last();
             }
 
             ClearPreviousHoveredTiles();
@@ -342,7 +342,7 @@ namespace TileBasedLevelEditor.ViewModels
 			HoveredOverTiles.Clear();
         }
 
-        public void OnLayerDeleted(Layer layer)
+        public void OnLayerDeleted(LayerViewModel layer)
         {
             //for(int i = 0; i < layer.Tiles.Length; i++)
             //{
@@ -366,7 +366,7 @@ namespace TileBasedLevelEditor.ViewModels
             //}
             TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(this));
         }
-        public void OnLayerVisibilityChange(Layer layer)
+        public void OnLayerVisibilityChange(LayerViewModel layer)
         {
             List<int> refreshTiles = new List<int>();
             //if (layer.Visible)

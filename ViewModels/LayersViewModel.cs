@@ -74,29 +74,28 @@ namespace TileBasedLevelEditor.ViewModels
 
         private void DeleteLayer(object? parameter)
         {
-            int layerIndex = Layers.IndexOf(SelectedLayer);
+            if (parameter is not LayerViewModel deletedLayer)
+                return;
 
-            if (!Layers.Remove(SelectedLayer))
+            int layerIndex = Layers.IndexOf(deletedLayer);
+
+            if (!Layers.Remove(deletedLayer))
                 return;
 
             if (layerIndex >= Layers.Count)
                 --layerIndex;
 
-            _parent.OnLayerDeleted(SelectedLayer.Layer);
+            _parent.OnLayerDeleted(deletedLayer);
             SelectedLayer = Layers[layerIndex];
-
-            OnPropertyChanged(nameof(SelectedLayer));
-            OnPropertyChanged(nameof(Layers));
         }
 
         private void ChangeLayerVisibility(object? parameter)
         {
-            if (parameter is not Layer layer)
+            if (parameter is not LayerViewModel layer)
                 return;
 
             layer.Visible = !layer.Visible;
             _parent.OnLayerVisibilityChange(layer);
-            OnPropertyChanged(nameof(Layers));
         }
     }
 }
