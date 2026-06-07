@@ -6,34 +6,33 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using TileBasedLevelEditor.Models;
-using TileBasedLevelEditor.Services.Rendering;
-using TileBasedLevelEditor.Services.Rendering.Data;
+using TileBasedLevelEditor.ViewModels.Rendering;
 
 namespace TileBasedLevelEditor.ViewModels
 {
     public class TilesetGridViewModel : TileGridViewModel
     {
-        private List<TilesetCell> _cells;
-        public override IReadOnlyList<GridCell> Cells => _cells;
+        private List<TilesetCellViewModel> _cells;
+        public override IReadOnlyList<GridCellViewModel> Cells => _cells;
 
         public TilesetGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tilesetImages, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
             : base(tileSize, nrTiles, tileMargin, OnHover, OnSelect, shouldBeCentered, gridLinesVisibility, canHighlightSelectedTile)
         {
             int arraySize = nrTiles.X * nrTiles.Y;
-            _cells = new List<TilesetCell>();
+            _cells = new List<TilesetCellViewModel>();
             if (tilesetImages != null)
             {
                 Debug.Assert(tilesetImages.Count() == arraySize);
                 for (int i = 0; i < arraySize; i++)
                 {
-                    _cells.Add(new TilesetCell(new Vec2<int>(i % nrTiles.Y, i / nrTiles.X), tilesetImages[i]));
+                    _cells.Add(new TilesetCellViewModel(new Vec2<int>(i % nrTiles.Y, i / nrTiles.X), tilesetImages[i]));
                 }
             }
             else
             {
                 for (int i = 0; i < arraySize; i++)
                 {
-                    _cells.Add(new TilesetCell(new Vec2<int>(i % nrTiles.Y, i / nrTiles.X), null));
+                    _cells.Add(new TilesetCellViewModel(new Vec2<int>(i % nrTiles.Y, i / nrTiles.X), null));
                 }
             }
         }
@@ -46,7 +45,7 @@ namespace TileBasedLevelEditor.ViewModels
             for (int i = 0; i < tileImages.Count(); i++)
             {
                 if (i >= _cells.Count)
-                    _cells.Add(new TilesetCell(new Vec2<int>(i % NrTiles.Y, i / NrTiles.X), tileImages[i]));
+                    _cells.Add(new TilesetCellViewModel(new Vec2<int>(i % NrTiles.Y, i / NrTiles.X), tileImages[i]));
                 else
                     _cells[i].Image = tileImages[i];
             }

@@ -39,5 +39,14 @@ namespace TileBasedLevelEditor.Services
             int tilesetArrayIndex = tilesetIndex.X + tilesetIndex.Y * tileset.NrTiles.X;
             return tileset.TileImages[tilesetArrayIndex];
         }
+
+        public CroppedBitmap? GetTileImageAt(Guid tilesetID, int tilesetIndex)
+        {
+            Tileset? tileset;
+            if (!Tilesets.TryGetValue(tilesetID, out tileset))
+                return null;
+
+            return tileset.TileImages[tilesetIndex];
+        }
     }
 }

@@ -1,10 +1,10 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:models="clr-namespace:TileBasedLevelEditor.Services.Rendering.Data">
+                    xmlns:renderVM="clr-namespace:TileBasedLevelEditor.ViewModels.Rendering">
 
     <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
-    <DataTemplate DataType="{x:Type models:TilemapCell}">
+    <DataTemplate DataType="{x:Type renderVM:TilemapCellViewModel}">
 
         <ItemsControl ItemsSource="{Binding Tiles}">
             <ItemsControl.ItemsPanel>

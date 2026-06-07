@@ -11,9 +11,10 @@ namespace TileBasedLevelEditor.Services
 {
     public interface ITilesetsService
     {
-        Dictionary<Guid, Tileset> Tilesets { get; }
-        void Reload();
-        void AddTileset(Tileset tileset);
-        CroppedBitmap? GetTileImageAt(Guid tilesetID, Vec2<int> tilesetIndex);
+        public Dictionary<Guid, Tileset> Tilesets { get; }
+        public void Reload();
+        public void AddTileset(Tileset tileset);
+        public CroppedBitmap? GetTileImageAt(Guid tilesetID, Vec2<int> tilesetIndex);
+        public CroppedBitmap? GetTileImageAt(Guid tilesetID, int tilesetIndex);
     }
 }

@@ -1,8 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:cells="clr-namespace:TileBasedLevelEditor.Services.Rendering.Data">
+                    xmlns:cells="clr-namespace:TileBasedLevelEditor.ViewModels.Rendering">
 
-    <DataTemplate DataType="{x:Type cells:TilesetCell}">
+    <DataTemplate DataType="{x:Type cells:TilesetCellViewModel}">
         <Image Source="{Binding Image}"
                RenderOptions.BitmapScalingMode="NearestNeighbor"
                Margin="{Binding DataContext.ThicknessTileMargin,

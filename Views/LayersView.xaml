@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
              xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
              xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
@@ -47,7 +48,7 @@
 
         <ListView Grid.Row="1"
                   x:Name="LayerList"
-                  ItemsSource="{Binding Layers}"
+                  ItemsSource="{Binding Layers, diag:PresentationTraceSources.TraceLevel=High}"
                   SelectedItem="{Binding SelectedLayer}"
                   Background="{StaticResource BackgroundBrush}"
                   MaxWidth="{Binding ActualWidth, ElementName=Root}"

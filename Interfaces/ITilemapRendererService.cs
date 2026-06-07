@@ -5,12 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using TileBasedLevelEditor.Models;
-using TileBasedLevelEditor.Services.Rendering.Data;
+using TileBasedLevelEditor.ViewModels;
+using TileBasedLevelEditor.ViewModels.Rendering;
 
 namespace TileBasedLevelEditor.Interfaces
 {
     public interface ITilemapRendererService
     {
-        List<TilemapCell> GetRenderedTilemapCells(Tilemap tilemap);
+        public List<TilemapCellViewModel> GetRenderedTilemapCells(TilemapEditorViewModel tilemap);
+
+        public void ApplyTile(TilemapCellViewModel cell, int tileIndex, LayerViewModel layer);
+        public void EraseTile(TilemapCellViewModel cell, LayerViewModel layer);
     }
 }

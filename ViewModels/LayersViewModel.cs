@@ -17,9 +17,10 @@ namespace TileBasedLevelEditor.ViewModels
     {
         private ITilemapLayersParent _parent;
         private ICustomNavigationService _navigationService;
+        public Tilemap CurrentTilemap => _parent.CurrentTilemap;
 
-        private Layer? _selectedLayer;
-        public Layer? SelectedLayer
+        private LayerViewModel? _selectedLayer;
+        public LayerViewModel? SelectedLayer
         {
             get => _selectedLayer;
             set
@@ -29,11 +30,9 @@ namespace TileBasedLevelEditor.ViewModels
                 OnPropertyChanged(nameof(CanDeleteLayer));
             }
         }
-        public Tilemap CurrentTilemap => _parent.CurrentTilemap;
 
-        private List<Layer> _layers => CurrentTilemap.Layers;
-        public ObservableCollection<Layer> Layers => new ObservableCollection<Layer>(_layers);
-        public bool CanDeleteLayer => SelectedLayer != null && _layers.Count > 1;
+        public ObservableCollection<LayerViewModel> Layers { get; }// => new ObservableCollection<Layer>(_layers);
+        public bool CanDeleteLayer => SelectedLayer != null && Layers.Count > 1;
 
         public ICommand AddLayerCommand { get; }
         public ICommand DeleteLayerCommand { get; }
@@ -43,6 +42,12 @@ namespace TileBasedLevelEditor.ViewModels
         {
             _parent = parent;
             _navigationService = navigationService;
+            Layers = new ObservableCollection<LayerViewModel>();
+
+            foreach (Layer layer in _parent.CurrentTilemap.Layers)
+            {
+                Layers.Add(new LayerViewModel(layer));
+            }
 
             AddLayerCommand = new RelayCommand(AddLayer);
             DeleteLayerCommand = new RelayCommand(DeleteLayer);
@@ -51,15 +56,15 @@ namespace TileBasedLevelEditor.ViewModels
 
         private void AddLayer(object? parameter)
         {
-            int newLayerIndex = _layers.Count;
+            int newLayerIndex = Layers.Count;
             if (SelectedLayer != null)
-                newLayerIndex = _layers.IndexOf(SelectedLayer) + 1;
+                newLayerIndex = Layers.IndexOf(SelectedLayer) + 1;
 
-            Layer newLayer = new Layer("New Layer", CurrentTilemap.TilemapSize.X * CurrentTilemap.TilemapSize.Y, newLayerIndex - 1);
-            _layers.Insert(newLayerIndex, newLayer);
-            for(int i = newLayer.VisibilityIndex + 1; i < _layers.Count; i++)
+            LayerViewModel newLayer = new LayerViewModel(new Layer("New Layer", CurrentTilemap.TilemapSize.X * CurrentTilemap.TilemapSize.Y, newLayerIndex - 1));
+            Layers.Insert(newLayerIndex, newLayer);
+            for(int i = newLayer.VisibilityIndex + 1; i < Layers.Count; i++)
             {
-                ++_layers[i].VisibilityIndex;
+                ++Layers[i].VisibilityIndex;
             }
 
             SelectedLayer = newLayer;
@@ -69,16 +74,16 @@ namespace TileBasedLevelEditor.ViewModels
 
         private void DeleteLayer(object? parameter)
         {
-            int layerIndex = _layers.IndexOf(SelectedLayer);
+            int layerIndex = Layers.IndexOf(SelectedLayer);
 
-            if (!_layers.Remove(SelectedLayer))
+            if (!Layers.Remove(SelectedLayer))
                 return;
 
-            if (layerIndex >= _layers.Count)
+            if (layerIndex >= Layers.Count)
                 --layerIndex;
 
-            _parent.OnLayerDeleted(SelectedLayer);
-            SelectedLayer = _layers[layerIndex];
+            _parent.OnLayerDeleted(SelectedLayer.Layer);
+            SelectedLayer = Layers[layerIndex];
 
             OnPropertyChanged(nameof(SelectedLayer));
             OnPropertyChanged(nameof(Layers));

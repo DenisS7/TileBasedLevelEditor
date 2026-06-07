@@ -8,9 +8,8 @@ using TileBasedLevelEditor.Commands;
 using TileBasedLevelEditor.CustomArgs;
 using TileBasedLevelEditor.Misc;
 using TileBasedLevelEditor.Models;
-using TileBasedLevelEditor.Services.Rendering;
-using TileBasedLevelEditor.Services.Rendering.Data;
 using TileBasedLevelEditor.ViewModel;
+using TileBasedLevelEditor.ViewModels.Rendering;
 
 namespace TileBasedLevelEditor.ViewModels
 {
@@ -52,7 +51,7 @@ namespace TileBasedLevelEditor.ViewModels
         public Vec2<int> GridSize => TileSize * NrTiles;
 
         //private ObservableCollection<GridCell> _tileImages;
-        public abstract IReadOnlyList<GridCell> Cells { get; }
+        public abstract IReadOnlyList<GridCellViewModel> Cells { get; }
         //{
         //    get => _tileImages;
         //    set

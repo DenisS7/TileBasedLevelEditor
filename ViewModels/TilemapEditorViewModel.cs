@@ -17,6 +17,7 @@ using TileBasedLevelEditor.Models;
 using TileBasedLevelEditor.Serialization;
 using TileBasedLevelEditor.Services;
 using TileBasedLevelEditor.ViewModel;
+using TileBasedLevelEditor.ViewModels.Rendering;
 using TileBasedLevelEditor.Views;
 
 namespace TileBasedLevelEditor.ViewModels
@@ -27,8 +28,8 @@ namespace TileBasedLevelEditor.ViewModels
         private ITilesetsService _tilesetsService;
         private ITilemapRendererService _tilemapRendererService;
         
-        private LayersViewModel _layersViewModel;
-        public LayersViewModel LayersViewModel => _layersViewModel;
+        //private LayersViewModel _layersViewModel;
+       // public LayersViewModel LayersViewModel;// => _layersViewModel;
 
         private Tilemap _currentTilemap;
 
@@ -40,7 +41,7 @@ namespace TileBasedLevelEditor.ViewModels
                 _currentTilemap = value;
                 //TO DO use tilemap tiles after serialization is done
                 TilemapGridVM.SetNewGridValues(CurrentTilemap.TileSize, CurrentTilemap.TilemapSize);//, null);
-                TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(_currentTilemap));
+                TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(this));
                 OnPropertyChanged(nameof(CurrentTilemap));
             }
         }
@@ -99,13 +100,15 @@ namespace TileBasedLevelEditor.ViewModels
                 OnPropertyChanged(nameof(NewTilemapHeight));
             }
         }
-        private Vec2<int> TilemapSize => CurrentTilemap.TilemapSize;
+        public Vec2<int> TilemapSize => CurrentTilemap.TilemapSize;
         public Vec2<int> TileSize => CurrentTilemap.TileSize;
-        private Layer? SelectedLayer => _layersViewModel.SelectedLayer;
+        public LayerViewModel? SelectedLayer => LayersViewModel.SelectedLayer;
+        public ObservableCollection<LayerViewModel> Layers => LayersViewModel.Layers;
 
         public event Action? RequestCloseNewTilemapDialog;
         public event Action? RequestCloseEditTilemapDialog;
 
+        public LayersViewModel LayersViewModel { get; }
         public TilemapGridViewModel TilemapGridVM { get; }
         public List<Tuple<Vec2<int>, CroppedBitmap?>> HoveredOverTiles = [];
 
@@ -121,9 +124,10 @@ namespace TileBasedLevelEditor.ViewModels
             _navigationService = navigationService;
             _tilesetsService = tilesetsService;
             _tilemapRendererService = tilemapRendererService;
-            _layersViewModel = new LayersViewModel(this, _navigationService);
             _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(32, 32), new Vec2<int>(20, 15));
+            
             TilemapGridVM = new TilemapGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), OnTileHovered, OnTileSelected, true, true, false);
+            LayersViewModel = new LayersViewModel(this, _navigationService);
 
             CreateNewTilemapCommand = new RelayCommand(OnCreateNewTilemap);
             AddNewTilemapCommand = new RelayCommand(OnAddNewTilemap);
@@ -137,8 +141,9 @@ namespace TileBasedLevelEditor.ViewModels
             : this (navigationService, tilesetsService, tilemapRendererService)
         {
             _currentTilemap = currentTilemap;
+
             TilemapGridVM.SetNewGridValues(TileSize, TilemapSize);//, tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
-            TilemapGridVM.SetNewTilemap(tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
+            TilemapGridVM.SetNewTilemap(tilemapRendererService.GetRenderedTilemapCells(this));
         }
 
         private void EditTilemapSize(Vec2<int> newTilemapSize)
@@ -244,7 +249,7 @@ namespace TileBasedLevelEditor.ViewModels
             CurrentTilemap.TilemapSize = NewTilemapSize;
 
             TilemapGridVM.SetNewGridValues(NewTilemapTileSize, NewTilemapSize); //, NewTileImages);
-            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
+            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(this));
 
             RequestCloseEditTilemapDialog?.Invoke();
         }
@@ -313,7 +318,7 @@ namespace TileBasedLevelEditor.ViewModels
 
             if (SelectedLayer == null)
             {
-                _layersViewModel.SelectedLayer = CurrentTilemap.Layers.Last();
+                LayersViewModel.SelectedLayer = LayersViewModel.SelectedLayer;//CurrentTilemap.Layers.Last();
             }
 
             ClearPreviousHoveredTiles();
@@ -326,19 +331,14 @@ namespace TileBasedLevelEditor.ViewModels
                 if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
                     continue;
 
-                CurrentTilemap.SetTile(tilemapTileIndex, tileData.Item1.TilesetIndex, SelectedLayer, tileData.Item1.TilesetID);
-                //int tilemapTileArrayIndex = tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X;
-                //List<Layer> topLayers = GetTopLayersForTileAt(tilemapTileArrayIndex);
-                //if (topLayers.Count == 0 || topLayers[0] == SelectedLayer)
-                //{
-                //    TileGridVM.TileImages[tilemapTileArrayIndex] = tileData.Item2;
-                //}
+                int tilemapArrayTileIndex = tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X;
+                CurrentTilemap.SetTile(tilemapArrayTileIndex, tileData.Item1.TilesetIndex, SelectedLayer.Layer, tileData.Item1.TilesetID);
+                TilemapCellViewModel cell = TilemapGridVM.GetCell(tilemapArrayTileIndex);
+                _tilemapRendererService.ApplyTile(cell, tilemapArrayTileIndex, SelectedLayer);
+                Debug.WriteLine(cell.Tiles.Count);
             }
 
-            //TO DO optimize
-            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
-			//TileGridVM.TileImages = 
-
+            //OnPropertyChanged(nameof(TilemapGridVM.Cells));
 			HoveredOverTiles.Clear();
         }
 
@@ -364,7 +364,7 @@ namespace TileBasedLevelEditor.ViewModels
             //    int tilesetTileArrayIndex = topLayers[0].Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topLayers[0].Tiles[i].TilesetIndex.Y;
             //    TileGridVM.TileImages[i] = tileset.TileImages[tilesetTileArrayIndex];
             //}
-            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
+            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(this));
         }
         public void OnLayerVisibilityChange(Layer layer)
         {
@@ -405,7 +405,7 @@ namespace TileBasedLevelEditor.ViewModels
             //		refreshTiles.Add(i);
             //	}
             //}
-            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
+            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(this));
         }
     }
 }

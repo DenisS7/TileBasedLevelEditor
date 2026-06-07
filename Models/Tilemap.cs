@@ -40,15 +40,20 @@ namespace TileBasedLevelEditor.Models
 
         public void SetTile(Vec2<int> tilemapIndex, Vec2<int> tilesetIndex, Layer layer, Guid tilesetID)
         {
+            int tilemapArrayIndex = GetTilemapArrayIndex(tilemapIndex);
+            SetTile(tilemapArrayIndex, tilesetIndex, layer, tilesetID);
+        }
+
+        public void SetTile(int tilemapIndex, Vec2<int> tilesetIndex, Layer layer, Guid tilesetID)
+        {
             if (!Layers.Contains(layer))
                 return;
 
-            int tilemapArrayIndex = GetTilemapArrayIndex(tilemapIndex);
-            if (0 > tilemapArrayIndex || tilemapArrayIndex >= layer.Tiles.Length)
+            if (0 > tilemapIndex || tilemapIndex >= layer.Tiles.Length)
                 return;
 
-            layer.Tiles[tilemapArrayIndex].TilesetIndex = tilesetIndex;
-            layer.Tiles[tilemapArrayIndex].TilesetID = tilesetID;
+            layer.Tiles[tilemapIndex].TilesetIndex = tilesetIndex;
+            layer.Tiles[tilemapIndex].TilesetID = tilesetID;
 
             TilesetsUsed.Add(tilesetID);
         }
