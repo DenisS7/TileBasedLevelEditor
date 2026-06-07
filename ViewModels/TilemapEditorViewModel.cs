@@ -148,7 +148,7 @@ namespace TileBasedLevelEditor.ViewModels
         private void EditTilemapSize(Vec2<int> newTilemapSize)
         {
             if (CurrentTilemap.TilesetsUsed.Count == 0)
-                return;// null;
+                return;
 
             int newTilemapArraySize = newTilemapSize.X * newTilemapSize.Y;
 
@@ -174,9 +174,6 @@ namespace TileBasedLevelEditor.ViewModels
                     }
                 }
             }
-
-            //TO DO Optimize
-            //return _tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap);
         }
 
         private void OnCreateNewTilemap(object? parameter)
@@ -258,24 +255,6 @@ namespace TileBasedLevelEditor.ViewModels
             RequestCloseEditTilemapDialog?.Invoke();
         }
 
-        private List<Layer> GetTopLayersForTileAt(int tileArrayIndex, int n = 1)
-        {
-            List<Layer> topLayers = new List<Layer>();
-            int currentLayerPosition = 0;
-            foreach (Layer layer in CurrentTilemap.Layers)
-            {
-                if (layer.Tiles[tileArrayIndex].TilesetID != Guid.Empty)
-                {
-                    topLayers.Add(layer);
-                    currentLayerPosition++;
-                    if (currentLayerPosition >= n)
-                        return topLayers;
-                }
-            }
-
-            return topLayers;
-        }
-
         private void ClearPreviousHoveredTiles()
         {
             foreach (Tuple<Vec2<int>, CroppedBitmap?> previousHovered in HoveredOverTiles)
@@ -289,25 +268,25 @@ namespace TileBasedLevelEditor.ViewModels
 
         private void OnTileHovered(Vec2<int>? vec)
         {
-            if (TileSelectedService.SelectedTiles == null || TileSelectedService.SelectedTiles.Count == 0)
-                return;
-
-            ClearPreviousHoveredTiles();
-
-            if (vec == null)
-                return;
-
-            TileData referenceTile = TileSelectedService.SelectedTiles[0].Item1;
-
-            foreach (Tuple<TileData, CroppedBitmap?> tileData in TileSelectedService.SelectedTiles)
-            {
-                Vec2<int> tilemapTileIndex = vec + tileData.Item1.TilesetIndex - referenceTile.TilesetIndex;
-                if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
-                    continue;
-                
-                //HoveredOverTiles.Add(new Tuple<Vec2<int>, CroppedBitmap?>(tilemapTileIndex, TileGridVM.Cells[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X]));
-                //TileGridVM.Cells[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = tileData.Item2;
-            }
+            //if (TileSelectedService.SelectedTiles == null || TileSelectedService.SelectedTiles.Count == 0)
+            //    return;
+            //
+            //ClearPreviousHoveredTiles();
+            //
+            //if (vec == null)
+            //    return;
+            //
+            //TileData referenceTile = TileSelectedService.SelectedTiles[0].Item1;
+            //
+            //foreach (Tuple<TileData, CroppedBitmap?> tileData in TileSelectedService.SelectedTiles)
+            //{
+            //    Vec2<int> tilemapTileIndex = vec + tileData.Item1.TilesetIndex - referenceTile.TilesetIndex;
+            //    if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
+            //        continue;
+            //    
+            //    //HoveredOverTiles.Add(new Tuple<Vec2<int>, CroppedBitmap?>(tilemapTileIndex, TileGridVM.Cells[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X]));
+            //    //TileGridVM.Cells[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = tileData.Item2;
+            //}
         }
 
         private void OnTileSelected(Vec2<int>? vec)
@@ -322,20 +301,19 @@ namespace TileBasedLevelEditor.ViewModels
 
             ClearPreviousHoveredTiles();
 
-            TileData referenceTile = TileSelectedService.SelectedTiles[0].Item1;
+            TileData referenceTile = TileSelectedService.SelectedTiles[0].TileData;
 
-            foreach (Tuple<TileData, CroppedBitmap?> tileData in TileSelectedService.SelectedTiles)
+            foreach (TileSelectedService.TilemapPreviewTile tileData in TileSelectedService.SelectedTiles)
             {
-                Vec2<int> tilemapTileIndex = vec + tileData.Item1.TilesetIndex - referenceTile.TilesetIndex;
+                Vec2<int> tilemapTileIndex = vec + tileData.TileData.TilesetIndex - referenceTile.TilesetIndex;
                 if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
                     continue;
 
                 int tilemapArrayTileIndex = tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X;
-                CurrentTilemap.SetTile(tilemapArrayTileIndex, tileData.Item1.TilesetIndex, SelectedLayer.Layer, tileData.Item1.TilesetID);
+                CurrentTilemap.SetTile(tilemapArrayTileIndex, tileData.TileData.TilesetIndex, SelectedLayer.Layer, tileData.TileData.TilesetID);
                 TilemapGridVM.ApplyTile(tilemapArrayTileIndex, SelectedLayer);
             }
 
-            //OnPropertyChanged(nameof(TilemapGridVM.Cells));
 			HoveredOverTiles.Clear();
         }
 

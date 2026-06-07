@@ -10,8 +10,9 @@ namespace TileBasedLevelEditor.Services
 {
     public static class TileSelectedService
     {
-        private static List<Tuple<TileData, CroppedBitmap?>>? _selectedTiles;
-        public static List<Tuple<TileData, CroppedBitmap?>>? SelectedTiles
+        public record TilemapPreviewTile(Vec2<int> Index, TileData TileData, CroppedBitmap? Image);
+        private static List<TilemapPreviewTile>? _selectedTiles;
+        public static List<TilemapPreviewTile>? SelectedTiles
         {
             get => _selectedTiles;
             set
@@ -23,7 +24,6 @@ namespace TileBasedLevelEditor.Services
                 }
             }
         }
-
 
         public static EventHandler? SelectedTileChanged; 
     }

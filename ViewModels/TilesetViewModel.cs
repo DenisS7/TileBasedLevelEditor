@@ -207,7 +207,7 @@ namespace TileBasedLevelEditor.ViewModels
                 return;
 
             HashSet<Vec2<int>> SelectedTiles = [];
-            List<Tuple<TileData, CroppedBitmap?>> SelectedTilesFull = [];
+            List<TileSelectedService.TilemapPreviewTile> SelectedTilesFull = [];
             foreach (SelectionArea selectionArea in TilesetGridVM.SelectionAreas)
             {
                 for (int i = selectionArea.StartTile.X; i <= selectionArea.EndTile.X; i++)
@@ -217,10 +217,8 @@ namespace TileBasedLevelEditor.ViewModels
                         if (SelectedTiles.Add(new Vec2<int>(i, j)))
                         {
                             CroppedBitmap? tileImage = CurrentTileset.TileImages[SelectedTiles.Last().X + SelectedTiles.Last().Y * NrTiles.X];
-
-							SelectedTilesFull.Add(new Tuple<TileData, CroppedBitmap?>(new TileData(SelectedTiles.Last(), CurrentTileset.ID), tileImage));
+							SelectedTilesFull.Add(new TileSelectedService.TilemapPreviewTile(new Vec2<int>(i, j), new TileData(SelectedTiles.Last(), CurrentTileset.ID), tileImage));
                         }
-                        
                     }
                 }
             }

@@ -20,28 +20,6 @@ namespace TileBasedLevelEditor.Services
             _tilesetsService = tilesetsService;
         }
 
-        private List<Layer> GetTopLayersForTileAt(Tilemap tilemap, int tileIndex, bool onlyVisible, int n = 1)
-        {
-            List<Layer> topLayers = new List<Layer>();
-            int currentLayerPosition = 0;
-            
-            foreach (Layer layer in tilemap.Layers)
-            {
-                if (onlyVisible && !layer.Visible)
-                    continue;
-
-                if (layer.Tiles[tileIndex].TilesetID != Guid.Empty)
-                {
-                    topLayers.Add(layer);
-                    currentLayerPosition++;
-                    if (currentLayerPosition >= n && n != 0)
-                        return topLayers;
-                }
-            }
-
-            return topLayers;
-        }
-
         public List<TilemapCellViewModel> GetRenderedTilemapCells(TilemapEditorViewModel tilemapVM)
         {
             List<TilemapCellViewModel> result = new List<TilemapCellViewModel>();
@@ -49,7 +27,7 @@ namespace TileBasedLevelEditor.Services
             for (int i = 0; i < tilemapVM.TilemapSize.X * tilemapVM.TilemapSize.Y; i++)
             {
                 TilemapCellViewModel cell = new TilemapCellViewModel(new Vec2<int>(i % tilemapVM.TilemapSize.Y, i / tilemapVM.TilemapSize.X));
-                for (int j = tilemapVM.Layers.Count - 1; j >= 0; j--)
+                for (int j = 0; j < tilemapVM.Layers.Count; j++)
                 {
                     TileData tile = tilemapVM.Layers[j].Tiles[i];
                     if (tile.TilesetID == Guid.Empty)
@@ -68,12 +46,6 @@ namespace TileBasedLevelEditor.Services
             TileData tile = layer.Tiles[tileIndex];
             CroppedBitmap? tileImage = _tilesetsService.GetTileImageAt(tile.TilesetID, tile.TilesetIndex);
 
-            if (cell.Tiles.Count == 0)
-            {
-                cell.Tiles.Add(new TilemapCellTileViewModel(tile, tileImage, layer));
-                return;
-            }
-
             for (int i = 0; i < cell.Tiles.Count; i++)
             {
                 if (cell.Tiles[i].LayerVM.VisibilityIndex == layer.VisibilityIndex)
@@ -88,6 +60,8 @@ namespace TileBasedLevelEditor.Services
                     return;
                 }
             }
+
+            cell.Tiles.Add(new TilemapCellTileViewModel(tile, tileImage, layer));
         }
 
         public void EraseTile(TilemapCellViewModel cell, LayerViewModel layer)

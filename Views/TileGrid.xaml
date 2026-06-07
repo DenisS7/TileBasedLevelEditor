@@ -63,24 +63,6 @@
                         </Style>
                     </Canvas.Style>
                     
-                    <!--ItemsControl ItemsSource="{Binding TileImages}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="{Binding DataContext.NrTiles.X, ElementName=TileGridRoot}"
-                                             Rows="{Binding DataContext.NrTiles.Y, ElementName=TileGridRoot}"
-                                             Background="Transparent"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Image Source="{Binding}"
-                                           Margin="{Binding DataContext.ThicknessTileMargin, ElementName=TileGridRoot}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl-->
-
                     <ItemsControl ItemsSource="{Binding Cells}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -90,6 +72,9 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
+
+                    <ContentControl Content="{Binding Path=(misc:TileGridOverlayBehavior.Content), RelativeSource={RelativeSource AncestorType=local:TileGrid}}"
+                                    IsHitTestVisible="False"/>
 
                     <ItemsControl ItemsSource="{Binding GridLines}"
                                   Visibility="{Binding GridLinesVisibility, Converter={StaticResource BoolToVis}}">

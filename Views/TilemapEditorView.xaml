@@ -4,10 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
+             xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
              xmlns:viewModels="clr-namespace:TileBasedLevelEditor.ViewModels"
+             xmlns:converters="clr-namespace:TileBasedLevelEditor.Converters"
              d:DataContext="{d:DesignInstance Type=viewModels:TilemapEditorViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="Root">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:GridTileToPixelConverter x:Key="GridTileToPixelConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
     <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
@@ -39,6 +48,49 @@
         </Grid>
 
         <local:TileGrid Grid.Row="1"
-                        DataContext="{Binding TilemapGridVM}"/>
+                        DataContext="{Binding TilemapGridVM}"
+                        x:Name="TileGridRoot">
+            <misc:TileGridOverlayBehavior.Content>
+                <ItemsControl ItemsSource="{Binding PreviewTiles}"
+                              IsHitTestVisible="False">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding Image}" 
+                                   Opacity="0.8"
+                                   Width="{Binding DataContext.TileSize.X, ElementName=TileGridRoot}"
+                                   Height="{Binding DataContext.TileSize.Y, ElementName=TileGridRoot}"
+                                   RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource GridTileToPixelConverter}">
+                                        <Binding Path="Index.X"/>
+                                        <Binding Path="DataContext.TileSize.X" RelativeSource="{RelativeSource AncestorType=local:TileGrid}"/>
+                                        <Binding Path="DataContext.TileMargin.X" RelativeSource="{RelativeSource AncestorType=local:TileGrid}"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Canvas.Top">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource GridTileToPixelConverter}">
+                                        <Binding Path="Index.Y"/>
+                                        <Binding Path="DataContext.TileSize.Y" RelativeSource="{RelativeSource AncestorType=local:TileGrid}"/>
+                                        <Binding Path="DataContext.TileMargin.Y" RelativeSource="{RelativeSource AncestorType=local:TileGrid}"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+            </misc:TileGridOverlayBehavior.Content>
+        </local:TileGrid>
     </Grid>
 </UserControl>

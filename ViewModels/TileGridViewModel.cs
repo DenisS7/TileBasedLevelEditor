@@ -49,17 +49,7 @@ namespace TileBasedLevelEditor.ViewModels
         }
 
         public Vec2<int> GridSize => TileSize * NrTiles;
-
-        //private ObservableCollection<GridCell> _tileImages;
         public abstract IReadOnlyList<GridCellViewModel> Cells { get; }
-        //{
-        //    get => _tileImages;
-        //    set
-        //    {
-        //        _tileImages = value;
-        //        OnPropertyChanged(nameof(Cells));
-        //    }
-        //}
 
         private bool _gridLinesVisibility;
 
@@ -254,6 +244,7 @@ namespace TileBasedLevelEditor.ViewModels
                 }
 
                 OnHover?.Invoke(HoveredTileIndex);
+                OnTileHovered(HoveredTileIndex);
             });
 
             SelectTileCommand = new RelayCommand(p =>
@@ -396,5 +387,7 @@ namespace TileBasedLevelEditor.ViewModels
 
             return new SelectionArea(StartTile, EndTile, TileSize, TileMargin);
         }
+
+        protected abstract void OnTileHovered(Vec2<int>? initTile);
     }
 }

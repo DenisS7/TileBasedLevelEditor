@@ -56,5 +56,9 @@ namespace TileBasedLevelEditor.ViewModels
             _cells.Clear();
             OnPropertyChanged(nameof(Cells));
         }
+
+        protected override void OnTileHovered(Vec2<int>? initTile)
+        {
+        }
     }
 }
