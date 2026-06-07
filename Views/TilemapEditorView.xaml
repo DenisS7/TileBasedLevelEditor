@@ -39,6 +39,6 @@
         </Grid>
 
         <local:TileGrid Grid.Row="1"
-                        DataContext="{Binding TileGridVM}"/>
+                        DataContext="{Binding TilemapGridVM}"/>
     </Grid>
 </UserControl>

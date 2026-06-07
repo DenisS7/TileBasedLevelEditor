@@ -17,9 +17,10 @@ namespace TileBasedLevelEditor
         {
             CustomNavigationService navigationService = new CustomNavigationService();
             TilesetsService tilesetsService = new TilesetsService();
+            TilemapRendererService tilemapRendererService = new TilemapRendererService(tilesetsService);
             MainWindow = new MainWindow()
             {
-                DataContext = new MainWindowViewModel(navigationService, tilesetsService)
+                DataContext = new MainWindowViewModel(navigationService, tilesetsService, tilemapRendererService)
             };
             MainWindow.Show();
             base.OnStartup(e);

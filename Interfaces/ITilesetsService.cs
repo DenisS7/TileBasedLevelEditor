@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using TileBasedLevelEditor.Models;
 
 namespace TileBasedLevelEditor.Services
@@ -13,5 +14,6 @@ namespace TileBasedLevelEditor.Services
         Dictionary<Guid, Tileset> Tilesets { get; }
         void Reload();
         void AddTileset(Tileset tileset);
+        CroppedBitmap? GetTileImageAt(Guid tilesetID, Vec2<int> tilesetIndex);
     }
 }

@@ -26,7 +26,7 @@ namespace TileBasedLevelEditor.ViewModels
     public class TilesetViewModel : ViewModelBase
     {
         private ICustomNavigationService _navigationService;
-        private TilesetsService _tilesetsService;
+        private ITilesetsService _tilesetsService;
         public ObservableCollection<Tileset> Tilesets => new ObservableCollection<Tileset>(_tilesetsService.Tilesets.Values);
         private Tileset? _currentTileset;
 
@@ -46,9 +46,10 @@ namespace TileBasedLevelEditor.ViewModels
 
                 if (_currentTileset != null)
                 {
-                    TileGridVM.SetNewGridValues(TileSize, NrTiles, _currentTileset.TileImages);
-                    TileGridVM.IsTileHovered = false;
-                    TileGridVM.SelectTileCommand.Execute(new TileSelectionArgs(null, false, DragStage.Start));
+                    TilesetGridVM.SetNewGridValues(TileSize, NrTiles);
+                    TilesetGridVM.SetNewTileImages(_currentTileset.TileImages);
+                    TilesetGridVM.IsTileHovered = false;
+                    TilesetGridVM.SelectTileCommand.Execute(new TileSelectionArgs(null, false, DragStage.Start));
                      
                     //TO DO
                     //TileGridVM.TileMargin = ;
@@ -56,7 +57,7 @@ namespace TileBasedLevelEditor.ViewModels
                 }
                 else
                 {
-                    TileGridVM.TileImages.Clear();
+                    TilesetGridVM.ClearCells();
                 }
             }
         }
@@ -117,9 +118,9 @@ namespace TileBasedLevelEditor.ViewModels
         public ICommand CancelNewTilesetCommand { get; }
         public ICommand ChooseTilesetImageCommand { get; }
 
-        public TileGridViewModel TileGridVM { get; }
+        public TilesetGridViewModel TilesetGridVM { get; }
 
-        public TilesetViewModel(ICustomNavigationService navigationService, TilesetsService tilesetsService)
+        public TilesetViewModel(ICustomNavigationService navigationService, ITilesetsService tilesetsService)
         {
             _navigationService = navigationService;
             _tilesetsService = tilesetsService;
@@ -131,7 +132,7 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 _currentTileset = null;
             }
-            TileGridVM = new TileGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), CurrentTileset?.TileImages, OnTileSelected);
+            TilesetGridVM = new TilesetGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), CurrentTileset?.TileImages, OnTileSelected);
             CreateNewTilesetCommand = new RelayCommand(OnCreateNewTileset);
             AddNewTilesetCommand = new RelayCommand(OnAddNewTileset);
             ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
@@ -199,15 +200,15 @@ namespace TileBasedLevelEditor.ViewModels
 
         private void OnTileSelected(Vec2<int>? vec)
         {
-            if (CurrentTileset == null || TileGridVM.InitialSelectedTile == null)
+            if (CurrentTileset == null || TilesetGridVM.InitialSelectedTile == null)
                 return;
 
-            if (TileGridVM.InitialSelectedTile < 0 || TileGridVM.InitialSelectedTile >= NrTiles)
+            if (TilesetGridVM.InitialSelectedTile < 0 || TilesetGridVM.InitialSelectedTile >= NrTiles)
                 return;
 
             HashSet<Vec2<int>> SelectedTiles = [];
             List<Tuple<TileData, CroppedBitmap?>> SelectedTilesFull = [];
-            foreach (SelectionArea selectionArea in TileGridVM.SelectionAreas)
+            foreach (SelectionArea selectionArea in TilesetGridVM.SelectionAreas)
             {
                 for (int i = selectionArea.StartTile.X; i <= selectionArea.EndTile.X; i++)
                 {
@@ -215,8 +216,9 @@ namespace TileBasedLevelEditor.ViewModels
                     {
                         if (SelectedTiles.Add(new Vec2<int>(i, j)))
                         {
-                            CroppedBitmap? tileImage = TileGridVM.TileImages[SelectedTiles.Last().X + SelectedTiles.Last().Y * NrTiles.X];
-                            SelectedTilesFull.Add(new Tuple<TileData, CroppedBitmap?>(new TileData(SelectedTiles.Last(), CurrentTileset.ID), tileImage));
+                            CroppedBitmap? tileImage = CurrentTileset.TileImages[SelectedTiles.Last().X + SelectedTiles.Last().Y * NrTiles.X];
+
+							SelectedTilesFull.Add(new Tuple<TileData, CroppedBitmap?>(new TileData(SelectedTiles.Last(), CurrentTileset.ID), tileImage));
                         }
                         
                     }

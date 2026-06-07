@@ -13,8 +13,15 @@
              Name="TileGridRoot">
 
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-        <converters:BooleanAndToVisibilityConverter x:Key="BoolAndToVis"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TileBasedLevelEditor;component/Views/TilesetCellTemplate.xaml"/>
+                <ResourceDictionary Source="/TileBasedLevelEditor;component/Views/TilemapCellTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+            <converters:BooleanAndToVisibilityConverter x:Key="BoolAndToVis"/>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Background="{StaticResource BackgroundBrush}">
@@ -56,7 +63,7 @@
                         </Style>
                     </Canvas.Style>
                     
-                    <ItemsControl ItemsSource="{Binding TileImages}">
+                    <!--ItemsControl ItemsSource="{Binding TileImages}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid Columns="{Binding DataContext.NrTiles.X, ElementName=TileGridRoot}"
@@ -72,6 +79,16 @@
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
+                    </ItemsControl-->
+
+                    <ItemsControl ItemsSource="{Binding Cells}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="{Binding DataContext.NrTiles.X, ElementName=TileGridRoot}"
+                                             Rows="{Binding DataContext.NrTiles.Y, ElementName=TileGridRoot}"
+                                             Background="Transparent"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                     </ItemsControl>
 
                     <ItemsControl ItemsSource="{Binding GridLines}"

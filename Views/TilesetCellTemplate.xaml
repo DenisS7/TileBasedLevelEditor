@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:cells="clr-namespace:TileBasedLevelEditor.Services.Rendering.Data">
+
+    <DataTemplate DataType="{x:Type cells:TilesetCell}">
+        <Image Source="{Binding Image}"
+               RenderOptions.BitmapScalingMode="NearestNeighbor"
+               Margin="{Binding DataContext.ThicknessTileMargin,
+                                RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+    </DataTemplate>
+
+</ResourceDictionary>

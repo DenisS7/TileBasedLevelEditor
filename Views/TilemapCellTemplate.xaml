@@ -1,0 +1,28 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:models="clr-namespace:TileBasedLevelEditor.Services.Rendering.Data">
+
+    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+    <DataTemplate DataType="{x:Type models:TilemapCell}">
+
+        <ItemsControl ItemsSource="{Binding Tiles}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding Image}"
+                           Opacity="{Binding Layer.Opacity}"
+                           Visibility="{Binding Layer.Visible, Converter={StaticResource BoolToVis}}"
+                           RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+    </DataTemplate>
+
+</ResourceDictionary>

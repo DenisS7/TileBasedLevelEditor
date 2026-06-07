@@ -1,22 +1,23 @@
-﻿using System;
+﻿using Newtonsoft.Json.Bson;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TileBasedLevelEditor.Commands;
-using System.Windows.Input;
-using System.Windows.Shapes;
-using TileBasedLevelEditor.ViewModel;
-using TileBasedLevelEditor.Models;
-using TileBasedLevelEditor.Services;
-using System.Windows.Media.Imaging;
-using System.Diagnostics;
-using System.Windows.Navigation;
 using System.Windows;
-using TileBasedLevelEditor.Serialization;
-using Newtonsoft.Json.Bson;
+using System.Windows.Input;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using TileBasedLevelEditor.Commands;
 using TileBasedLevelEditor.Interfaces;
+using TileBasedLevelEditor.Models;
+using TileBasedLevelEditor.Serialization;
+using TileBasedLevelEditor.Services;
+using TileBasedLevelEditor.ViewModel;
+using TileBasedLevelEditor.Views;
 
 namespace TileBasedLevelEditor.ViewModels
 {
@@ -24,6 +25,7 @@ namespace TileBasedLevelEditor.ViewModels
     {
         private ICustomNavigationService _navigationService;
         private ITilesetsService _tilesetsService;
+        private ITilemapRendererService _tilemapRendererService;
         
         private LayersViewModel _layersViewModel;
         public LayersViewModel LayersViewModel => _layersViewModel;
@@ -37,8 +39,8 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 _currentTilemap = value;
                 //TO DO use tilemap tiles after serialization is done
-                TileGridVM.SetNewGridValues(CurrentTilemap.TileSize, CurrentTilemap.TilemapSize, null);
-
+                TilemapGridVM.SetNewGridValues(CurrentTilemap.TileSize, CurrentTilemap.TilemapSize);//, null);
+                TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(_currentTilemap));
                 OnPropertyChanged(nameof(CurrentTilemap));
             }
         }
@@ -104,7 +106,7 @@ namespace TileBasedLevelEditor.ViewModels
         public event Action? RequestCloseNewTilemapDialog;
         public event Action? RequestCloseEditTilemapDialog;
 
-        public TileGridViewModel TileGridVM { get; }
+        public TilemapGridViewModel TilemapGridVM { get; }
         public List<Tuple<Vec2<int>, CroppedBitmap?>> HoveredOverTiles = [];
 
         public ICommand CreateNewTilemapCommand { get; }
@@ -114,13 +116,14 @@ namespace TileBasedLevelEditor.ViewModels
         public ICommand SaveEditedCurrentTilemapCommand { get; }
         public ICommand CancelEditingTilemapCommand { get; }
 
-        public TilemapEditorViewModel(ICustomNavigationService navigationService, ITilesetsService tilesetsService)
+        public TilemapEditorViewModel(ICustomNavigationService navigationService, ITilesetsService tilesetsService, ITilemapRendererService tilemapRendererService)
         {
             _navigationService = navigationService;
             _tilesetsService = tilesetsService;
+            _tilemapRendererService = tilemapRendererService;
             _layersViewModel = new LayersViewModel(this, _navigationService);
             _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(32, 32), new Vec2<int>(20, 15));
-            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, true, false);
+            TilemapGridVM = new TilemapGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), OnTileHovered, OnTileSelected, true, true, false);
 
             CreateNewTilemapCommand = new RelayCommand(OnCreateNewTilemap);
             AddNewTilemapCommand = new RelayCommand(OnAddNewTilemap);
@@ -130,29 +133,20 @@ namespace TileBasedLevelEditor.ViewModels
             CancelEditingTilemapCommand = new RelayCommand(OnCancelEditingTilemap);
         }
 
-        public TilemapEditorViewModel(ICustomNavigationService navigationService, ITilesetsService tilesetsService, Tilemap currentTilemap)
+        public TilemapEditorViewModel(ICustomNavigationService navigationService, ITilesetsService tilesetsService, ITilemapRendererService tilemapRendererService, Tilemap currentTilemap)
+            : this (navigationService, tilesetsService, tilemapRendererService)
         {
-            _navigationService = navigationService;
-            _tilesetsService = tilesetsService;
-            _layersViewModel = new LayersViewModel(this, _navigationService);
             _currentTilemap = currentTilemap;
-            TileGridVM = new TileGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), null, OnTileHovered, OnTileSelected, true, true, false);
-
-            CreateNewTilemapCommand = new RelayCommand(OnCreateNewTilemap);
-            AddNewTilemapCommand = new RelayCommand(OnAddNewTilemap);
-            CancelNewTilemapCommand = new RelayCommand(OnCancelNewTileset);
-            EditCurrentTilemapCommand = new RelayCommand(OnEditCurrentTilemap);
-            SaveEditedCurrentTilemapCommand = new RelayCommand(OnSaveEditedCurrentTilemap);
-            CancelEditingTilemapCommand = new RelayCommand(OnCancelEditingTilemap);
+            TilemapGridVM.SetNewGridValues(TileSize, TilemapSize);//, tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
+            TilemapGridVM.SetNewTilemap(tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
         }
 
-        private List<CroppedBitmap?>? EditTilemapSize(Vec2<int> newTilemapSize)
+        private void EditTilemapSize(Vec2<int> newTilemapSize)
         {
             if (CurrentTilemap.TilesetsUsed.Count == 0)
-                return null;
+                return;// null;
 
             int newTilemapArraySize = newTilemapSize.X * newTilemapSize.Y;
-            List<CroppedBitmap?> TilemapImages = Enumerable.Repeat<CroppedBitmap?>(null, newTilemapArraySize).ToList();
 
             foreach (Layer layer in CurrentTilemap.Layers)
             {
@@ -173,12 +167,12 @@ namespace TileBasedLevelEditor.ViewModels
                         int newTileArrayIndex = x + y * newTilemapSize.X;
                         layer.Tiles[newTileArrayIndex] = Copy[oldTileArrayIndex];
                         Tileset tileset = _tilesetsService.Tilesets[Copy[oldTileArrayIndex].TilesetID];
-                        TilemapImages[newTileArrayIndex] = tileset.TileImages[Copy[oldTileArrayIndex].TilesetIndex.X + tileset.NrTiles.X * Copy[oldTileArrayIndex].TilesetIndex.Y];
                     }
                 }
             }
 
-            return TilemapImages;
+            //TO DO Optimize
+            //return _tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap);
         }
 
         private void OnCreateNewTilemap(object? parameter)
@@ -243,13 +237,14 @@ namespace TileBasedLevelEditor.ViewModels
             Vec2<int> NewTilemapTileSize = new Vec2<int>(Int32.Parse(NewTilemapTileWidth), Int32.Parse(NewTilemapTileHeight));
             Vec2<int> NewTilemapSize = new Vec2<int>(Int32.Parse(NewTilemapWidth), Int32.Parse(NewTilemapHeight));
 
-            List<CroppedBitmap?>? NewTileImages = EditTilemapSize(NewTilemapSize);
+            EditTilemapSize(NewTilemapSize);
 
             CurrentTilemap.Name = NewTilemapName;
             CurrentTilemap.TileSize = NewTilemapTileSize;
             CurrentTilemap.TilemapSize = NewTilemapSize;
 
-            TileGridVM.SetNewGridValues(NewTilemapTileSize, NewTilemapSize, NewTileImages);
+            TilemapGridVM.SetNewGridValues(NewTilemapTileSize, NewTilemapSize); //, NewTileImages);
+            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
 
             RequestCloseEditTilemapDialog?.Invoke();
         }
@@ -281,8 +276,8 @@ namespace TileBasedLevelEditor.ViewModels
         {
             foreach (Tuple<Vec2<int>, CroppedBitmap?> previousHovered in HoveredOverTiles)
             {
-                Vec2<int> tilemapTileIndex = previousHovered.Item1;
-                TileGridVM.TileImages[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = previousHovered.Item2;
+                //Vec2<int> tilemapTileIndex = previousHovered.Item1;
+                //TilemapGridVM.Cells[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = previousHovered.Item2;
             }
 
             HoveredOverTiles.Clear();
@@ -306,8 +301,8 @@ namespace TileBasedLevelEditor.ViewModels
                 if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
                     continue;
                 
-                HoveredOverTiles.Add(new Tuple<Vec2<int>, CroppedBitmap?>(tilemapTileIndex, TileGridVM.TileImages[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X]));
-                TileGridVM.TileImages[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = tileData.Item2;
+                //HoveredOverTiles.Add(new Tuple<Vec2<int>, CroppedBitmap?>(tilemapTileIndex, TileGridVM.Cells[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X]));
+                //TileGridVM.Cells[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = tileData.Item2;
             }
         }
 
@@ -332,81 +327,85 @@ namespace TileBasedLevelEditor.ViewModels
                     continue;
 
                 CurrentTilemap.SetTile(tilemapTileIndex, tileData.Item1.TilesetIndex, SelectedLayer, tileData.Item1.TilesetID);
-                int tilemapTileArrayIndex = tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X;
-                List<Layer> topLayers = GetTopLayersForTileAt(tilemapTileArrayIndex);
-                if (topLayers.Count == 0 || topLayers[0] == SelectedLayer)
-                {
-                    TileGridVM.TileImages[tilemapTileArrayIndex] = tileData.Item2;
-                }
+                //int tilemapTileArrayIndex = tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X;
+                //List<Layer> topLayers = GetTopLayersForTileAt(tilemapTileArrayIndex);
+                //if (topLayers.Count == 0 || topLayers[0] == SelectedLayer)
+                //{
+                //    TileGridVM.TileImages[tilemapTileArrayIndex] = tileData.Item2;
+                //}
             }
-            HoveredOverTiles.Clear();
+
+            //TO DO optimize
+            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
+			//TileGridVM.TileImages = 
+
+			HoveredOverTiles.Clear();
         }
 
         public void OnLayerDeleted(Layer layer)
         {
-            for(int i = 0; i < layer.Tiles.Length; i++)
-            {
-                if (layer.Tiles[i].TilesetID == Guid.Empty)
-                    continue;
-
-                List<Layer> topLayers = GetTopLayersForTileAt(i);
-
-                if(topLayers.Count == 0)
-                {
-                    TileGridVM.TileImages[i] = null;
-                    continue;
-                }
-
-                if (topLayers[0].VisibilityIndex < layer.VisibilityIndex)
-                    continue;
-
-                Tileset tileset = _tilesetsService.Tilesets[topLayers[0].Tiles[i].TilesetID];
-                int tilesetTileArrayIndex = topLayers[0].Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topLayers[0].Tiles[i].TilesetIndex.Y;
-                TileGridVM.TileImages[i] = tileset.TileImages[tilesetTileArrayIndex];
-            }
+            //for(int i = 0; i < layer.Tiles.Length; i++)
+            //{
+            //    if (layer.Tiles[i].TilesetID == Guid.Empty)
+            //        continue;
+            //
+            //    List<Layer> topLayers = GetTopLayersForTileAt(i);
+            //
+            //    if(topLayers.Count == 0)
+            //    {
+            //        TileGridVM.TileImages[i] = null;
+            //        continue;
+            //    }
+            //
+            //    if (topLayers[0].VisibilityIndex < layer.VisibilityIndex)
+            //        continue;
+            //
+            //    Tileset tileset = _tilesetsService.Tilesets[topLayers[0].Tiles[i].TilesetID];
+            //    int tilesetTileArrayIndex = topLayers[0].Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topLayers[0].Tiles[i].TilesetIndex.Y;
+            //    TileGridVM.TileImages[i] = tileset.TileImages[tilesetTileArrayIndex];
+            //}
+            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
         }
         public void OnLayerVisibilityChange(Layer layer)
         {
-            if (layer.Visible)
-            {
-                for (int i = 0; i < layer.Tiles.Length; i++)
-                {
-                    if (layer.Tiles[i].TilesetID == Guid.Empty)
-                        continue;
-
-                    List<Layer> topLayers = GetTopLayersForTileAt(i);
-
-                    if (topLayers.Count == 0 || topLayers[0] != layer)
-                        continue;
-
-                    Tileset tileset = _tilesetsService.Tilesets[topLayers[0].Tiles[i].TilesetID];
-                    int tilesetTileArrayIndex = topLayers[0].Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topLayers[0].Tiles[i].TilesetIndex.Y;
-                    TileGridVM.TileImages[i] = tileset.TileImages[tilesetTileArrayIndex];
-                }
-            }
-            else
-            {
-                for (int i = 0; i < layer.Tiles.Length; i++)
-                {
-                    if (layer.Tiles[i].TilesetID == Guid.Empty)
-                        continue;
-
-                    List<Layer> topLayers = GetTopLayersForTileAt(i, 2);
-
-                    if (topLayers.Count > 0 && topLayers[0] != layer)
-                        continue;
-
-                    if (topLayers.Count == 1)
-                    {
-                        TileGridVM.TileImages[i] = null;
-                        continue;
-                    }
-
-                    Tileset tileset = _tilesetsService.Tilesets[topLayers[1].Tiles[i].TilesetID];
-                    int tilesetTileArrayIndex = topLayers[1].Tiles[i].TilesetIndex.X + tileset.NrTiles.X * topLayers[1].Tiles[i].TilesetIndex.Y;
-                    TileGridVM.TileImages[i] = tileset.TileImages[tilesetTileArrayIndex];
-                }
-            }
+            List<int> refreshTiles = new List<int>();
+            //if (layer.Visible)
+            //{
+            //    for (int i = 0; i < layer.Tiles.Length; i++)
+            //    {
+            //        if (layer.Tiles[i].TilesetID == Guid.Empty)
+            //            continue;
+            //
+            //        List<Layer> topLayers = GetTopLayersForTileAt(i);
+            //
+            //        if (topLayers.Count == 0 || topLayers[0] != layer)
+            //            continue;
+            //
+            //        refreshTiles.Add(i);
+            //    }
+            //}
+            //else
+            //{
+            //    for (int i = 0; i < layer.Tiles.Length; i++)
+            //    {
+            //        if (layer.Tiles[i].TilesetID == Guid.Empty)
+            //            continue;
+            //
+            //        List<Layer> topLayers = GetTopLayersForTileAt(i, 2);
+            //
+            //        if (topLayers.Count > 0 && topLayers[0] != layer)
+            //            continue;
+            //
+            //        if (topLayers.Count == 1)
+            //        {
+            //            TileGridVM.TileImages[i] = null;
+            //            continue;
+            //        }
+            //
+            //		refreshTiles.Add(i);
+            //	}
+            //}
+            TilemapGridVM.SetNewTilemap(_tilemapRendererService.GetRenderedTilemapCells(CurrentTilemap));
         }
     }
 }

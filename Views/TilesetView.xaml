@@ -54,7 +54,7 @@
                             SelectedItem="{Binding CurrentTileset, Mode=TwoWay}">
                     <TabControl.ContentTemplate>
                         <DataTemplate>
-                            <local:TileGrid DataContext="{Binding DataContext.TileGridVM, ElementName=Root}"/>
+                            <local:TileGrid DataContext="{Binding DataContext.TilesetGridVM, ElementName=Root}"/>
                         </DataTemplate>
                     </TabControl.ContentTemplate>
                 </TabControl>

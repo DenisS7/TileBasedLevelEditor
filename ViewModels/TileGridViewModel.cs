@@ -1,18 +1,20 @@
-﻿using TileBasedLevelEditor.Commands;
-using TileBasedLevelEditor.ViewModel;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using TileBasedLevelEditor.Commands;
 using TileBasedLevelEditor.CustomArgs;
 using TileBasedLevelEditor.Misc;
 using TileBasedLevelEditor.Models;
+using TileBasedLevelEditor.Services.Rendering;
+using TileBasedLevelEditor.Services.Rendering.Data;
+using TileBasedLevelEditor.ViewModel;
 
 namespace TileBasedLevelEditor.ViewModels
 {
-    public class TileGridViewModel : ViewModelBase
+    public abstract class TileGridViewModel : ViewModelBase
     {
         private Vec2<int> _tileSize;
         public Vec2<int> TileSize
@@ -49,16 +51,16 @@ namespace TileBasedLevelEditor.ViewModels
 
         public Vec2<int> GridSize => TileSize * NrTiles;
 
-        private ObservableCollection<CroppedBitmap?> _tileImages;
-        public ObservableCollection<CroppedBitmap?> TileImages
-        {
-            get => _tileImages;
-            set
-            {
-                _tileImages = value;
-                OnPropertyChanged(nameof(TileImages));
-            }
-        }
+        //private ObservableCollection<GridCell> _tileImages;
+        public abstract IReadOnlyList<GridCell> Cells { get; }
+        //{
+        //    get => _tileImages;
+        //    set
+        //    {
+        //        _tileImages = value;
+        //        OnPropertyChanged(nameof(Cells));
+        //    }
+        //}
 
         private bool _gridLinesVisibility;
 
@@ -232,7 +234,7 @@ namespace TileBasedLevelEditor.ViewModels
         public ICommand HoverTileCommand { get; }
         public ICommand SelectTileCommand { get; }
 
-        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, List<CroppedBitmap?>? tileImages = null, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
+        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
         {
             _tileSize = tileSize;
             _nrTiles = nrTiles;
@@ -294,20 +296,38 @@ namespace TileBasedLevelEditor.ViewModels
                 OnSelect?.Invoke(args.Index);
             });
 
-            SetTileImages(tileImages);
+            //SetTileImages(tileImages);
 
             GenerateGridLines();
         }
 
-        public void SetNewGridValues(Vec2<int> tileSize, Vec2<int> nrTiles, List<CroppedBitmap?>? tileImages = null)
+        public void SetNewGridValues(Vec2<int> tileSize, Vec2<int> nrTiles)
         {
             _tileSize = tileSize;
             _nrTiles = nrTiles;
 
-            SetTileImages(tileImages);
             GenerateGridLines();
             NotifyGridUpdates();
         }
+
+        //public void SetTileImages(List<GridCell>? cells = null)
+        //{
+        //    if (cells != null)
+        //    {
+        //        Cells = new ObservableCollection<GridCell>(cells);
+        //    }
+        //    else
+        //    {
+        //        Cells = new ObservableCollection<GridCell>();
+        //        for (int i = 0; i < NrTiles.X; i++)
+        //        {
+        //            for (int j = 0; j < NrTiles.Y; j++)
+        //            {
+        //                Cells.Add(new GridCell());
+        //            }
+        //        }
+        //    }
+        //}
 
         private void NotifyGridUpdates()
         {
@@ -317,25 +337,6 @@ namespace TileBasedLevelEditor.ViewModels
             OnPropertyChanged(nameof(ScaledViewportHeight));
             OnPropertyChanged(nameof(TileSize));
             OnPropertyChanged(nameof(NrTiles));
-        }
-
-        private void SetTileImages(List<CroppedBitmap?>? tileImages = null)
-        {
-            if (tileImages != null)
-            {
-                TileImages = new ObservableCollection<CroppedBitmap?>(tileImages);
-            }
-            else
-            {
-                TileImages = new ObservableCollection<CroppedBitmap?>();
-                for (int i = 0; i < NrTiles.X; i++)
-                {
-                    for (int j = 0; j < NrTiles.Y; j++)
-                    {
-                        TileImages.Add(null);
-                    }
-                }
-            }
         }
 
         private void GenerateGridLines()
