@@ -40,7 +40,7 @@ namespace TileBasedLevelEditor.Misc
             Vec2<int> hoveredTile = new Vec2<int>((int)(mousePosition.X / ((tileSize.X + tilesMargin.X) * vm.ScrollViewerZoom)), (int)(mousePosition.Y / ((tileSize.Y + tilesMargin.Y) * vm.ScrollViewerZoom)));
             //System.Diagnostics.Debug.WriteLine($"HoveredTile: {hoveredTile.X} {hoveredTile.Y}");
 
-            if (hoveredTile >= vm.NrTiles)
+            if (hoveredTile >= vm.NrTiles || hoveredTile < 0)
                 return null;
 
             return hoveredTile;

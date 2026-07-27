@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TileBasedLevelEditor.ViewModels.Rendering.GridCellViewModel">
+    <Position X="1.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>ViewModels\Rendering\GridCell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.Rendering.TilemapCellViewModel">
+    <Position X="0.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\Rendering\TilemapCell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.Rendering.TilemapCellTileViewModel">
+    <Position X="12" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAQAAAAAAAAAAAQBAAAAAAAACAAQA=</HashCode>
+      <FileName>ViewModels\Rendering\TilemapCellTile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.Rendering.TilesetCellViewModel">
+    <Position X="3.25" Y="6" Width="1.5" />
+    <InheritanceLine Type="TileBasedLevelEditor.ViewModels.Rendering.GridCellViewModel" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.5" Y="5.636" />
+        <Point X="2.5" Y="5.8" />
+        <Point X="4" Y="5.8" />
+        <Point X="4" Y="6" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQBAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\Rendering\TilesetCell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.LayersViewModel">
+    <Position X="5.25" Y="3.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAABAAAAABAAkAAAIAEAAAAQAAgAAgAEgAAABAAAQAA=</HashCode>
+      <FileName>ViewModels\LayersViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.LayerViewModel">
+    <Position X="9.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAACAIAAAAAAAAYAAAAAAAIMBAAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\LayerViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.MainWindowViewModel">
+    <Position X="14.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAARIAAAAAAAAAAAAEAAAAAAAAAQAAA=</HashCode>
+      <FileName>ViewModels\MainWindowViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.TileGridViewModel">
+    <Position X="17.5" Y="3.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>QgEgWkBgBiACCYEFAAIAEQgQECABAAACQIgAQpJQCgA=</HashCode>
+      <FileName>ViewModels\TileGridViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.TilemapEditorViewModel">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EQIIABAETAIEoAEwIEgCAAAAEDkRAAAEAICABCAAGCg=</HashCode>
+      <FileName>ViewModels\TilemapEditorViewModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.TilemapGridViewModel">
+    <Position X="15.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAMAAAAAhAAJAAAAAEAAAAAgAAAAAAAAQAAA=</HashCode>
+      <FileName>ViewModels\TilemapGridViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.TilesetGridViewModel">
+    <Position X="19.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAJAAIAAAAAEAAAAAAAAAAAAAAQABA=</HashCode>
+      <FileName>ViewModels\TilesetGridViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModels.TilesetViewModel" Collapsed="true">
+    <Position X="21" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEBUAAgAAAIgAEgIAAACYgQABAAgCAAIECAEIAAAAQ=</HashCode>
+      <FileName>ViewModels\TilesetViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TileBasedLevelEditor.ViewModel.ViewModelBase" Collapsed="true">
+    <Position X="10.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\ViewModelBase.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

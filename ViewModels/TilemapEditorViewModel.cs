@@ -296,7 +296,7 @@ namespace TileBasedLevelEditor.ViewModels
 
             if (SelectedLayer == null)
             {
-                LayersViewModel.SelectedLayer = LayersViewModel.Layers.Last();//CurrentTilemap.Layers.Last();
+                LayersViewModel.SelectedLayer = LayersViewModel.Layers.Last();
             }
 
             ClearPreviousHoveredTiles();

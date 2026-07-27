@@ -7,6 +7,7 @@
              xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
              xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
              xmlns:converters="clr-namespace:TileBasedLevelEditor.Converters"
+             xmlns:customUI="clr-namespace:TileBasedLevelEditor.CustomUI"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance Type=vm:TileGridViewModel}"
              d:DesignHeight="450" d:DesignWidth="800"
@@ -62,19 +63,9 @@
                             </Style.Triggers>
                         </Style>
                     </Canvas.Style>
-                    
-                    <ItemsControl ItemsSource="{Binding Cells}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="{Binding DataContext.NrTiles.X, ElementName=TileGridRoot}"
-                                             Rows="{Binding DataContext.NrTiles.Y, ElementName=TileGridRoot}"
-                                             Background="Transparent"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
 
-                    <ContentControl Content="{Binding Path=(misc:TileGridOverlayBehavior.Content), RelativeSource={RelativeSource AncestorType=local:TileGrid}}"
-                                    IsHitTestVisible="False"/>
+
+                    <customUI:GridCanvas/>
 
                     <ItemsControl ItemsSource="{Binding GridLines}"
                                   Visibility="{Binding GridLinesVisibility, Converter={StaticResource BoolToVis}}">

@@ -91,7 +91,7 @@ namespace TileBasedLevelEditor.ViewModels
                 if (_hoveredTileIndex != null && _hoveredTileIndex.X >= 0 && _hoveredTileIndex.Y >= 0)
                 {
                     IsTileHovered = true;
-                    HoveredTileLocation = new Vec2<double>(_hoveredTileIndex.X * (TileSize.X + TileMargin.X) + TileMargin.X, _hoveredTileIndex.Y * (TileSize.Y + TileMargin.Y) + TileMargin.Y);
+                    HoveredTileLocation = new Vec2<double>(_hoveredTileIndex.X * (TileSize.X + TileMargin.X), _hoveredTileIndex.Y * (TileSize.Y + TileMargin.Y));
                 }
                 else
                 {

@@ -28,7 +28,7 @@ namespace TileBasedLevelEditor.ViewModels
             int arraySize = nrTiles.X * nrTiles.Y;
             _cells = new List<TilemapCellViewModel>();
             for (int i = 0; i < arraySize; i++)
-                _cells.Add(new TilemapCellViewModel(new Vec2<int>(i % nrTiles.Y, i / nrTiles.X)));
+                _cells.Add(new TilemapCellViewModel(new Vec2<int>(i % nrTiles.X, i / nrTiles.X)));
         }
 
         public void RemoveLayer(LayerViewModel layer)

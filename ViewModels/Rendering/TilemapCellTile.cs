@@ -47,7 +47,7 @@ namespace TileBasedLevelEditor.ViewModels.Rendering
 
         public TilemapCellTileViewModel(TileData tile, CroppedBitmap? image, LayerViewModel layerVM)
         {
-            _tile = Tile;
+            _tile = tile;
             _image = image;
             _layerVM = layerVM;
         }

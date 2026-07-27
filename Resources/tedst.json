@@ -1,0 +1,17 @@
+{
+  "ID": "ce4f19ad-7d49-4a0a-8017-c3ae55200ae3",
+  "Name": "tedst",
+  "FilePath": "D:\\GitHub\\TileBasedLevelEditor\\Resources\\Tileset.png",
+  "TileSize": {
+    "X": 32,
+    "Y": 32
+  },
+  "NrTiles": {
+    "X": 8,
+    "Y": 9
+  },
+  "ImageSize": {
+    "X": 256,
+    "Y": 288
+  }
+}

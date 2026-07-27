@@ -22,11 +22,16 @@ namespace TileBasedLevelEditor.Models
             TileMargin = tileMargin;
         }
 
-        public Rect RectArea => new Rect(
-          x: StartTile.X * (TileSize.X + TileMargin.X),
-          y: StartTile.Y * (TileSize.Y + TileMargin.Y),
-          width: (EndTile.X - StartTile.X + 1) * (TileSize.X + TileMargin.X) + TileMargin.X,
-          height: (EndTile.Y - StartTile.Y + 1) * (TileSize.Y + TileMargin.Y) + TileMargin.Y
-        );
+        public Rect RectArea
+        {
+            get
+            {
+                Vec2<int> leftTopMargin = new Vec2<int>(StartTile.X > 0 ? 1 : 0, StartTile.Y > 0 ? 1 : 0);
+                return new Rect( x: StartTile.X * (TileSize.X + TileMargin.X) - TileMargin.X * leftTopMargin.X,
+                          y: StartTile.Y * (TileSize.Y + TileMargin.Y) - TileMargin.X * leftTopMargin.Y,
+                          width: (EndTile.X - StartTile.X + 1) * (TileSize.X + TileMargin.X) + TileMargin.X * leftTopMargin.X,
+                          height: (EndTile.Y - StartTile.Y + 1) * (TileSize.Y + TileMargin.Y) + TileMargin.Y * leftTopMargin.Y);
+            }
+          }
     }
 }
