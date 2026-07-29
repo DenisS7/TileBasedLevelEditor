@@ -16,16 +16,19 @@ namespace TileBasedLevelEditor.Models
 
         public Vec2<int> TilemapSize { get; set; }
 
+        public Vec2<int> TileMargin { get; set; }
+
         public HashSet<Guid> TilesetsUsed { get; }
 
         public List<Layer> Layers { get; }
 
-        public Tilemap(string name, Vec2<int> tileSize, Vec2<int> tilemapSize)
+        public Tilemap(string name, Vec2<int> tileSize, Vec2<int> tilemapSize, Vec2<int> tileMargin)
         {
             Name = name;
             TileSize = tileSize;
             TilemapSize = tilemapSize;
             TilesetsUsed = new HashSet<Guid>();
+            TileMargin = tileMargin;
             int tilemapArraySize = tilemapSize.X * tilemapSize.Y;
             Layers = [  new Layer("Layer 1", tilemapArraySize, 0),
                         new Layer("Layer 2", tilemapArraySize, 1),

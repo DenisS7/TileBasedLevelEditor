@@ -22,7 +22,7 @@ using TileBasedLevelEditor.Views;
 
 namespace TileBasedLevelEditor.ViewModels
 {
-    public class TilemapEditorViewModel : ViewModelBase, ITilemapLayersParent
+    public class TilemapEditorViewModel : ViewModelBase, ITilemapParent
     {
         private ICustomNavigationService _navigationService;
         private ITilesetsService _tilesetsService;
@@ -102,7 +102,7 @@ namespace TileBasedLevelEditor.ViewModels
         public Vec2<int> TilemapSize => CurrentTilemap.TilemapSize;
         public Vec2<int> TileSize => CurrentTilemap.TileSize;
         public LayerViewModel? SelectedLayer => LayersViewModel.SelectedLayer;
-        public ObservableCollection<LayerViewModel> Layers => LayersViewModel.Layers;
+        public ObservableCollection<LayerViewModel> Layers { get; }
 
         public event Action? RequestCloseNewTilemapDialog;
         public event Action? RequestCloseEditTilemapDialog;
@@ -122,10 +122,15 @@ namespace TileBasedLevelEditor.ViewModels
         {
             _navigationService = navigationService;
             _tilesetsService = tilesetsService;
-            //_tilemapRendererService = tilemapRendererService;
-            _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(32, 32), new Vec2<int>(20, 15));
-            
-            TilemapGridVM = new TilemapGridViewModel(TileSize, TilemapSize, new Vec2<int>(0, 0), tilemapRendererService, OnTileHovered, OnTileSelected, true, true, false);
+            _currentTilemap = new Tilemap("TestTilemap", new Vec2<int>(32, 32), new Vec2<int>(20, 15), 0);
+
+            Layers = new ObservableCollection<LayerViewModel>();
+            foreach (Layer layer in _currentTilemap.Layers)
+            {
+                Layers.Add(new LayerViewModel(layer));
+            }
+
+            TilemapGridVM = new TilemapGridViewModel(this, tilemapRendererService, OnTileHovered, OnTileSelected, true, true, false);
             LayersViewModel = new LayersViewModel(this, _navigationService);
 
             CreateNewTilemapCommand = new RelayCommand(OnCreateNewTilemap);
@@ -192,7 +197,7 @@ namespace TileBasedLevelEditor.ViewModels
             {
                 Vec2<int> NewTilemapTileSize = new Vec2<int>(Int32.Parse(NewTilemapTileWidth), Int32.Parse(NewTilemapTileHeight));
                 Vec2<int> NewTilemapSize = new Vec2<int>(Int32.Parse(NewTilemapWidth), Int32.Parse(NewTilemapHeight));
-                Tilemap newTilemap = new Tilemap(NewTilemapName, NewTilemapTileSize, NewTilemapSize);
+                Tilemap newTilemap = new Tilemap(NewTilemapName, NewTilemapTileSize, NewTilemapSize, 0);
                 //TO DO after tilemap serialization is done
                 //if (Serializer.SaveTilemap(newTilemap))
                 {

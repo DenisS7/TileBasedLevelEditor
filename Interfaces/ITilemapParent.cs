@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,10 +9,10 @@ using TileBasedLevelEditor.ViewModels;
 
 namespace TileBasedLevelEditor.Interfaces
 {
-    public interface ITilemapLayersParent
+    public interface ITilemapParent
     {
         public Tilemap CurrentTilemap { get; }
-
+        public ObservableCollection<LayerViewModel> Layers { get; }
         public void OnLayerDeleted(LayerViewModel layer);
     }
 }

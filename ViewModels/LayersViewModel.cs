@@ -15,7 +15,7 @@ namespace TileBasedLevelEditor.ViewModels
 {
     public class LayersViewModel : ViewModelBase
     {
-        private ITilemapLayersParent _parent;
+        private ITilemapParent _parent;
         private ICustomNavigationService _navigationService;
         public Tilemap CurrentTilemap => _parent.CurrentTilemap;
 
@@ -31,23 +31,17 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        public ObservableCollection<LayerViewModel> Layers { get; }// => new ObservableCollection<Layer>(_layers);
+        public ObservableCollection<LayerViewModel> Layers => new ObservableCollection<LayerViewModel>(_parent.Layers);
         public bool CanDeleteLayer => SelectedLayer != null && Layers.Count > 1;
 
         public ICommand AddLayerCommand { get; }
         public ICommand DeleteLayerCommand { get; }
         public ICommand ChangeLayerVisibilityCommand { get; }
 
-        public LayersViewModel(ITilemapLayersParent parent, ICustomNavigationService navigationService)
+        public LayersViewModel(ITilemapParent parent, ICustomNavigationService navigationService)
         {
             _parent = parent;
             _navigationService = navigationService;
-            Layers = new ObservableCollection<LayerViewModel>();
-
-            foreach (Layer layer in _parent.CurrentTilemap.Layers)
-            {
-                Layers.Add(new LayerViewModel(layer));
-            }
 
             AddLayerCommand = new RelayCommand(AddLayer);
             DeleteLayerCommand = new RelayCommand(DeleteLayer);

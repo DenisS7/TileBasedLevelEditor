@@ -10,7 +10,9 @@ namespace TileBasedLevelEditor.CustomUI
 {
     public class GridCanvas : FrameworkElement
     {
+        //private readonly VisualCollection _layers;
         private readonly VisualCollection _children;
+        private readonly List<ContainerVisual> _layers;
         private DrawingVisual[] _cells = Array.Empty<DrawingVisual>();
         private TileGridViewModel? _source = null;
         private Vec2<int> _gridSize => _source?.NrTiles ?? new Vec2<int>(0);
@@ -22,6 +24,7 @@ namespace TileBasedLevelEditor.CustomUI
         public GridCanvas()
         {
             _children = new VisualCollection(this);
+            _layers = new List<ContainerVisual>();
 
             DataContextChanged += OnDataContextChanged;
         }
@@ -56,7 +59,7 @@ namespace TileBasedLevelEditor.CustomUI
             {
                 if (newItem is TilemapCellTileViewModel tile)
                 {
-                    tile.PropertyChanged += (s, e) => RedrawCell(cell.Index);
+                    tile.PropertyChanged += (s, e) => RedrawCell(cell.Index, tile.LayerVM.VisibilityIndex);
                 }
             }
         }
@@ -66,9 +69,9 @@ namespace TileBasedLevelEditor.CustomUI
             if (cell is TilemapCellViewModel tilemapCell)
             {
                 tilemapCell.Tiles.CollectionChanged += (s, e) => AttachToTiles(cell, s, e);
-                foreach (TilemapCellTileViewModel tile in tilemapCell.Tiles)
+                for (int i = 0; i < tilemapCell.Tiles.Count; i++)
                 {
-                    tile.PropertyChanged += (s, e) => RedrawCell(cell.Index);
+                    tilemapCell.Tiles[i].PropertyChanged += (s, e) => RedrawCell(cell.Index, tilemapCell.Tiles[i].LayerVM.VisibilityIndex);
                 }
             }
             else if (cell is TilesetCellViewModel tilesetCell)
@@ -81,59 +84,97 @@ namespace TileBasedLevelEditor.CustomUI
             }
         }
 
+        private ContainerVisual BuildLayerContainer(LayerViewModel layer)
+        {
+            ContainerVisual layerContainer = new ContainerVisual { Opacity = layer.Visible ? layer.Opacity : 0.0 };
+            layer.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName is nameof(layer.Visible) || e.PropertyName is nameof(layer.Opacity))
+                    layerContainer.Opacity = layer.Visible ? layer.Opacity : 0.0;
+            };
+            return layerContainer;
+        }
+
         public void BuildCanvas(TileGridViewModel source)
         {
             _source = source;
             _localRect = new Rect(0, 0, _tileSize.X, _tileSize.Y);
 
             _children.Clear();
-            _cells = new DrawingVisual[_gridSize.X * _gridSize.Y];
 
-            for (int i = 0; i < _gridSize.Y; i++)
+            if (source is TilemapGridViewModel tilemap)
             {
-                for (int j = 0; j < _gridSize.X; j++)
+                foreach (LayerViewModel layer in tilemap.Layers)
                 {
-                    DrawingVisual dv = new DrawingVisual { Offset = new Vector(j * (_tileSize.X + source.TileMargin.X) , i  * (_tileSize.Y + source.TileMargin.Y)) };
-                    RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);
-                    
-                    int cellArrayIndex = i * _gridSize.X + j;
-                    RecordCell(dv, source.Cells[cellArrayIndex]);
-                    AttachToCell(source.Cells[cellArrayIndex]);
-                    _cells[cellArrayIndex] = dv;
-                    _children.Add(dv);
+                    ContainerVisual layerContainer = BuildLayerContainer(layer);
+
+                    for (int i = 0; i < _gridSize.Y; i++)
+                    {
+                        for (int j = 0; j < _gridSize.X; j++)
+                        {
+                            int cellArrayIndex = i * _gridSize.X + j;
+                            TilemapCellViewModel cell = (TilemapCellViewModel)source.Cells[cellArrayIndex];
+                            
+                            DrawingVisual dv = new DrawingVisual { Offset = new Vector(j * (_tileSize.X + source.TileMargin.X), i * (_tileSize.Y + source.TileMargin.Y)) };
+                            RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);
+
+                            RecordTile(dv, source.Cells[cellArrayIndex], layer.VisibilityIndex);
+                            AttachToCell(source.Cells[cellArrayIndex]);
+                            layerContainer.Children.Add(dv);
+
+                        }
+                    }
+
+                    _layers.Add(layerContainer);
+                    _children.Add(layerContainer);
                 }
+            }
+            else if (source is TilesetGridViewModel tileset)
+            {
+                _cells = new DrawingVisual[_gridSize.X * _gridSize.Y];
+                for (int i = 0; i < _gridSize.Y; i++)
+                {
+                    for (int j = 0; j < _gridSize.X; j++)
+                    {
+                        DrawingVisual dv = new DrawingVisual { Offset = new Vector(j * (_tileSize.X + source.TileMargin.X), i * (_tileSize.Y + source.TileMargin.Y)) };
+                        RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);
+
+                        int cellArrayIndex = i * _gridSize.X + j;
+                        RecordTile(dv, source.Cells[cellArrayIndex]);
+                        AttachToCell(source.Cells[cellArrayIndex]);
+                        _cells[cellArrayIndex] = dv;
+                        _children.Add(dv);
+                    }
+                }
+            }    
+            else
+            {
+                throw new NotImplementedException("Grid canvas source type not implemented!");
             }
 
             InvalidateMeasure();
         }
 
-        public void RedrawCell(Vec2<int> cellIndex)
+        public void RedrawCell(Vec2<int> cellIndex, int visibilityIndex = -1)
         {
             if (_source == null)
                 return;
 
             int cellArrayIndex = cellIndex.Y * _gridSize.X + cellIndex.X;
-            RecordCell(_cells[cellArrayIndex], _source.Cells[cellArrayIndex]);
+            RecordTile((DrawingVisual)_layers[visibilityIndex].Children[cellArrayIndex], _source.Cells[cellArrayIndex], visibilityIndex);
         }
 
-        private void RecordCell(DrawingVisual dv, GridCellViewModel cell)
+        private void RecordTile(DrawingVisual dv, GridCellViewModel cell, int visibilityIndex = -1)
         {
             using var dc = dv.RenderOpen();
 
             if (cell is TilemapCellViewModel tilemapCell)
             {
-                foreach (TilemapCellTileViewModel tilemapCellTile in tilemapCell.Tiles)
-                {
-                    if (!tilemapCellTile.LayerVM.Visible)
-                        continue;
+                IEnumerable<TilemapCellTileViewModel> tiles = tilemapCell.Tiles.Where(tile => tile.LayerVM.VisibilityIndex == visibilityIndex);
+                if (tiles.Count() == 0)
+                    return;
 
-                    bool applyOpacity = tilemapCellTile.LayerVM.Opacity < 1.0;
-                    if (applyOpacity)
-                        dc.PushOpacity(tilemapCellTile.LayerVM.Opacity);
-                    dc.DrawImage(tilemapCellTile.Image, _localRect);
-                    if (applyOpacity)
-                        dc.Pop();
-                }
+                dc.DrawImage(tiles.ElementAt(0).Image, _localRect);
             }
             else if (cell is TilesetCellViewModel tilesetCell)
             {

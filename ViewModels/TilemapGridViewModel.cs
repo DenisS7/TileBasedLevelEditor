@@ -14,21 +14,25 @@ namespace TileBasedLevelEditor.ViewModels
 {
     public class TilemapGridViewModel : TileGridViewModel
     {
+        private ITilemapRendererService _tilemapRendererService;
+        private ITilemapParent _parent;
+        
+        public ObservableCollection<LayerViewModel> Layers => _parent.Layers;
         public ObservableCollection<TileSelectedService.TilemapPreviewTile> PreviewTiles { get; }
         private List<TilemapCellViewModel> _cells;
         public override IReadOnlyList<GridCellViewModel> Cells => _cells;
 
-        ITilemapRendererService _tilemapRendererService;
-        public TilemapGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, ITilemapRendererService tilemapRendererService, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true) 
-            : base(tileSize, nrTiles, tileMargin, OnHover, OnSelect, shouldBeCentered, gridLinesVisibility, canHighlightSelectedTile)
+        public TilemapGridViewModel(ITilemapParent parent, ITilemapRendererService tilemapRendererService, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true) 
+            : base(parent.CurrentTilemap.TileSize, parent.CurrentTilemap.TilemapSize, parent.CurrentTilemap.TileMargin, OnHover, OnSelect, shouldBeCentered, gridLinesVisibility, canHighlightSelectedTile)
         {
             PreviewTiles = new ObservableCollection<TileSelectedService.TilemapPreviewTile>();
             _tilemapRendererService = tilemapRendererService;
+            _parent = parent;
 
-            int arraySize = nrTiles.X * nrTiles.Y;
+            int arraySize = NrTiles.X * NrTiles.Y;
             _cells = new List<TilemapCellViewModel>();
             for (int i = 0; i < arraySize; i++)
-                _cells.Add(new TilemapCellViewModel(new Vec2<int>(i % nrTiles.X, i / nrTiles.X)));
+                _cells.Add(new TilemapCellViewModel(new Vec2<int>(i % NrTiles.X, i / NrTiles.X)));
         }
 
         public void RemoveLayer(LayerViewModel layer)
