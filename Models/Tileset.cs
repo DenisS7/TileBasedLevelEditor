@@ -100,6 +100,7 @@ namespace TileBasedLevelEditor.Models
                             TileSize.Y
                         );
                         var tileBmp = new CroppedBitmap(bmp, rect);
+                        tileBmp.Freeze();
                         TileImages.Add(tileBmp);
                     }
                 }
