@@ -5,12 +5,14 @@ using System.Windows.Input;
 using TileBasedLevelEditor.CustomArgs;
 using TileBasedLevelEditor.Models;
 using TileBasedLevelEditor.ViewModels;
+using System.Diagnostics;
 
 namespace TileBasedLevelEditor.Misc
 {
     public static class TileSelector
     {
         public static bool IsDragging = false;
+        public static Point OldMousePos = new Point(-1, -1);
 
         public static readonly DependencyProperty HoverCommandProperty =
             DependencyProperty.RegisterAttached(
@@ -142,8 +144,8 @@ namespace TileBasedLevelEditor.Misc
             if (grid.DataContext is TileGridViewModel vm)
             {
                 IsDragging = true;
-
-                Vec2<int>? hoveredTile = GetHoveredTile(grid, e.GetPosition(grid));
+                OldMousePos = e.GetPosition(grid);
+                Vec2<int>? hoveredTile = GetHoveredTile(grid, OldMousePos);
                 //if (hoveredTile != null)
                 cmd.Execute(new TileSelectionArgs(hoveredTile, isAdd, DragStage.Start));
             }
@@ -165,11 +167,25 @@ namespace TileBasedLevelEditor.Misc
             bool isAdd = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
             if (grid.DataContext is TileGridViewModel vm)
             {
-                Vec2<int>? hoveredTile = GetHoveredTile(grid, e.GetPosition(grid));
-                if (hoveredTile != null)
+                Point newPos = e.GetPosition(grid);
+                
+                Vector direction = (newPos - OldMousePos);
+                double distance = direction.Length;
+                direction.Normalize();
+                double travelledDist = 0.0;
+                Vec2<int>? oldTile = new Vec2<int>(-1);
+                while (distance > travelledDist)
                 {
-                    cmd.Execute(new TileSelectionArgs(hoveredTile, isAdd, DragStage.Dragging));
+                    Point newPoint = OldMousePos + travelledDist * direction;
+                    Vec2<int>? hoveredTile = GetHoveredTile(grid, newPoint);
+                    if (hoveredTile != null && hoveredTile != oldTile)
+                    {
+                        cmd.Execute(new TileSelectionArgs(hoveredTile, isAdd, DragStage.Dragging));
+                    }
+                    travelledDist += (double)(vm.TileSize.X) * vm.ScrollViewerZoom;
+                    oldTile = hoveredTile;
                 }
+                OldMousePos = newPos;
             }
         }
 
