@@ -65,8 +65,6 @@ namespace TileBasedLevelEditor.ViewModels
 
         public record LineInfo(double X1, double Y1, double X2, double Y2, bool IsEdge);
 
-        public ObservableCollection<LineInfo> GridLines { get; private set; } = [];
-
         private bool _isTileHovered = true;
 
         public bool IsTileHovered
@@ -287,8 +285,6 @@ namespace TileBasedLevelEditor.ViewModels
             });
 
             //SetTileImages(tileImages);
-
-            GenerateGridLines();
         }
 
         public void SetNewGridValues(Vec2<int> tileSize, Vec2<int> nrTiles)
@@ -296,7 +292,6 @@ namespace TileBasedLevelEditor.ViewModels
             _tileSize = tileSize;
             _nrTiles = nrTiles;
 
-            GenerateGridLines();
             NotifyGridUpdates();
         }
 
@@ -327,35 +322,6 @@ namespace TileBasedLevelEditor.ViewModels
             OnPropertyChanged(nameof(ScaledViewportHeight));
             OnPropertyChanged(nameof(TileSize));
             OnPropertyChanged(nameof(NrTiles));
-        }
-
-        private void GenerateGridLines()
-        {
-            GridLines.Clear();
-
-            for (int i = 0; i <= NrTiles.X; i++)
-            {
-                double x = i * TileSize.X;
-                if (i == 0)
-                {
-                    x += 1.0; 
-                }
-
-                bool isEdge = i == 0 || i == NrTiles.X;
-                GridLines.Add(new LineInfo(x, 0, x, GridSize.Y, isEdge));
-            }
-
-            for (int i = 0; i <= NrTiles.Y; i++)
-            {
-                double y = i * TileSize.Y;
-                if (i == 0)
-                {
-                    y += 1.0;
-                }
-
-                bool isEdge = i == 0 || i == NrTiles.Y;
-                GridLines.Add(new LineInfo(0, y, GridSize.X, y, isEdge));
-            }
         }
 
         private SelectionArea GetSelectionArea(Vec2<int> PointA, Vec2<int> PointB)

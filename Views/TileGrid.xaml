@@ -65,43 +65,7 @@
                     </Canvas.Style>
 
 
-                    <customUI:GridCanvas/>
-
-                    <ItemsControl ItemsSource="{Binding GridLines}"
-                                  Visibility="{Binding GridLinesVisibility, Converter={StaticResource BoolToVis}}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <Canvas x:Name="OverlayCanvas"
-                                        Background="Transparent"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Top"
-                                        Width="{Binding GridSize.X}"
-                                        Height="{Binding GridSize.Y}"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Line X1="{Binding X1}"
-                                      Y1="{Binding Y1}"
-                                      X2="{Binding X2}"
-                                      Y2="{Binding Y2}"
-                                      Stroke="{StaticResource ForegroundBrush}"
-                                      StrokeThickness="0.2">
-                                    <Line.Style>
-                                        <Style TargetType="Line">
-                                            <Setter Property="StrokeDashArray" Value="4, 4"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsEdge}" Value="True">
-                                                    <Setter Property="StrokeDashArray" Value="{x:Null}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Line.Style>
-                                </Line>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <customUI:GridCanvas x:Name="GridCanvas"/>
 
                     <Rectangle Width="{Binding TileSize.X}"
                                Height="{Binding TileSize.Y}"
