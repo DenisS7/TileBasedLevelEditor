@@ -31,7 +31,7 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
-        public ObservableCollection<LayerViewModel> Layers => new ObservableCollection<LayerViewModel>(_parent.Layers);
+        public ObservableCollection<LayerViewModel> Layers => _parent.Layers;
         public bool CanDeleteLayer => SelectedLayer != null && Layers.Count > 1;
 
         public ICommand AddLayerCommand { get; }

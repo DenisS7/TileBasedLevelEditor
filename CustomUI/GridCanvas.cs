@@ -74,6 +74,17 @@ namespace TileBasedLevelEditor.CustomUI
             }    
         }
 
+        private void OnGridCellsChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (_source == null)
+                return;
+
+            if (e.PropertyName == nameof(_source.Cells))
+            {
+                BuildCanvas(_source);
+            }
+        }
+
         private void OnGridLinesVisibilityChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is TileGridViewModel vm && e.PropertyName is nameof(_source.GridLinesVisibility))
@@ -91,38 +102,13 @@ namespace TileBasedLevelEditor.CustomUI
             }
         }
 
-        private void AttachToTiles(GridCellViewModel cell, object? sender, NotifyCollectionChangedEventArgs args)
+        private void OnLayerRenderingChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (args.NewItems == null)
+            if (sender is not LayerViewModel layer)
                 return;
 
-            foreach (var newItem in args.NewItems)
-            {
-                if (newItem is TilemapCellTileViewModel tile)
-                {
-                    tile.PropertyChanged += (s, e) => RedrawCell(cell.Index, tile.LayerVM.VisibilityIndex);
-                }
-            }
-        }
-
-        private void AttachToCell(GridCellViewModel cell)
-        {
-            if (cell is TilemapCellViewModel tilemapCell)
-            {
-                tilemapCell.Tiles.CollectionChanged += (s, e) => AttachToTiles(cell, s, e);
-                for (int i = 0; i < tilemapCell.Tiles.Count; i++)
-                {
-                    tilemapCell.Tiles[i].PropertyChanged += (s, e) => RedrawCell(cell.Index, tilemapCell.Tiles[i].LayerVM.VisibilityIndex);
-                }
-            }
-            else if (cell is TilesetCellViewModel tilesetCell)
-            {
-                //TO DO implement tileset changing
-            }
-            else
-            {
-                throw new NotImplementedException("Not implemented for cell type");
-            }
+            if (e.PropertyName is nameof(layer.Visible) || e.PropertyName is nameof(layer.Opacity))
+                _layers[layer.VisibilityIndex].Opacity = layer.Visible ? layer.Opacity : 0.0;
         }
 
         private void CreateGridLines()
@@ -130,7 +116,7 @@ namespace TileBasedLevelEditor.CustomUI
             if (_source == null)
                 return;
 
-            _source.PropertyChanged -= (s, e) => OnZoomChanged(s, e);
+            _source.PropertyChanged -= OnZoomChanged;
             using (gridLineVisual.RenderOpen()) { };
             InvalidateVisual();
 
@@ -180,30 +166,50 @@ namespace TileBasedLevelEditor.CustomUI
 
             double halfEdgeGridLineThickness = _edgeGridLineThickness / 2.0;
 
-            _source.PropertyChanged += (s, e) => OnZoomChanged(s, e);
+            _source.PropertyChanged += OnZoomChanged;
             
             _children.Add(gridLineVisual);
+        }
+
+        private void ClearCanvas()
+        {
+            if (_source != null)
+            {
+                _source.PropertyChanged -= OnZoomChanged;
+                _source.PropertyChanged -= OnGridLinesVisibilityChanged;
+                _source.PropertyChanged -= OnGridCellsChanged;
+
+                if (_source is TilemapGridViewModel tilemap)
+                {
+                    for (int i = 0; i < tilemap.Layers.Count; i++)
+                    {
+                        tilemap.Layers[i].PropertyChanged -= OnLayerRenderingChanged;
+                    }
+
+                    tilemap.OnCellChanged -= RedrawCell;
+                }
+                _source = null;
+            }
+
+            _children.Clear();
+            _layers.Clear();
+
+            InvalidateVisual();
         }
 
         private ContainerVisual BuildLayerContainer(LayerViewModel layer)
         {
             ContainerVisual layerContainer = new ContainerVisual { Opacity = layer.Visible ? layer.Opacity : 0.0 };
-            layer.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName is nameof(layer.Visible) || e.PropertyName is nameof(layer.Opacity))
-                    layerContainer.Opacity = layer.Visible ? layer.Opacity : 0.0;
-            };
+            layer.PropertyChanged += OnLayerRenderingChanged;
             return layerContainer;
         }
 
         private void BuildCanvas(TileGridViewModel source)
         {
-            //TO DO: Add clear canvas
+            ClearCanvas();
+
             _source = source;
             _localRect = new Rect(0, 0, _tileSize.X, _tileSize.Y);
-
-            _children.Clear();
-            _layers.Clear();
 
             if (source is TilemapGridViewModel tilemap)
             {
@@ -222,15 +228,15 @@ namespace TileBasedLevelEditor.CustomUI
                             RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);
 
                             RecordTile(dv, source.Cells[cellArrayIndex], layer.VisibilityIndex);
-                            AttachToCell(source.Cells[cellArrayIndex]);
                             layerContainer.Children.Add(dv);
-
                         }
                     }
 
                     _layers.Add(layerContainer);
                     _children.Add(layerContainer);
                 }
+
+                tilemap.OnCellChanged += RedrawCell;
             }
             else if (source is TilesetGridViewModel tileset)
             {
@@ -244,7 +250,6 @@ namespace TileBasedLevelEditor.CustomUI
 
                         int cellArrayIndex = i * _gridNrTiles.X + j;
                         RecordTile(dv, source.Cells[cellArrayIndex]);
-                        AttachToCell(source.Cells[cellArrayIndex]);
                         _cells[cellArrayIndex] = dv;
                         _children.Add(dv);
                     }
@@ -255,18 +260,18 @@ namespace TileBasedLevelEditor.CustomUI
                 throw new NotImplementedException("Grid canvas source type not implemented!");
             }
 
-            _source.PropertyChanged += (s, e) => OnGridLinesVisibilityChanged(s, e);
+            _source.PropertyChanged += OnGridCellsChanged;
+            _source.PropertyChanged += OnGridLinesVisibilityChanged;
 
             CreateGridLines();
             InvalidateMeasure();
         }
 
-        private void RedrawCell(Vec2<int> cellIndex, int visibilityIndex = -1)
+        private void RedrawCell(int cellArrayIndex, int visibilityIndex = -1)
         {
             if (_source == null)
                 return;
 
-            int cellArrayIndex = cellIndex.Y * _gridNrTiles.X + cellIndex.X;
             RecordTile((DrawingVisual)_layers[visibilityIndex].Children[cellArrayIndex], _source.Cells[cellArrayIndex], visibilityIndex);
         }
 

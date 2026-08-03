@@ -49,6 +49,8 @@ namespace TileBasedLevelEditor.ViewModels
                 else
                     _cells[i].Image = tileImages[i];
             }
+
+            OnPropertyChanged(nameof(Cells));
         }
 
         public void ClearCells()

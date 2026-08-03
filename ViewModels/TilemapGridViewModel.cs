@@ -22,6 +22,8 @@ namespace TileBasedLevelEditor.ViewModels
         private List<TilemapCellViewModel> _cells;
         public override IReadOnlyList<GridCellViewModel> Cells => _cells;
 
+        public event Action<int, int>? OnCellChanged;
+
         public TilemapGridViewModel(ITilemapParent parent, ITilemapRendererService tilemapRendererService, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true) 
             : base(parent.CurrentTilemap.TileSize, parent.CurrentTilemap.TilemapSize, parent.CurrentTilemap.TileMargin, OnHover, OnSelect, shouldBeCentered, gridLinesVisibility, canHighlightSelectedTile)
         {
@@ -43,6 +45,7 @@ namespace TileBasedLevelEditor.ViewModels
         public void ApplyTile(int tilemapArrayTileIndex, LayerViewModel layer)
         {
             _tilemapRendererService.ApplyTile(_cells[tilemapArrayTileIndex], tilemapArrayTileIndex, layer);
+            OnCellChanged?.Invoke(tilemapArrayTileIndex, layer.VisibilityIndex);
         }
 
         public void SetNewTilemap(TilemapEditorViewModel tilemapVM)
