@@ -203,6 +203,12 @@ namespace TileBasedLevelEditor.ViewModels
                 {
                     //_tilemapsService.AddTileset(newTilemap);
                     //OnPropertyChanged(nameof(Tilemaps));
+                    Layers.Clear();
+                    foreach (Layer layer in newTilemap.Layers)
+                    {
+                        Layers.Add(new LayerViewModel(layer));
+                    }
+                    
                     CurrentTilemap = newTilemap;
                 }
             }
