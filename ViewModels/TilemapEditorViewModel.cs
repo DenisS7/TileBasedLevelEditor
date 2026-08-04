@@ -152,9 +152,6 @@ namespace TileBasedLevelEditor.ViewModels
 
         private void EditTilemapSize(Vec2<int> newTilemapSize)
         {
-            if (CurrentTilemap.TilesetsUsed.Count == 0)
-                return;
-
             int newTilemapArraySize = newTilemapSize.X * newTilemapSize.Y;
 
             foreach (Layer layer in CurrentTilemap.Layers)
