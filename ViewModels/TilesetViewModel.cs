@@ -208,6 +208,8 @@ namespace TileBasedLevelEditor.ViewModels
 
             HashSet<Vec2<int>> SelectedTiles = [];
             List<TileSelectedService.TilemapPreviewTile> SelectedTilesFull = [];
+            Vec2<int> min = new Vec2<int>(int.MaxValue, int.MaxValue);
+            Vec2<int> max = new Vec2<int>(int.MinValue, int.MinValue);
             foreach (SelectionArea selectionArea in TilesetGridVM.SelectionAreas)
             {
                 for (int i = selectionArea.StartTile.X; i <= selectionArea.EndTile.X; i++)
@@ -218,11 +220,17 @@ namespace TileBasedLevelEditor.ViewModels
                         {
                             CroppedBitmap? tileImage = CurrentTileset.TileImages[SelectedTiles.Last().X + SelectedTiles.Last().Y * NrTiles.X];
 							SelectedTilesFull.Add(new TileSelectedService.TilemapPreviewTile(new Vec2<int>(i, j), new TileData(SelectedTiles.Last(), CurrentTileset.ID), tileImage));
+
+                            min.X = Math.Min(min.X, i);
+                            min.Y = Math.Min(min.Y, j);
+                            max.X = Math.Max(max.X, i);
+                            max.Y = Math.Max(max.Y, j);
                         }
                     }
                 }
             }
             TileSelectedService.SelectedTiles = SelectedTilesFull;
+            TileSelectedService.ReferenceTile = (min + max) / 2;
         }
     }
 }

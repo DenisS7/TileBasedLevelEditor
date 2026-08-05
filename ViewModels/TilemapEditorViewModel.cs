@@ -299,7 +299,7 @@ namespace TileBasedLevelEditor.ViewModels
 
         private void OnTileSelected(Vec2<int>? vec)
         {
-            if (TileSelectedService.SelectedTiles == null || TileSelectedService.SelectedTiles.Count == 0 || vec == null)
+            if (TileSelectedService.SelectedTiles == null || TileSelectedService.SelectedTiles.Count == 0 || TileSelectedService.SelectedTiles == null || vec == null)
                 return;
 
             if (SelectedLayer == null)
@@ -309,11 +309,9 @@ namespace TileBasedLevelEditor.ViewModels
 
             ClearPreviousHoveredTiles();
 
-            TileData referenceTile = TileSelectedService.SelectedTiles[0].TileData;
-
             foreach (TileSelectedService.TilemapPreviewTile tileData in TileSelectedService.SelectedTiles)
             {
-                Vec2<int> tilemapTileIndex = vec + tileData.TileData.TilesetIndex - referenceTile.TilesetIndex;
+                Vec2<int> tilemapTileIndex = vec + tileData.TileData.TilesetIndex - TileSelectedService.ReferenceTile;
                 if (tilemapTileIndex < 0 || tilemapTileIndex >= TilemapSize)
                     continue;
 

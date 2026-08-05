@@ -11,6 +11,16 @@ namespace TileBasedLevelEditor.Services
     public static class TileSelectedService
     {
         public record TilemapPreviewTile(Vec2<int> Index, TileData TileData, CroppedBitmap? Image);
+        private static Vec2<int>? _referenceTile;
+        public static Vec2<int>? ReferenceTile
+        {
+            get => _referenceTile;
+            set
+            {
+                _referenceTile = value;
+            }
+        }
+
         private static List<TilemapPreviewTile>? _selectedTiles;
         public static List<TilemapPreviewTile>? SelectedTiles
         {
