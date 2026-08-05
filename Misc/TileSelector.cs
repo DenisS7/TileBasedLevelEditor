@@ -39,9 +39,7 @@ namespace TileBasedLevelEditor.Misc
                 mousePosition.Y -= (grid.ActualHeight - vm.CanvasHeight * vm.ScrollViewerZoom) / 2.0;
             }
 
-            Vec2<int> hoveredTile = new Vec2<int>((int)(mousePosition.X / ((tileSize.X + tilesMargin.X) * vm.ScrollViewerZoom)), (int)(mousePosition.Y / ((tileSize.Y + tilesMargin.Y) * vm.ScrollViewerZoom)));
-            //System.Diagnostics.Debug.WriteLine($"HoveredTile: {hoveredTile.X} {hoveredTile.Y}");
-
+            Vec2<int> hoveredTile = new Vec2<int>((int)Math.Floor(mousePosition.X / ((tileSize.X + tilesMargin.X) * vm.ScrollViewerZoom)), (int)Math.Floor(mousePosition.Y / ((tileSize.Y + tilesMargin.Y) * vm.ScrollViewerZoom)));
             if (hoveredTile >= vm.NrTiles || hoveredTile < 0)
                 return null;
 
