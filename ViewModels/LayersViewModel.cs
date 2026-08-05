@@ -54,13 +54,13 @@ namespace TileBasedLevelEditor.ViewModels
             if (SelectedLayer != null)
                 newLayerIndex = Layers.IndexOf(SelectedLayer) + 1;
 
-            CurrentTilemap.Layers.Insert(newLayerIndex, new Layer("New Layer", CurrentTilemap.TilemapSize.X * CurrentTilemap.TilemapSize.Y, newLayerIndex - 1));
+            CurrentTilemap.Layers.Insert(newLayerIndex, new Layer("New Layer", CurrentTilemap.TilemapSize.X * CurrentTilemap.TilemapSize.Y, Math.Max(newLayerIndex, Layers.Count)));
             LayerViewModel newLayer = new LayerViewModel(CurrentTilemap.Layers[newLayerIndex]);
-            Layers.Insert(newLayerIndex, newLayer);
             for(int i = newLayer.VisibilityIndex + 1; i < Layers.Count; i++)
             {
                 ++Layers[i].VisibilityIndex;
             }
+            Layers.Insert(newLayerIndex, newLayer);
 
             SelectedLayer = newLayer;
         }

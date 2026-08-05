@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Bson;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using TileBasedLevelEditor.Models;
@@ -12,7 +13,7 @@ namespace TileBasedLevelEditor.CustomUI
     public class GridCanvas : FrameworkElement
     {
         private readonly VisualCollection _children;
-        private readonly List<ContainerVisual> _layers = new List<ContainerVisual>();
+        private readonly ContainerVisual _layersParent = new ContainerVisual();
         private DrawingVisual[] _cells = Array.Empty<DrawingVisual>();
         private TileGridViewModel? _source = null;
         private Vec2<int> _gridNrTiles => _source?.NrTiles ?? 0;
@@ -102,13 +103,45 @@ namespace TileBasedLevelEditor.CustomUI
             }
         }
 
+        private void OnLayerCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                {
+                    foreach (LayerViewModel layer in e.NewItems!)
+                    {
+                        AddNewLayer(layer);
+                    }
+                    break;
+                }
+                case NotifyCollectionChangedAction.Remove:
+                {
+                    foreach (LayerViewModel layer in e.OldItems!)
+                    {
+                        RemoveLayer(layer);
+                    }
+                    break;
+                }
+                case NotifyCollectionChangedAction.Move:
+                {
+                    //TO DO: Add rearranging layers logic here or on layer rendering changed
+                    break;
+                }
+            }
+        }
+
         private void OnLayerRenderingChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is not LayerViewModel layer)
                 return;
 
             if (e.PropertyName is nameof(layer.Visible) || e.PropertyName is nameof(layer.Opacity))
-                _layers[layer.VisibilityIndex].Opacity = layer.Visible ? layer.Opacity : 0.0;
+                Unsafe.As<ContainerVisual>(_layersParent.Children[layer.VisibilityIndex]).Opacity = layer.Visible ? layer.Opacity : 0.0;
+            //else if (e.PropertyName is nameof(layer.VisibilityIndex))
+            //{
+            //
+            //}
         }
 
         private void CreateGridLines()
@@ -192,7 +225,7 @@ namespace TileBasedLevelEditor.CustomUI
             }
 
             _children.Clear();
-            _layers.Clear();
+            _layersParent.Children.Clear();
 
             InvalidateVisual();
         }
@@ -202,6 +235,39 @@ namespace TileBasedLevelEditor.CustomUI
             ContainerVisual layerContainer = new ContainerVisual { Opacity = layer.Visible ? layer.Opacity : 0.0 };
             layer.PropertyChanged += OnLayerRenderingChanged;
             return layerContainer;
+        }
+
+        private void RemoveLayer(LayerViewModel layer)
+        {
+            if (_source == null)
+                return;
+
+            layer.PropertyChanged -= OnLayerRenderingChanged;
+            _layersParent.Children.RemoveAt(layer.VisibilityIndex);
+        }
+
+        private void AddNewLayer(LayerViewModel layer)
+        {
+            if (_source == null)
+                return;
+
+            ContainerVisual layerContainer = BuildLayerContainer(layer);
+
+            for (int i = 0; i < _gridNrTiles.Y; i++)
+            {
+                for (int j = 0; j < _gridNrTiles.X; j++)
+                {
+                    int cellArrayIndex = i * _gridNrTiles.X + j;
+                    TilemapCellViewModel cell = (TilemapCellViewModel)_source.Cells[cellArrayIndex];
+
+                    DrawingVisual dv = new DrawingVisual { Offset = new Vector(j * (_tileSize.X + _source.TileMargin.X), i * (_tileSize.Y + _source.TileMargin.Y)) };
+                    RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);
+
+                    RecordTile(dv, _source.Cells[cellArrayIndex], layer.VisibilityIndex);
+                    layerContainer.Children.Add(dv);
+                }
+            }
+            _layersParent.Children.Add(layerContainer);
         }
 
         private void BuildCanvas(TileGridViewModel source)
@@ -215,28 +281,12 @@ namespace TileBasedLevelEditor.CustomUI
             {
                 foreach (LayerViewModel layer in tilemap.Layers)
                 {
-                    ContainerVisual layerContainer = BuildLayerContainer(layer);
-
-                    for (int i = 0; i < _gridNrTiles.Y; i++)
-                    {
-                        for (int j = 0; j < _gridNrTiles.X; j++)
-                        {
-                            int cellArrayIndex = i * _gridNrTiles.X + j;
-                            TilemapCellViewModel cell = (TilemapCellViewModel)source.Cells[cellArrayIndex];
-                            
-                            DrawingVisual dv = new DrawingVisual { Offset = new Vector(j * (_tileSize.X + source.TileMargin.X), i * (_tileSize.Y + source.TileMargin.Y)) };
-                            RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);
-
-                            RecordTile(dv, source.Cells[cellArrayIndex], layer.VisibilityIndex);
-                            layerContainer.Children.Add(dv);
-                        }
-                    }
-
-                    _layers.Add(layerContainer);
-                    _children.Add(layerContainer);
+                    AddNewLayer(layer);   
                 }
 
                 tilemap.OnCellChanged += RedrawCell;
+                tilemap.Layers.CollectionChanged += OnLayerCollectionChanged;
+                _children.Add(_layersParent);
             }
             else if (source is TilesetGridViewModel tileset)
             {
@@ -267,12 +317,17 @@ namespace TileBasedLevelEditor.CustomUI
             InvalidateMeasure();
         }
 
-        private void RedrawCell(int cellArrayIndex, int visibilityIndex = -1)
+        private DrawingVisual GetCellFromLayer(int cellArrayIndex, int layerIndex)
+        {
+            return Unsafe.As<DrawingVisual>(Unsafe.As<ContainerVisual>(_layersParent.Children[layerIndex]).Children[cellArrayIndex]);
+        }
+
+        private void RedrawCell(int cellArrayIndex, int visibilityIndex)
         {
             if (_source == null)
                 return;
 
-            RecordTile((DrawingVisual)_layers[visibilityIndex].Children[cellArrayIndex], _source.Cells[cellArrayIndex], visibilityIndex);
+            RecordTile(GetCellFromLayer(cellArrayIndex, visibilityIndex), _source.Cells[cellArrayIndex], visibilityIndex);
         }
 
         private void RecordTile(DrawingVisual dv, GridCellViewModel cell, int visibilityIndex = -1)
