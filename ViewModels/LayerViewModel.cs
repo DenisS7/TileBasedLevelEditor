@@ -76,6 +76,16 @@ namespace TileBasedLevelEditor.ViewModels
             }
         }
 
+        public bool Locked
+        {
+            get => Layer.Locked;
+            set
+            {
+                Layer.Locked = value;
+                OnPropertyChanged(nameof(Locked));
+            }
+        }
+
         public LayerViewModel(Layer layer)
         {
             _layer = layer;

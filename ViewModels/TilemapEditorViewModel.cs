@@ -331,6 +331,9 @@ namespace TileBasedLevelEditor.ViewModels
 
             ClearPreviousHoveredTiles();
 
+            if (SelectedLayer!.Locked)
+                return;
+
             foreach (TileSelectedService.TilemapPreviewTile tileData in TileSelectedService.SelectedTiles)
             {
                 Vec2<int> tilemapTileIndex = vec + tileData.TileData.TilesetIndex - TileSelectedService.ReferenceTile;

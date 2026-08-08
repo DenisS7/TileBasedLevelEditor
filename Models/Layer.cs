@@ -11,17 +11,19 @@ namespace TileBasedLevelEditor.Models
         public string Name { get; set; }
         public double Opacity { get; set; }
         public bool Visible { get; set; }
+        public bool Locked { get; set; }
         public TileData[] Tiles { get; set; }
         public int VisibilityIndex { get; set; }
 
         public Layer(string name, int size, int visibilityIndex)
         {
-            this.Name = name;
+            Name = name;
             Tiles = new TileData[size];
             VisibilityIndex = visibilityIndex;
 
             Opacity = 1.0;
             Visible = true;
+            Locked = false;
         }
 
     }

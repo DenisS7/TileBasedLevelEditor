@@ -43,6 +43,7 @@ namespace TileBasedLevelEditor.ViewModels
         public ICommand AddLayerCommand { get; }
         public ICommand DeleteLayerCommand { get; }
         public ICommand ChangeLayerVisibilityCommand { get; }
+        public ICommand LockLayerCommand { get; }
 
         public LayersViewModel(ITilemapParent parent, ICustomNavigationService navigationService)
         {
@@ -56,6 +57,7 @@ namespace TileBasedLevelEditor.ViewModels
             AddLayerCommand = new RelayCommand(AddLayer);
             DeleteLayerCommand = new RelayCommand(DeleteLayer);
             ChangeLayerVisibilityCommand = new RelayCommand(ChangeLayerVisibility);
+            LockLayerCommand = new RelayCommand(LockLayer);
         }
 
         private void RefreshLayersSource(object? sender, NotifyCollectionChangedEventArgs args)
@@ -103,6 +105,14 @@ namespace TileBasedLevelEditor.ViewModels
                 return;
 
             layer.Visible = !layer.Visible;
+        }
+
+        private void LockLayer(object? parameter)
+        {
+            if (parameter is not LayerViewModel layer)
+                return;
+
+            layer.Locked = !layer.Locked;
         }
     }
 }

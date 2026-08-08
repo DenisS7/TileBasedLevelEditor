@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <None Remove="Resources\Hidden.png" />
+    <None Remove="Resources\locked.png" />
+    <None Remove="Resources\unlocked.png" />
     <None Remove="Resources\Visible.png" />
   </ItemGroup>
 
@@ -19,6 +21,12 @@
 
   <ItemGroup>
     <Resource Include="Resources\Hidden.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\locked.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\unlocked.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Visible.png">

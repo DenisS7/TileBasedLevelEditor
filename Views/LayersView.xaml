@@ -106,6 +106,41 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    <GridViewColumn Header="Locked" 
+                                            Width="55">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.LockLayerCommand, ElementName=LayerList}"
+                                        CommandParameter="{Binding}"
+                                        Padding="0"
+                                        Margin="0"
+                                        Background="Transparent"
+                                        BorderThickness="0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                    <Image Width="16"
+                                           Height="16">
+                                        <Image.Style>
+                                            <Style TargetType="Image">
+                                                <Setter Property="Source" Value="/Resources/Locked.png"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Locked}" Value="False">
+                                                        <Setter Property="Source" Value="/Resources/Unlocked.png"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                </Button>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
