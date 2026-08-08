@@ -27,7 +27,7 @@ namespace TileBasedLevelEditor.Services
             for (int i = 0; i < tilemapVM.TilemapSize.X * tilemapVM.TilemapSize.Y; i++)
             {
                 TilemapCellViewModel cell = new TilemapCellViewModel(new Vec2<int>(i % tilemapVM.TilemapSize.X, i / tilemapVM.TilemapSize.X));
-                for (int j = 0; j < tilemapVM.Layers.Count; j++)
+                for (int j = 0; j < tilemapVM.Layers.Count - 1; j++)
                 {
                     TileData tile = tilemapVM.Layers[j].Tiles[i];
                     if (tile.TilesetID == Guid.Empty)

@@ -101,6 +101,9 @@ namespace TileBasedLevelEditor.ViewModels
         }
         public Vec2<int> TilemapSize => CurrentTilemap.TilemapSize;
         public Vec2<int> TileSize => CurrentTilemap.TileSize;
+        private Layer _previewLayer;
+        public Layer PreviewLayer => _previewLayer;
+        public LayerViewModel PreviewLayerVM;
         public LayerViewModel? SelectedLayer => LayersViewModel.SelectedLayer;
         public ObservableCollection<LayerViewModel> Layers { get; }
 
@@ -130,6 +133,11 @@ namespace TileBasedLevelEditor.ViewModels
                 Layers.Add(new LayerViewModel(layer));
             }
 
+            _previewLayer = new Layer("Preview Layer", _currentTilemap.TilemapSize.X * _currentTilemap.TilemapSize.Y, _currentTilemap.Layers.Count);
+            _previewLayer.Opacity = 0.5;
+            PreviewLayerVM = new LayerViewModel(_previewLayer);
+            Layers.Add(PreviewLayerVM);
+
             TilemapGridVM = new TilemapGridViewModel(this, tilemapRendererService, OnTileHovered, OnTileSelected, true, true, false);
             LayersViewModel = new LayersViewModel(this, _navigationService);
 
@@ -154,12 +162,11 @@ namespace TileBasedLevelEditor.ViewModels
         {
             int newTilemapArraySize = newTilemapSize.X * newTilemapSize.Y;
 
-            foreach (Layer layer in CurrentTilemap.Layers)
+            foreach (LayerViewModel layer in Layers)
             {
                 TileData[] Copy = (TileData[])layer.Tiles.Clone();
 
                 layer.Tiles = new TileData[newTilemapArraySize];
-                Vec2<int> UnusedTile = new Vec2<int>(-1);
                 Vec2<int> MinTilemapSize = new Vec2<int>(Math.Min(CurrentTilemap.TilemapSize.X, newTilemapSize.X), Math.Min(CurrentTilemap.TilemapSize.Y, newTilemapSize.Y));
                 for (int y = 0; y < MinTilemapSize.Y; y++)
                 {
@@ -167,7 +174,7 @@ namespace TileBasedLevelEditor.ViewModels
                     {
                         int oldTileArrayIndex = x + y * CurrentTilemap.TilemapSize.X;
 
-                        if (Copy[oldTileArrayIndex].TilesetIndex == null || Copy[oldTileArrayIndex].TilesetIndex == UnusedTile)
+                        if (Copy[oldTileArrayIndex].TilesetID == Guid.Empty)
                             continue;
 
                         int newTileArrayIndex = x + y * newTilemapSize.X;
@@ -185,15 +192,21 @@ namespace TileBasedLevelEditor.ViewModels
 
         private void OnAddNewTilemap(object? parameter)
         {
+            //TO DO: unify this part with edited tilemap
             if (NewTilemapName.Length < 3
                 || NewTilemapTileHeight.Length == 0 || NewTilemapTileWidth.Length == 0 
                 || NewTilemapWidth.Length == 0 || NewTilemapHeight.Length == 0)
                 return;
 
+            Vec2<int> NewTilemapTileSize = new Vec2<int>(Int32.Parse(NewTilemapTileWidth), Int32.Parse(NewTilemapTileHeight));
+            Vec2<int> NewTilemapSize = new Vec2<int>(Int32.Parse(NewTilemapWidth), Int32.Parse(NewTilemapHeight));
+
+            if (NewTilemapTileSize.X == 0 || NewTilemapTileSize.Y == 0 ||
+                NewTilemapSize.X == 0 || NewTilemapSize.X == 0)
+                return;
+
             try
             {
-                Vec2<int> NewTilemapTileSize = new Vec2<int>(Int32.Parse(NewTilemapTileWidth), Int32.Parse(NewTilemapTileHeight));
-                Vec2<int> NewTilemapSize = new Vec2<int>(Int32.Parse(NewTilemapWidth), Int32.Parse(NewTilemapHeight));
                 Tilemap newTilemap = new Tilemap(NewTilemapName, NewTilemapTileSize, NewTilemapSize, 0);
                 //TO DO after tilemap serialization is done
                 //if (Serializer.SaveTilemap(newTilemap))
@@ -205,6 +218,11 @@ namespace TileBasedLevelEditor.ViewModels
                     {
                         Layers.Add(new LayerViewModel(layer));
                     }
+
+                    _previewLayer = new Layer("Preview Layer", newTilemap.TilemapSize.X * newTilemap.TilemapSize.Y, newTilemap.Layers.Count);
+                    _previewLayer.Opacity = 0.5;
+                    PreviewLayerVM.Layer = _previewLayer;
+                    Layers.Add(PreviewLayerVM);
                     
                     CurrentTilemap = newTilemap;
                 }
@@ -245,6 +263,10 @@ namespace TileBasedLevelEditor.ViewModels
 
             Vec2<int> NewTilemapTileSize = new Vec2<int>(Int32.Parse(NewTilemapTileWidth), Int32.Parse(NewTilemapTileHeight));
             Vec2<int> NewTilemapSize = new Vec2<int>(Int32.Parse(NewTilemapWidth), Int32.Parse(NewTilemapHeight));
+
+            if (NewTilemapTileSize.X == 0 || NewTilemapTileSize.Y == 0 ||
+                NewTilemapSize.X == 0 || NewTilemapSize.X == 0)
+                return;
 
             EditTilemapSize(NewTilemapSize);
 
@@ -304,7 +326,7 @@ namespace TileBasedLevelEditor.ViewModels
 
             if (SelectedLayer == null)
             {
-                LayersViewModel.SelectedLayer = LayersViewModel.Layers.Last();
+                LayersViewModel.SelectedLayer = Layers[Layers.Count - 2];
             }
 
             ClearPreviousHoveredTiles();

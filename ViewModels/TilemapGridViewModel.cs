@@ -18,7 +18,6 @@ namespace TileBasedLevelEditor.ViewModels
         private ITilemapParent _parent;
         
         public ObservableCollection<LayerViewModel> Layers => _parent.Layers;
-        public ObservableCollection<TileSelectedService.TilemapPreviewTile> PreviewTiles { get; }
         private List<TilemapCellViewModel> _cells;
         public override IReadOnlyList<GridCellViewModel> Cells => _cells;
 
@@ -27,7 +26,6 @@ namespace TileBasedLevelEditor.ViewModels
         public TilemapGridViewModel(ITilemapParent parent, ITilemapRendererService tilemapRendererService, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true) 
             : base(parent.CurrentTilemap.TileSize, parent.CurrentTilemap.TilemapSize, parent.CurrentTilemap.TileMargin, OnHover, OnSelect, shouldBeCentered, gridLinesVisibility, canHighlightSelectedTile)
         {
-            PreviewTiles = new ObservableCollection<TileSelectedService.TilemapPreviewTile>();
             _tilemapRendererService = tilemapRendererService;
             _parent = parent;
 
@@ -54,31 +52,36 @@ namespace TileBasedLevelEditor.ViewModels
             OnPropertyChanged(nameof(Cells));
         }
 
-        public void ShowPreview(List<TileSelectedService.TilemapPreviewTile> previewTiles)
-        {
-            PreviewTiles.Clear();
-        }
-
         protected override void OnTileHovered(Vec2<int>? initTile)
         {
-            PreviewTiles.Clear();
+            //TO DO: find a better way to clear tiles
+            for (int i = 0; i < Layers.Last().Tiles.Length; i++)
+            {
+                if (Layers.Last().Tiles[i].TilesetID == Guid.Empty)
+                    continue;
+
+                Layers.Last().Tiles[i] = new TileData();
+                ApplyTile(i, Layers.Last());
+            }
+
             if (initTile == null)
                 return;
 
             if (TileSelectedService.SelectedTiles == null || TileSelectedService.SelectedTiles.Count == 0)
                 return;
 
-            TileData referenceTile = TileSelectedService.SelectedTiles[0].TileData;
+            if (TileSelectedService.ReferenceTile == null)
+                return;
             
             foreach (TileSelectedService.TilemapPreviewTile previewTile in TileSelectedService.SelectedTiles)
             {
-                Vec2<int> tilemapTileIndex = initTile + previewTile.TileData.TilesetIndex - referenceTile.TilesetIndex;
+                Vec2<int> tilemapTileIndex = initTile + previewTile.TileData.TilesetIndex - TileSelectedService.ReferenceTile;
                 if (tilemapTileIndex < 0 || tilemapTileIndex >= NrTiles)
                     continue;
-                TileSelectedService.TilemapPreviewTile tilemapPreviewTile = previewTile with { Index = tilemapTileIndex };
-                PreviewTiles.Add(tilemapPreviewTile);
-                //HoveredOverTiles.Add(new Tuple<Vec2<int>, CroppedBitmap?>(tilemapTileIndex, TileGridVM.Cells[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X]));
-                //TileGridVM.Cells[tilemapTileIndex.X + tilemapTileIndex.Y * TilemapSize.X] = tileData.Item2;
+
+                int tilemapArrayTileIndex = tilemapTileIndex.X + tilemapTileIndex.Y * NrTiles.X;
+                Layers.Last().Tiles[tilemapArrayTileIndex] = previewTile.TileData;
+                ApplyTile(tilemapArrayTileIndex, Layers.Last());
             }
         }
     }
