@@ -60,6 +60,11 @@ namespace TileBasedLevelEditor.ViewModels
             LockLayerCommand = new RelayCommand(LockLayer);
         }
 
+        public void MoveLayerTo(int from, int to)
+        {
+            AllLayers.Move(from, to);
+        }
+
         private void RefreshLayersSource(object? sender, NotifyCollectionChangedEventArgs args)
         {
             _layersSource.View.Refresh();

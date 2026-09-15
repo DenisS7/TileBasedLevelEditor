@@ -57,6 +57,8 @@
                   BorderThickness="5 0 2 2"
                   Padding="0"
                   misc:ListViewFillColumnBehavior.IsListViewObserved="True"
+                  misc:ListViewReorderBehavior.ReorderCommand="True"
+                  misc:TestProp.TestCommand="True"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.View>
                 <GridView AllowsColumnReorder="False"
@@ -65,7 +67,10 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}"
-                                           Margin="3 0 0 0"/>
+                                           IsHitTestVisible="True"
+                                           Margin="3 0 0 0"
+                                           Background="Transparent"
+                                           />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -80,17 +85,21 @@
                                         Padding="0"
                                         Margin="0"
                                         Background="Transparent"
-                                        BorderThickness="0">
+                                        BorderThickness="0"
+                                        IsHitTestVisible="False">
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    IsHitTestVisible="False">
                                                 <ContentPresenter HorizontalAlignment="Center"
-                                                                    VerticalAlignment="Center"/>
+                                                                    VerticalAlignment="Center"
+                                                                  IsHitTestVisible="False"/>
                                             </Border>
                                         </ControlTemplate>
                                     </Button.Template>
                                     <Image Width="16"
-                                           Height="16">
+                                           Height="16"
+                                           IsHitTestVisible="False">
                                         <Image.Style>
                                             <Style TargetType="Image">
                                                 <Setter Property="Source" Value="/Resources/Visible.png"/>

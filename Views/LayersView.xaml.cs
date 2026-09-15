@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,12 @@ namespace TileBasedLevelEditor.Views
         public LayersView()
         {
             InitializeComponent();
+            var element = Mouse.DirectlyOver;
+            Debug.WriteLine("test");
+            if (element is null)
+                return;
+            
+            Debug.WriteLine(element.GetType());
         }
     }
 }
