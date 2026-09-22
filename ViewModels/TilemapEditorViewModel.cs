@@ -352,5 +352,17 @@ namespace TileBasedLevelEditor.ViewModels
         {
             TilemapGridVM.RemoveLayer(layer);
         }
+
+        public void OnLayersSwapped(int layer1, int layer2)
+        {
+            if (layer1 == layer2)
+                return;
+
+            int layerCount = Layers.Count - 1;
+            if (layerCount < layer1 || layerCount < layer2)
+                return;
+
+            TilemapGridVM.SwapLayers(Layers[layer1], Layers[layer2]);
+        }
     }
 }

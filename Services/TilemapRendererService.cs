@@ -86,5 +86,48 @@ namespace TileBasedLevelEditor.Services
                 EraseTile(cells[i], layer);
             }
         }
+
+        public void SwapLayers(List<TilemapCellViewModel> cells, LayerViewModel layer1, LayerViewModel layer2)
+        {
+            for (int i = 0; i < cells.Count; i++)
+            {
+                TilemapCellTileViewModel? tile1 = null;
+                TilemapCellTileViewModel? tile2 = null;
+                for (int j = 0; j < cells[i].Tiles.Count; j++)
+                {
+                    if (cells[i].Tiles[j].LayerVM == layer1)
+                    {
+                        tile1 = cells[i].Tiles[j];
+                        if (tile2 != null)
+                            break;
+                    }
+                    else if (cells[i].Tiles[j].LayerVM == layer2)
+                    {
+                        tile2 = cells[i].Tiles[j];
+                        if (tile1 != null)
+                            break;
+                    }
+                }
+
+                if (tile1 != null && tile2 != null)
+                {
+                    (tile1, tile2) = (tile2, tile1);
+                    continue;
+                }
+
+                if (tile1 == null)
+                {
+                    if (tile2 == null)
+                        continue;
+
+                    layer1.Tiles[i] = tile2.Tile;
+                    ApplyTile(cells[i], i, layer1);
+                    continue;
+                }
+
+                layer2.Tiles[i] = tile1.Tile;
+                ApplyTile(cells[i], i, layer2);
+            }
+        }
     }
 }

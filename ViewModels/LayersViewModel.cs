@@ -63,6 +63,7 @@ namespace TileBasedLevelEditor.ViewModels
         public void MoveLayerTo(int from, int to)
         {
             AllLayers.Move(from, to);
+            _parent.OnLayersSwapped(from, to);
         }
 
         private void RefreshLayersSource(object? sender, NotifyCollectionChangedEventArgs args)

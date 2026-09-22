@@ -40,6 +40,11 @@ namespace TileBasedLevelEditor.ViewModels
             _tilemapRendererService.RemoveLayer(_cells, layer);
         }
 
+        public void SwapLayers(LayerViewModel layer1, LayerViewModel layer2)
+        {
+            _tilemapRendererService.SwapLayers(_cells, layer1, layer2);
+        }
+
         public void ApplyTile(int tilemapArrayTileIndex, LayerViewModel layer)
         {
             _tilemapRendererService.ApplyTile(_cells[tilemapArrayTileIndex], tilemapArrayTileIndex, layer);

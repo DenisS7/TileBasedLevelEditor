@@ -14,5 +14,6 @@ namespace TileBasedLevelEditor.Interfaces
         public Tilemap CurrentTilemap { get; }
         public ObservableCollection<LayerViewModel> Layers { get; }
         public void OnLayerDeleted(LayerViewModel layer);
+        public void OnLayersSwapped(int layer1, int layer2);
     }
 }

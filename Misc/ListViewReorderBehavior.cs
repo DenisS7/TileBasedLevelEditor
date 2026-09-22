@@ -52,20 +52,47 @@ namespace TileBasedLevelEditor.Misc
             }
         }
 
-        private static LayerViewModel? GetItemAt(ListView listView, Point point)
+        private static LayerViewModel? GetItemAt(ListView listView, Point point, List<int>? validColumns = null)
         {
             HitTestResult result = VisualTreeHelper.HitTest(listView, point);
-            if (result is null)
+            if (result == null)
                 return null;
 
             DependencyObject? hit = result.VisualHit;
+            if (hit == null)
+                return null;
 
-            if (hit is null)
+            bool validHit = false;
+            //TO DO: change this to variables in behavior
+            if (validColumns != null)
+            {
+                if (listView.View is not GridView gridView || gridView.Columns.Count < 1)
+                      return null;
+
+                double prevX = 0;
+                double nextX = 0;
+                for (int i = 0; i < gridView.Columns.Count; i++)
+                {
+                    nextX += gridView.Columns[i].Width;
+                    if (validColumns.Contains(i) && prevX < point.X && point.X < nextX)
+                    {
+                        validHit = true;
+                        break;
+                    }
+
+                    prevX = nextX;
+                }
+            }
+            else
+            {
+                validHit = true;
+            }
+
+            if (!validHit)
                 return null;
 
             DependencyObject? obj = VisualTreeHelper.GetParent(hit);
-
-            while (obj is not null)
+            while (obj != null)
             {
                 if (obj is ListViewItem item2)
                 {
@@ -86,13 +113,11 @@ namespace TileBasedLevelEditor.Misc
             if (sender is not ListView listView)
                 return;
 
-            //listView.SelectedItem = GetItemAt(listView, e.GetPosition(listView));
-            //Debug.WriteLine(e.GetPosition(listView));
-
-            _selectedItem = GetItemAt(listView, e.GetPosition(listView));
+            _selectedItem = GetItemAt(listView, e.GetPosition(listView), new List<int> { 0 });
             if (_selectedItem == null)
                 return;
 
+            listView.SelectedItem = _selectedItem;
             listView.CaptureMouse();
         }
 
@@ -104,6 +129,10 @@ namespace TileBasedLevelEditor.Misc
             if (_selectedItem == null)
                 return;
 
+            LayersViewModel? vm2 = listView.DataContext as LayersViewModel;
+            if (vm2 is null)
+                return;
+
             var item0 = listView.Items.GetItemAt(0);
             var item1 = listView.Items.GetItemAt(1);
 
@@ -111,23 +140,14 @@ namespace TileBasedLevelEditor.Misc
             if (item is null)
                 return;
 
-            LayersViewModel? vm2 = listView.DataContext as LayersViewModel;
-            if (vm2 is null)
+            if (listView.SelectedItem == item)
                 return;
 
             int from = listView.Items.IndexOf(_selectedItem);
             int to = item != null ? listView.Items.IndexOf(item) : listView.Items.Count;
+
             //change to command
             vm2.MoveLayerTo(from, to);
-
-            Debug.WriteLine("Elements:");
-            for(int i = 0; i < listView.Items.Count; i++)
-            {
-                LayerViewModel vm = listView.Items[i] as LayerViewModel;
-                string text = string.Format("Pos: {0}    Object: {1}", i, vm.Name);
-                Debug.WriteLine(text);
-            }
-            Debug.WriteLine("");
         }
 
         private static void ListView_MouseLeftButtonUp(object sender, MouseEventArgs e)
@@ -135,19 +155,8 @@ namespace TileBasedLevelEditor.Misc
             if (sender is not ListView listView)
                 return;
 
-            //if (_selectedItem == null)
-            //    return;
-            //
-            //LayerViewModel? vm = GetItemAt(listView, e.GetPosition(listView));
-            //if (vm == null)
-            //    return;
-            //
-            //int index = listView.Items.IndexOf(vm);// listView.Items.Count;
-            //if (index < 0)
-            //    return;
-            //
-            //listView.Items.MoveCurrentToPosition(index);
             _selectedItem = null;
+            //listView.ReleaseMouseCapture();
         }
     }
 }
