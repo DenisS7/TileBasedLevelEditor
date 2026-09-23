@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,33 +8,33 @@ using TileBasedLevelEditor.Models;
 
 namespace TileBasedLevelEditor.Services
 {
-    public static class TileSelectedService
-    {
-        public record TilemapPreviewTile(Vec2<int> Index, TileData TileData, CroppedBitmap? Image);
-        private static Vec2<int>? _referenceTile;
-        public static Vec2<int>? ReferenceTile
-        {
-            get => _referenceTile;
-            set
-            {
-                _referenceTile = value;
-            }
-        }
+	public static class TileSelectedService
+	{
+		public record TilemapPreviewTile(Vec2<int> Index, TileData TileData, CroppedBitmap? Image);
+		private static Vec2<int>? _referenceTile;
+		public static Vec2<int>? ReferenceTile
+		{
+			get => _referenceTile;
+			set
+			{
+				_referenceTile = value;
+			}
+		}
 
-        private static List<TilemapPreviewTile>? _selectedTiles;
-        public static List<TilemapPreviewTile>? SelectedTiles
-        {
-            get => _selectedTiles;
-            set
-            {
-                if (_selectedTiles != value)
-                {
-                    _selectedTiles = value;
-                    SelectedTileChanged?.Invoke(null, EventArgs.Empty);
-                }
-            }
-        }
+		private static List<TilemapPreviewTile>? _selectedTiles;
+		public static List<TilemapPreviewTile>? SelectedTiles
+		{
+			get => _selectedTiles;
+			set
+			{
+				if (_selectedTiles != value)
+				{
+					_selectedTiles = value;
+					SelectedTileChanged?.Invoke(null, EventArgs.Empty);
+				}
+			}
+		}
 
-        public static EventHandler? SelectedTileChanged; 
-    }
+		public static EventHandler? SelectedTileChanged; 
+	}
 }

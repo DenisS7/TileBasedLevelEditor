@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,20 +16,20 @@ using System.Windows.Shapes;
 
 namespace TileBasedLevelEditor.Views
 {
-    /// <summary>
-    /// Interaction logic for LayersView.xaml
-    /// </summary>
-    public partial class LayersView : UserControl
-    {
-        public LayersView()
-        {
-            InitializeComponent();
-            var element = Mouse.DirectlyOver;
-            Debug.WriteLine("test");
-            if (element is null)
-                return;
-            
-            Debug.WriteLine(element.GetType());
-        }
-    }
+	/// <summary>
+	/// Interaction logic for LayersView.xaml
+	/// </summary>
+	public partial class LayersView : UserControl
+	{
+		public LayersView()
+		{
+			InitializeComponent();
+			var element = Mouse.DirectlyOver;
+			Debug.WriteLine("test");
+			if (element is null)
+				return;
+			
+			Debug.WriteLine(element.GetType());
+		}
+	}
 }

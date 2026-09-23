@@ -1,28 +1,28 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:renderVM="clr-namespace:TileBasedLevelEditor.ViewModels.Rendering">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:renderVM="clr-namespace:TileBasedLevelEditor.ViewModels.Rendering">
 
-    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+	<BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
-    <DataTemplate DataType="{x:Type renderVM:TilemapCellViewModel}">
+	<DataTemplate DataType="{x:Type renderVM:TilemapCellViewModel}">
 
-        <ItemsControl ItemsSource="{Binding Tiles}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Grid/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+		<ItemsControl ItemsSource="{Binding Tiles}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<Grid/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
 
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Image Source="{Binding Image}"
-                           Opacity="{Binding LayerVM.Opacity}"
-                           Visibility="{Binding LayerVM.Visible, Converter={StaticResource BoolToVis}}"
-                           RenderOptions.BitmapScalingMode="NearestNeighbor"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Image Source="{Binding Image}"
+						   Opacity="{Binding LayerVM.Opacity}"
+						   Visibility="{Binding LayerVM.Visible, Converter={StaticResource BoolToVis}}"
+						   RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
 
-    </DataTemplate>
+	</DataTemplate>
 
 </ResourceDictionary>

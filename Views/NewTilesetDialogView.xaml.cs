@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,14 +15,14 @@ using TileBasedLevelEditor.ViewModels;
 
 namespace TileBasedLevelEditor.Views
 {
-    /// <summary>
-    /// Interaction logic for NewTilesetDialogView.xaml
-    /// </summary>
-    public partial class NewTilesetDialogView : Window
-    {
-        public NewTilesetDialogView()
-        {
-            InitializeComponent();
-        }
-    }
+	/// <summary>
+	/// Interaction logic for NewTilesetDialogView.xaml
+	/// </summary>
+	public partial class NewTilesetDialogView : Window
+	{
+		public NewTilesetDialogView()
+		{
+			InitializeComponent();
+		}
+	}
 }

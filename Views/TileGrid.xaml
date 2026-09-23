@@ -1,88 +1,88 @@
-﻿<UserControl x:Class="TileBasedLevelEditor.Views.TileGrid"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
-             xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
-             xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
-             xmlns:converters="clr-namespace:TileBasedLevelEditor.Converters"
-             xmlns:customUI="clr-namespace:TileBasedLevelEditor.CustomUI"
-             mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance Type=vm:TileGridViewModel}"
-             d:DesignHeight="450" d:DesignWidth="800"
-             Name="TileGridRoot">
+<UserControl x:Class="TileBasedLevelEditor.Views.TileGrid"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
+			 xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
+			 xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
+			 xmlns:converters="clr-namespace:TileBasedLevelEditor.Converters"
+			 xmlns:customUI="clr-namespace:TileBasedLevelEditor.CustomUI"
+			 mc:Ignorable="d" 
+			 d:DataContext="{d:DesignInstance Type=vm:TileGridViewModel}"
+			 d:DesignHeight="450" d:DesignWidth="800"
+			 Name="TileGridRoot">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/TileBasedLevelEditor;component/Views/TilesetCellTemplate.xaml"/>
-                <ResourceDictionary Source="/TileBasedLevelEditor;component/Views/TilemapCellTemplate.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/TileBasedLevelEditor;component/Views/TilesetCellTemplate.xaml"/>
+				<ResourceDictionary Source="/TileBasedLevelEditor;component/Views/TilemapCellTemplate.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
 
-            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-            <converters:BooleanAndToVisibilityConverter x:Key="BoolAndToVis"/>
-        </ResourceDictionary>
-    </UserControl.Resources>
+			<BooleanToVisibilityConverter x:Key="BoolToVis"/>
+			<converters:BooleanAndToVisibilityConverter x:Key="BoolAndToVis"/>
+		</ResourceDictionary>
+	</UserControl.Resources>
 
-    <Grid Background="{StaticResource BackgroundBrush}">
-        <ScrollViewer CanContentScroll="false"
-                      VerticalScrollBarVisibility="Auto" 
-                      HorizontalScrollBarVisibility="Auto" 
-                      misc:ZoomBehavior.IsEnabled="True"
-                      misc:ZoomBehavior.ZoomFactor="0.1"
-                      misc:ZoomBehavior.ChildElement="{Binding ElementName=TileCanvas}"
-                      misc:DragBehavior.IsEnabled="True"
-                      misc:SizeChangedBehavior.IsObserved="True"
-                      misc:SizeChangedBehavior.ObservedSize="{Binding ScrollViewerSize, Mode=OneWayToSource}"
-                      misc:ScrollToCenterBehavior.ScrollToCenter="{Binding ShouldBeCentered}"
-                      Name="TilesetScrollViewer">
+	<Grid Background="{StaticResource BackgroundBrush}">
+		<ScrollViewer CanContentScroll="false"
+					  VerticalScrollBarVisibility="Auto" 
+					  HorizontalScrollBarVisibility="Auto" 
+					  misc:ZoomBehavior.IsEnabled="True"
+					  misc:ZoomBehavior.ZoomFactor="0.1"
+					  misc:ZoomBehavior.ChildElement="{Binding ElementName=TileCanvas}"
+					  misc:DragBehavior.IsEnabled="True"
+					  misc:SizeChangedBehavior.IsObserved="True"
+					  misc:SizeChangedBehavior.ObservedSize="{Binding ScrollViewerSize, Mode=OneWayToSource}"
+					  misc:ScrollToCenterBehavior.ScrollToCenter="{Binding ShouldBeCentered}"
+					  Name="TilesetScrollViewer">
 
-            <Grid Width="{Binding ScaledViewportWidth}"
-                  Height="{Binding ScaledViewportHeight}"
-                  misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
-                  misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
-                  VerticalAlignment="Top"
-                  HorizontalAlignment="Left"
-                  Background="Transparent">
-                
-                <Canvas Name="TileCanvas"
-                        Width="{Binding CanvasWidth}"
-                        Height="{Binding CanvasHeight}"
-                        Background="Transparent">
-                    
-                    <Canvas.Style>
-                        <Style TargetType="Canvas">
-                            <Setter Property="VerticalAlignment"   Value="Top"  />
-                            <Setter Property="HorizontalAlignment" Value="Left" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ShouldBeCentered}" Value="True">
-                                    <Setter Property="VerticalAlignment"   Value="Center" />
-                                    <Setter Property="HorizontalAlignment" Value="Center" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Canvas.Style>
+			<Grid Width="{Binding ScaledViewportWidth}"
+				  Height="{Binding ScaledViewportHeight}"
+				  misc:TileSelector.HoverCommand="{Binding HoverTileCommand}"
+				  misc:TileSelector.SelectCommand="{Binding SelectTileCommand}"
+				  VerticalAlignment="Top"
+				  HorizontalAlignment="Left"
+				  Background="Transparent">
+				
+				<Canvas Name="TileCanvas"
+						Width="{Binding CanvasWidth}"
+						Height="{Binding CanvasHeight}"
+						Background="Transparent">
+					
+					<Canvas.Style>
+						<Style TargetType="Canvas">
+							<Setter Property="VerticalAlignment"   Value="Top"  />
+							<Setter Property="HorizontalAlignment" Value="Left" />
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding ShouldBeCentered}" Value="True">
+									<Setter Property="VerticalAlignment"   Value="Center" />
+									<Setter Property="HorizontalAlignment" Value="Center" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Canvas.Style>
 
 
-                    <customUI:GridCanvas x:Name="GridCanvas"/>
+					<customUI:GridCanvas x:Name="GridCanvas"/>
 
-                    <Rectangle Width="{Binding TileSize.X}"
-                               Height="{Binding TileSize.Y}"
-                               Visibility="{Binding IsTileHovered, Converter={StaticResource BoolToVis}}"
-                               Opacity="0.2"
-                               Fill="Aqua"
-                               IsHitTestVisible="False"
-                               Canvas.Left="{Binding HoveredTileLocation.X}"
-                               Canvas.Top="{Binding HoveredTileLocation.Y}"/>
+					<Rectangle Width="{Binding TileSize.X}"
+							   Height="{Binding TileSize.Y}"
+							   Visibility="{Binding IsTileHovered, Converter={StaticResource BoolToVis}}"
+							   Opacity="0.2"
+							   Fill="Aqua"
+							   IsHitTestVisible="False"
+							   Canvas.Left="{Binding HoveredTileLocation.X}"
+							   Canvas.Top="{Binding HoveredTileLocation.Y}"/>
 
-                    <Path Data="{Binding SelectionGeometry}"
-                          Fill="DodgerBlue"
-                          Opacity="0.5"
-                          IsHitTestVisible="False"
-                          Visibility="{Binding CanHighlightSelectedTile, Converter={StaticResource BoolToVis}}"/>
-                </Canvas>
-            </Grid>
-        </ScrollViewer>
-    </Grid>
+					<Path Data="{Binding SelectionGeometry}"
+						  Fill="DodgerBlue"
+						  Opacity="0.5"
+						  IsHitTestVisible="False"
+						  Visibility="{Binding CanHighlightSelectedTile, Converter={StaticResource BoolToVis}}"/>
+				</Canvas>
+			</Grid>
+		</ScrollViewer>
+	</Grid>
 </UserControl>

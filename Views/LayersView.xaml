@@ -1,149 +1,149 @@
-﻿<UserControl x:Class="TileBasedLevelEditor.Views.LayersView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
-             xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
-             xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
-             xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
-             xmlns:converters="clr-namespace:TileBasedLevelEditor.Converters"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=vm:LayersViewModel}"
-             x:Name="Root">
+<UserControl x:Class="TileBasedLevelEditor.Views.LayersView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+			 xmlns:local="clr-namespace:TileBasedLevelEditor.Views"
+			 xmlns:misc="clr-namespace:TileBasedLevelEditor.Misc"
+			 xmlns:vm="clr-namespace:TileBasedLevelEditor.ViewModels"
+			 xmlns:converters="clr-namespace:TileBasedLevelEditor.Converters"
+			 mc:Ignorable="d" 
+			 d:DesignHeight="450" d:DesignWidth="800"
+			 d:DataContext="{d:DesignInstance Type=vm:LayersViewModel}"
+			 x:Name="Root">
 
-    <Grid Background="{StaticResource DarkBackgroundBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+	<Grid Background="{StaticResource DarkBackgroundBrush}">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="40"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
 
-        <Grid Grid.Row="0"
-              Margin="5 0 2 2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+		<Grid Grid.Row="0"
+			  Margin="5 0 2 2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0"
-                       Text="Layers"
-                       FontSize="20"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Center"
-                       TextAlignment="Left"/>
+			<TextBlock Grid.Column="0"
+					   Text="Layers"
+					   FontSize="20"
+					   HorizontalAlignment="Left"
+					   VerticalAlignment="Center"
+					   TextAlignment="Left"/>
 
-            <Button Grid.Column="2"
-                    Content="Delete Layer"
-                    IsEnabled="{Binding CanDeleteLayer}"
-                    Command="{Binding DeleteLayerCommand}"
-                    CommandParameter="{Binding SelectedLayer}"/>
+			<Button Grid.Column="2"
+					Content="Delete Layer"
+					IsEnabled="{Binding CanDeleteLayer}"
+					Command="{Binding DeleteLayerCommand}"
+					CommandParameter="{Binding SelectedLayer}"/>
 
-            <Button Grid.Column="3"
-                    Content="Add Layer"
-                    Margin="10 0 0 0"
-                    Command="{Binding AddLayerCommand}"/>
-        </Grid>
+			<Button Grid.Column="3"
+					Content="Add Layer"
+					Margin="10 0 0 0"
+					Command="{Binding AddLayerCommand}"/>
+		</Grid>
 
-        <ListView Grid.Row="1"
-                  x:Name="LayerList"
-                  ItemsSource="{Binding Layers}"
-                  SelectedItem="{Binding SelectedLayer}"
-                  Background="{StaticResource BackgroundBrush}"
-                  MaxWidth="{Binding ActualWidth, ElementName=Root}"
-                  BorderBrush="{StaticResource DarkBackgroundBrush}"
-                  BorderThickness="5 0 2 2"
-                  Padding="0"
-                  misc:ListViewFillColumnBehavior.IsListViewObserved="True"
-                  misc:ListViewReorderBehavior.ReorderCommand="True"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListView.View>
-                <GridView AllowsColumnReorder="False"
-                          ColumnHeaderContainerStyle="{StaticResource LayersColumnHeader}">
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}"
-                                           Margin="3 0 0 0"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Opacity" DisplayMemberBinding="{Binding Opacity}" 
-                                    Width="55"/>
-                    <GridViewColumn Header="Visible" 
-                                    Width="55">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Command="{Binding DataContext.ChangeLayerVisibilityCommand, ElementName=LayerList}"
-                                        CommandParameter="{Binding}"
-                                        Padding="0"
-                                        Margin="0"
-                                        Background="Transparent"
-                                        BorderThickness="0">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                    <Image Width="16"
-                                           Height="16">
-                                        <Image.Style>
-                                            <Style TargetType="Image">
-                                                <Setter Property="Source" Value="/Resources/Visible.png"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Visible}" Value="False">
-                                                        <Setter Property="Source" Value="/Resources/Hidden.png"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Image.Style>
-                                    </Image>
-                                </Button>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Locked" 
-                                            Width="55">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Command="{Binding DataContext.LockLayerCommand, ElementName=LayerList}"
-                                        CommandParameter="{Binding}"
-                                        Padding="0"
-                                        Margin="0"
-                                        Background="Transparent"
-                                        BorderThickness="0">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Button.Template>
-                                    <Image Width="16"
-                                           Height="16">
-                                        <Image.Style>
-                                            <Style TargetType="Image">
-                                                <Setter Property="Source" Value="/Resources/Locked.png"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Locked}" Value="False">
-                                                        <Setter Property="Source" Value="/Resources/Unlocked.png"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Image.Style>
-                                    </Image>
-                                </Button>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
-    </Grid>
+		<ListView Grid.Row="1"
+				  x:Name="LayerList"
+				  ItemsSource="{Binding Layers}"
+				  SelectedItem="{Binding SelectedLayer}"
+				  Background="{StaticResource BackgroundBrush}"
+				  MaxWidth="{Binding ActualWidth, ElementName=Root}"
+				  BorderBrush="{StaticResource DarkBackgroundBrush}"
+				  BorderThickness="5 0 2 2"
+				  Padding="0"
+				  misc:ListViewFillColumnBehavior.IsListViewObserved="True"
+				  misc:ListViewReorderBehavior.ReorderCommand="True"
+				  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+			<ListView.View>
+				<GridView AllowsColumnReorder="False"
+						  ColumnHeaderContainerStyle="{StaticResource LayersColumnHeader}">
+					<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Name}"
+										   Margin="3 0 0 0"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+					<GridViewColumn Header="Opacity" DisplayMemberBinding="{Binding Opacity}" 
+									Width="55"/>
+					<GridViewColumn Header="Visible" 
+									Width="55">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<Button Command="{Binding DataContext.ChangeLayerVisibilityCommand, ElementName=LayerList}"
+										CommandParameter="{Binding}"
+										Padding="0"
+										Margin="0"
+										Background="Transparent"
+										BorderThickness="0">
+									<Button.Template>
+										<ControlTemplate TargetType="Button">
+											<Border Background="{TemplateBinding Background}">
+												<ContentPresenter HorizontalAlignment="Center"
+																  VerticalAlignment="Center"/>
+											</Border>
+										</ControlTemplate>
+									</Button.Template>
+									<Image Width="16"
+										   Height="16">
+										<Image.Style>
+											<Style TargetType="Image">
+												<Setter Property="Source" Value="/Resources/Visible.png"/>
+												<Style.Triggers>
+													<DataTrigger Binding="{Binding Visible}" Value="False">
+														<Setter Property="Source" Value="/Resources/Hidden.png"/>
+													</DataTrigger>
+												</Style.Triggers>
+											</Style>
+										</Image.Style>
+									</Image>
+								</Button>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+					<GridViewColumn Header="Locked" 
+											Width="55">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<Button Command="{Binding DataContext.LockLayerCommand, ElementName=LayerList}"
+										CommandParameter="{Binding}"
+										Padding="0"
+										Margin="0"
+										Background="Transparent"
+										BorderThickness="0">
+									<Button.Template>
+										<ControlTemplate TargetType="Button">
+											<Border Background="{TemplateBinding Background}">
+												<ContentPresenter HorizontalAlignment="Center"
+												VerticalAlignment="Center"/>
+											</Border>
+										</ControlTemplate>
+									</Button.Template>
+									<Image Width="16"
+										   Height="16">
+										<Image.Style>
+											<Style TargetType="Image">
+												<Setter Property="Source" Value="/Resources/Locked.png"/>
+												<Style.Triggers>
+													<DataTrigger Binding="{Binding Locked}" Value="False">
+														<Setter Property="Source" Value="/Resources/Unlocked.png"/>
+													</DataTrigger>
+												</Style.Triggers>
+											</Style>
+										</Image.Style>
+									</Image>
+								</Button>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+				</GridView>
+			</ListView.View>
+		</ListView>
+	</Grid>
 </UserControl>

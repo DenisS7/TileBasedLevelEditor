@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,14 +8,14 @@ using TileBasedLevelEditor.Models;
 
 namespace TileBasedLevelEditor.ViewModels.Rendering
 {
-    public class TilemapCellViewModel : GridCellViewModel
-    {
-        public ObservableCollection<TilemapCellTileViewModel> Tiles { get; set; }
+	public class TilemapCellViewModel : GridCellViewModel
+	{
+		public ObservableCollection<TilemapCellTileViewModel> Tiles { get; set; }
 
-        public TilemapCellViewModel(Vec2<int> index) 
-            : base(index)
-        {
-            Tiles = new ObservableCollection<TilemapCellTileViewModel>();
-        }
-    }
+		public TilemapCellViewModel(Vec2<int> index) 
+			: base(index)
+		{
+			Tiles = new ObservableCollection<TilemapCellTileViewModel>();
+		}
+	}
 }

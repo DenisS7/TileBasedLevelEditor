@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,13 +10,13 @@ using TileBasedLevelEditor.ViewModels.Rendering;
 
 namespace TileBasedLevelEditor.Interfaces
 {
-    public interface ITilemapRendererService
-    {
-        public List<TilemapCellViewModel> GetRenderedTilemapCells(TilemapEditorViewModel tilemap);
+	public interface ITilemapRendererService
+	{
+		public List<TilemapCellViewModel> GetRenderedTilemapCells(TilemapEditorViewModel tilemap);
 
-        public void ApplyTile(TilemapCellViewModel cell, int tileIndex, LayerViewModel layer);
-        public void EraseTile(TilemapCellViewModel cell, LayerViewModel layer);
-        public void RemoveLayer(List<TilemapCellViewModel> cells, LayerViewModel layer);
-        public void SwapLayers(List<TilemapCellViewModel> cells, LayerViewModel layer1, LayerViewModel layer2);
-    }
+		public void ApplyTile(TilemapCellViewModel cell, int tileIndex, LayerViewModel layer);
+		public void EraseTile(TilemapCellViewModel cell, LayerViewModel layer);
+		public void RemoveLayer(List<TilemapCellViewModel> cells, LayerViewModel layer);
+		public void SwapLayers(List<TilemapCellViewModel> cells, LayerViewModel layer1, LayerViewModel layer2);
+	}
 }

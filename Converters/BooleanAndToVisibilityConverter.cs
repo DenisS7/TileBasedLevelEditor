@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -9,22 +9,22 @@ using System.Windows.Data;
 
 namespace TileBasedLevelEditor.Converters
 {
-    public class BooleanAndToVisibilityConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            foreach (var booleanValue in values)
-            {
-                if (booleanValue is bool b && !b) 
-                    return Visibility.Collapsed;
-            }
+	public class BooleanAndToVisibilityConverter : IMultiValueConverter
+	{
+		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+		{
+			foreach (var booleanValue in values)
+			{
+				if (booleanValue is bool b && !b) 
+					return Visibility.Collapsed;
+			}
 
-            return Visibility.Visible;
-        }
+			return Visibility.Visible;
+		}
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

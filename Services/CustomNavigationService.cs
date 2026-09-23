@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,49 +9,49 @@ using TileBasedLevelEditor.Views;
 
 namespace TileBasedLevelEditor.Services
 {
-    public class CustomNavigationService : ICustomNavigationService
-    {
-        public CustomNavigationService() { }
-        public void OpenNewTilesetDialog(TilesetViewModel tilesetViewModel)
-        {
-            NewTilesetDialogView newTilesetDialogView = new NewTilesetDialogView()
-            {
-                DataContext = tilesetViewModel
-            };
-           
-            tilesetViewModel.RequestCloseNewTilesetDialog += () =>
-            {
-                newTilesetDialogView.Close();
-            };
-            newTilesetDialogView.Show();
-        }
+	public class CustomNavigationService : ICustomNavigationService
+	{
+		public CustomNavigationService() { }
+		public void OpenNewTilesetDialog(TilesetViewModel tilesetViewModel)
+		{
+			NewTilesetDialogView newTilesetDialogView = new NewTilesetDialogView()
+			{
+				DataContext = tilesetViewModel
+			};
+		   
+			tilesetViewModel.RequestCloseNewTilesetDialog += () =>
+			{
+				newTilesetDialogView.Close();
+			};
+			newTilesetDialogView.Show();
+		}
 
-        public void OpenNewTilemapDialog(TilemapEditorViewModel tilemapEditorViewModel)
-        {
-            NewTilemapDialogView newTilemapDialogView = new NewTilemapDialogView()
-            {
-                DataContext = tilemapEditorViewModel
-            };
+		public void OpenNewTilemapDialog(TilemapEditorViewModel tilemapEditorViewModel)
+		{
+			NewTilemapDialogView newTilemapDialogView = new NewTilemapDialogView()
+			{
+				DataContext = tilemapEditorViewModel
+			};
 
-            tilemapEditorViewModel.RequestCloseNewTilemapDialog += () =>
-            {
-                newTilemapDialogView.Close();
-            };
-            newTilemapDialogView.Show();
-        }
+			tilemapEditorViewModel.RequestCloseNewTilemapDialog += () =>
+			{
+				newTilemapDialogView.Close();
+			};
+			newTilemapDialogView.Show();
+		}
 
-        public void OpenEditTilemapDialog(TilemapEditorViewModel tilemapEditorViewModel)
-        {
-            EditTilemapDialogView editTilemapDialogView = new EditTilemapDialogView()
-            {
-                DataContext = tilemapEditorViewModel
-            };
+		public void OpenEditTilemapDialog(TilemapEditorViewModel tilemapEditorViewModel)
+		{
+			EditTilemapDialogView editTilemapDialogView = new EditTilemapDialogView()
+			{
+				DataContext = tilemapEditorViewModel
+			};
 
-            tilemapEditorViewModel.RequestCloseEditTilemapDialog += () =>
-            {
-                editTilemapDialogView.Close();
-            };
-            editTilemapDialogView.Show();
-        }
-    }
+			tilemapEditorViewModel.RequestCloseEditTilemapDialog += () =>
+			{
+				editTilemapDialogView.Close();
+			};
+			editTilemapDialogView.Show();
+		}
+	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,14 +15,14 @@ using System.Windows.Shapes;
 
 namespace TileBasedLevelEditor.Views
 {
-    /// <summary>
-    /// Interaction logic for TilesetView.xaml
-    /// </summary>
-    public partial class TilesetView : UserControl
-    {
-        public TilesetView()
-        {
-            InitializeComponent();
-        }
-    }
+	/// <summary>
+	/// Interaction logic for TilesetView.xaml
+	/// </summary>
+	public partial class TilesetView : UserControl
+	{
+		public TilesetView()
+		{
+			InitializeComponent();
+		}
+	}
 }

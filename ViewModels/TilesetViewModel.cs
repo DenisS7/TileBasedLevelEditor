@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -23,214 +23,214 @@ using TileBasedLevelEditor.Views;
 
 namespace TileBasedLevelEditor.ViewModels
 {
-    public class TilesetViewModel : ViewModelBase
-    {
-        private ICustomNavigationService _navigationService;
-        private ITilesetsService _tilesetsService;
-        public ObservableCollection<Tileset> Tilesets => new ObservableCollection<Tileset>(_tilesetsService.Tilesets.Values);
-        private Tileset? _currentTileset;
+	public class TilesetViewModel : ViewModelBase
+	{
+		private ICustomNavigationService _navigationService;
+		private ITilesetsService _tilesetsService;
+		public ObservableCollection<Tileset> Tilesets => new ObservableCollection<Tileset>(_tilesetsService.Tilesets.Values);
+		private Tileset? _currentTileset;
 
-        public Tileset? CurrentTileset
-        {
-            get => _currentTileset;
-            set
-            {
-                if (_currentTileset == value) 
-                    return;
+		public Tileset? CurrentTileset
+		{
+			get => _currentTileset;
+			set
+			{
+				if (_currentTileset == value) 
+					return;
 
-                _currentTileset = value;
-                OnPropertyChanged(nameof(CurrentTileset));
-                OnPropertyChanged(nameof(ImageSize));
-                OnPropertyChanged(nameof(TileSize));
-                OnPropertyChanged(nameof(NrTiles));
+				_currentTileset = value;
+				OnPropertyChanged(nameof(CurrentTileset));
+				OnPropertyChanged(nameof(ImageSize));
+				OnPropertyChanged(nameof(TileSize));
+				OnPropertyChanged(nameof(NrTiles));
 
-                if (_currentTileset != null)
-                {
-                    TilesetGridVM.SetNewGridValues(TileSize, NrTiles);
-                    TilesetGridVM.SetNewTileImages(_currentTileset.TileImages);
-                    TilesetGridVM.IsTileHovered = false;
-                    TilesetGridVM.SelectTileCommand.Execute(new TileSelectionArgs(null, false, DragStage.Start));
-                     
-                    //TO DO
-                    //TileGridVM.TileMargin = ;
-                    //TileGridVM.ImagePadding = ;
-                }
-                else
-                {
-                    TilesetGridVM.ClearCells();
-                }
-            }
-        }
+				if (_currentTileset != null)
+				{
+					TilesetGridVM.SetNewGridValues(TileSize, NrTiles);
+					TilesetGridVM.SetNewTileImages(_currentTileset.TileImages);
+					TilesetGridVM.IsTileHovered = false;
+					TilesetGridVM.SelectTileCommand.Execute(new TileSelectionArgs(null, false, DragStage.Start));
+					 
+					//TO DO
+					//TileGridVM.TileMargin = ;
+					//TileGridVM.ImagePadding = ;
+				}
+				else
+				{
+					TilesetGridVM.ClearCells();
+				}
+			}
+		}
 
-        private string _newTilesetName = "";
-        public string NewTilesetName
-        {
-            get => _newTilesetName;
-            set
-            {
-                _newTilesetName = value;
-                OnPropertyChanged(nameof(NewTilesetName));
-            }
-        }
+		private string _newTilesetName = "";
+		public string NewTilesetName
+		{
+			get => _newTilesetName;
+			set
+			{
+				_newTilesetName = value;
+				OnPropertyChanged(nameof(NewTilesetName));
+			}
+		}
 
-        private string _newTilesetPath = "";
-        public string NewTilesetPath
-        {
-            get => _newTilesetPath;
-            set
-            {
-                _newTilesetPath = value;
-                OnPropertyChanged(nameof(NewTilesetPath));
-            }
-        }
+		private string _newTilesetPath = "";
+		public string NewTilesetPath
+		{
+			get => _newTilesetPath;
+			set
+			{
+				_newTilesetPath = value;
+				OnPropertyChanged(nameof(NewTilesetPath));
+			}
+		}
 
-        private string _newTilesetTileWidth = "";
-        public string NewTilesetTileWidth
-        {
-            get => _newTilesetTileWidth;
-            set
-            {
-                _newTilesetTileWidth = value;
-                OnPropertyChanged(nameof(NewTilesetTileWidth));
-            }
-        }
+		private string _newTilesetTileWidth = "";
+		public string NewTilesetTileWidth
+		{
+			get => _newTilesetTileWidth;
+			set
+			{
+				_newTilesetTileWidth = value;
+				OnPropertyChanged(nameof(NewTilesetTileWidth));
+			}
+		}
 
-        private string _newTilesetTileHeight = "";
-        public string NewTilesetTileHeight
-        {
-            get => _newTilesetTileHeight;
-            set
-            {
-                _newTilesetTileHeight = value;
-                OnPropertyChanged(nameof(NewTilesetTileHeight));
-            }
-        }
+		private string _newTilesetTileHeight = "";
+		public string NewTilesetTileHeight
+		{
+			get => _newTilesetTileHeight;
+			set
+			{
+				_newTilesetTileHeight = value;
+				OnPropertyChanged(nameof(NewTilesetTileHeight));
+			}
+		}
 
-        public Vec2<int> TileSize => CurrentTileset?.TileSize ?? new Vec2<int>(0);
+		public Vec2<int> TileSize => CurrentTileset?.TileSize ?? new Vec2<int>(0);
 
-        public Vec2<int> ImageSize => CurrentTileset?.ImageSize ?? new Vec2<int>(0);
+		public Vec2<int> ImageSize => CurrentTileset?.ImageSize ?? new Vec2<int>(0);
 
-        public Vec2<int> NrTiles => CurrentTileset?.NrTiles ?? new Vec2<int>(0);
+		public Vec2<int> NrTiles => CurrentTileset?.NrTiles ?? new Vec2<int>(0);
 
-        public event Action? RequestCloseNewTilesetDialog;
-        public ICommand CreateNewTilesetCommand { get; }
-        public ICommand AddNewTilesetCommand { get; }
-        public ICommand CancelNewTilesetCommand { get; }
-        public ICommand ChooseTilesetImageCommand { get; }
+		public event Action? RequestCloseNewTilesetDialog;
+		public ICommand CreateNewTilesetCommand { get; }
+		public ICommand AddNewTilesetCommand { get; }
+		public ICommand CancelNewTilesetCommand { get; }
+		public ICommand ChooseTilesetImageCommand { get; }
 
-        public TilesetGridViewModel TilesetGridVM { get; }
+		public TilesetGridViewModel TilesetGridVM { get; }
 
-        public TilesetViewModel(ICustomNavigationService navigationService, ITilesetsService tilesetsService)
-        {
-            _navigationService = navigationService;
-            _tilesetsService = tilesetsService;
-            if (_tilesetsService.Tilesets != null && _tilesetsService.Tilesets.Count > 0)
-            {                
-                _currentTileset = _tilesetsService.Tilesets.First().Value;
-            }
-            else
-            {
-                _currentTileset = null;
-            }
-            TilesetGridVM = new TilesetGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), CurrentTileset?.TileImages, OnTileSelected);
-            CreateNewTilesetCommand = new RelayCommand(OnCreateNewTileset);
-            AddNewTilesetCommand = new RelayCommand(OnAddNewTileset);
-            ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
-            CancelNewTilesetCommand = new RelayCommand(OnCancelNewTileset);
-        }
+		public TilesetViewModel(ICustomNavigationService navigationService, ITilesetsService tilesetsService)
+		{
+			_navigationService = navigationService;
+			_tilesetsService = tilesetsService;
+			if (_tilesetsService.Tilesets != null && _tilesetsService.Tilesets.Count > 0)
+			{                
+				_currentTileset = _tilesetsService.Tilesets.First().Value;
+			}
+			else
+			{
+				_currentTileset = null;
+			}
+			TilesetGridVM = new TilesetGridViewModel(TileSize, NrTiles, new Vec2<int>(2, 2), CurrentTileset?.TileImages, OnTileSelected);
+			CreateNewTilesetCommand = new RelayCommand(OnCreateNewTileset);
+			AddNewTilesetCommand = new RelayCommand(OnAddNewTileset);
+			ChooseTilesetImageCommand = new RelayCommand(OnChooseTilesetImage);
+			CancelNewTilesetCommand = new RelayCommand(OnCancelNewTileset);
+		}
 
-        private void OnCreateNewTileset(object? parameter)
-        {
-            _navigationService.OpenNewTilesetDialog(this);
-        }
+		private void OnCreateNewTileset(object? parameter)
+		{
+			_navigationService.OpenNewTilesetDialog(this);
+		}
 
-        private void OnAddNewTileset(object? parameter)
-        {
-            if (NewTilesetName.Length < 3 || NewTilesetPath.Length == 0 ||
-                NewTilesetTileHeight.Length == 0 || NewTilesetTileWidth.Length == 0)
-                return;
+		private void OnAddNewTileset(object? parameter)
+		{
+			if (NewTilesetName.Length < 3 || NewTilesetPath.Length == 0 ||
+				NewTilesetTileHeight.Length == 0 || NewTilesetTileWidth.Length == 0)
+				return;
 
-            try
-            {
-                Vec2<int> NewTilesetTileSize = new Vec2<int>(Int32.Parse(NewTilesetTileWidth), Int32.Parse(NewTilesetTileHeight));
-                Tileset newTileset = new Tileset(NewTilesetName, NewTilesetTileSize, NewTilesetPath, Guid.NewGuid());
-                if (Serializer.SaveTileset(newTileset))
-                {    
-                    _tilesetsService.AddTileset(newTileset);
-                    OnPropertyChanged(nameof(Tilesets));
-                    CurrentTileset = newTileset;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Error loading tileset:\n{ex.Message}",
-                    "Load Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            RequestCloseNewTilesetDialog?.Invoke();
-        }
+			try
+			{
+				Vec2<int> NewTilesetTileSize = new Vec2<int>(Int32.Parse(NewTilesetTileWidth), Int32.Parse(NewTilesetTileHeight));
+				Tileset newTileset = new Tileset(NewTilesetName, NewTilesetTileSize, NewTilesetPath, Guid.NewGuid());
+				if (Serializer.SaveTileset(newTileset))
+				{    
+					_tilesetsService.AddTileset(newTileset);
+					OnPropertyChanged(nameof(Tilesets));
+					CurrentTileset = newTileset;
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(
+					$"Error loading tileset:\n{ex.Message}",
+					"Load Error",
+					MessageBoxButton.OK,
+					MessageBoxImage.Error);
+			}
+			RequestCloseNewTilesetDialog?.Invoke();
+		}
 
-        private void OnCancelNewTileset(object? parameter)
-        {
-            RequestCloseNewTilesetDialog?.Invoke();
-        }
+		private void OnCancelNewTileset(object? parameter)
+		{
+			RequestCloseNewTilesetDialog?.Invoke();
+		}
 
-        private void OnChooseTilesetImage(object? parameter)
-        {
-            var dlg = new OpenFileDialog
-            {
-                Title = "Select a Tileset Image",
-                Filter = "PNG Files (*.png)|*.png|JPEG Files (*.jpg;*.jpeg)|*.jpg;*.jpeg|All Images|*.png;*.jpg;*.jpeg"
-            };
+		private void OnChooseTilesetImage(object? parameter)
+		{
+			var dlg = new OpenFileDialog
+			{
+				Title = "Select a Tileset Image",
+				Filter = "PNG Files (*.png)|*.png|JPEG Files (*.jpg;*.jpeg)|*.jpg;*.jpeg|All Images|*.png;*.jpg;*.jpeg"
+			};
 
-            bool? result = dlg.ShowDialog();
-            if (result != true) 
-                return;
+			bool? result = dlg.ShowDialog();
+			if (result != true) 
+				return;
 
-            string path = dlg.FileName;
-            if (!File.Exists(path)) 
-                return;
+			string path = dlg.FileName;
+			if (!File.Exists(path)) 
+				return;
 
-            NewTilesetPath = path;
-            if (NewTilesetName == String.Empty)
-                NewTilesetName = System.IO.Path.GetFileNameWithoutExtension(path);
-        }
+			NewTilesetPath = path;
+			if (NewTilesetName == String.Empty)
+				NewTilesetName = System.IO.Path.GetFileNameWithoutExtension(path);
+		}
 
-        private void OnTileSelected(Vec2<int>? vec)
-        {
-            if (CurrentTileset == null || TilesetGridVM.InitialSelectedTile == null)
-                return;
+		private void OnTileSelected(Vec2<int>? vec)
+		{
+			if (CurrentTileset == null || TilesetGridVM.InitialSelectedTile == null)
+				return;
 
-            if (TilesetGridVM.InitialSelectedTile < 0 || TilesetGridVM.InitialSelectedTile >= NrTiles)
-                return;
+			if (TilesetGridVM.InitialSelectedTile < 0 || TilesetGridVM.InitialSelectedTile >= NrTiles)
+				return;
 
-            HashSet<Vec2<int>> SelectedTiles = [];
-            List<TileSelectedService.TilemapPreviewTile> SelectedTilesFull = [];
-            Vec2<int> min = new Vec2<int>(int.MaxValue, int.MaxValue);
-            Vec2<int> max = new Vec2<int>(int.MinValue, int.MinValue);
-            foreach (SelectionArea selectionArea in TilesetGridVM.SelectionAreas)
-            {
-                for (int i = selectionArea.StartTile.X; i <= selectionArea.EndTile.X; i++)
-                {
-                    for (int j = selectionArea.StartTile.Y; j <= selectionArea.EndTile.Y; j++)
-                    {
-                        if (SelectedTiles.Add(new Vec2<int>(i, j)))
-                        {
-                            CroppedBitmap? tileImage = CurrentTileset.TileImages[SelectedTiles.Last().X + SelectedTiles.Last().Y * NrTiles.X];
+			HashSet<Vec2<int>> SelectedTiles = [];
+			List<TileSelectedService.TilemapPreviewTile> SelectedTilesFull = [];
+			Vec2<int> min = new Vec2<int>(int.MaxValue, int.MaxValue);
+			Vec2<int> max = new Vec2<int>(int.MinValue, int.MinValue);
+			foreach (SelectionArea selectionArea in TilesetGridVM.SelectionAreas)
+			{
+				for (int i = selectionArea.StartTile.X; i <= selectionArea.EndTile.X; i++)
+				{
+					for (int j = selectionArea.StartTile.Y; j <= selectionArea.EndTile.Y; j++)
+					{
+						if (SelectedTiles.Add(new Vec2<int>(i, j)))
+						{
+							CroppedBitmap? tileImage = CurrentTileset.TileImages[SelectedTiles.Last().X + SelectedTiles.Last().Y * NrTiles.X];
 							SelectedTilesFull.Add(new TileSelectedService.TilemapPreviewTile(new Vec2<int>(i, j), new TileData(SelectedTiles.Last(), CurrentTileset.ID), tileImage));
 
-                            min.X = Math.Min(min.X, i);
-                            min.Y = Math.Min(min.Y, j);
-                            max.X = Math.Max(max.X, i);
-                            max.Y = Math.Max(max.Y, j);
-                        }
-                    }
-                }
-            }
-            TileSelectedService.SelectedTiles = SelectedTilesFull;
-            TileSelectedService.ReferenceTile = (min + max) / 2;
-        }
-    }
+							min.X = Math.Min(min.X, i);
+							min.Y = Math.Min(min.Y, j);
+							max.X = Math.Max(max.X, i);
+							max.Y = Math.Max(max.Y, j);
+						}
+					}
+				}
+			}
+			TileSelectedService.SelectedTiles = SelectedTilesFull;
+			TileSelectedService.ReferenceTile = (min + max) / 2;
+		}
+	}
 }

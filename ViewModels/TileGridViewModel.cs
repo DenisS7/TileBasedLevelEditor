@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -13,347 +13,347 @@ using TileBasedLevelEditor.ViewModels.Rendering;
 
 namespace TileBasedLevelEditor.ViewModels
 {
-    public abstract class TileGridViewModel : ViewModelBase
-    {
-        private Vec2<int> _tileSize;
-        public Vec2<int> TileSize
-        {
-            get => _tileSize;
-        }
+	public abstract class TileGridViewModel : ViewModelBase
+	{
+		private Vec2<int> _tileSize;
+		public Vec2<int> TileSize
+		{
+			get => _tileSize;
+		}
 
-        private Vec2<int> _nrTiles;
+		private Vec2<int> _nrTiles;
 
-        public Vec2<int> NrTiles
-        {
-            get => _nrTiles;
-        }
+		public Vec2<int> NrTiles
+		{
+			get => _nrTiles;
+		}
 
-        //Right & Bottom should always be 0
-        public Thickness ThicknessTileMargin => new Thickness(_tileMargin.X, _tileMargin.Y, 0, 0);
+		//Right & Bottom should always be 0
+		public Thickness ThicknessTileMargin => new Thickness(_tileMargin.X, _tileMargin.Y, 0, 0);
 
-        private Vec2<int> _tileMargin;
+		private Vec2<int> _tileMargin;
 
-        public Vec2<int> TileMargin
-        {
-            get => _tileMargin;
-            set
-            {
-                _tileMargin = value;
-                OnPropertyChanged(nameof(TileMargin));
-                OnPropertyChanged(nameof(ThicknessTileMargin));
-                OnPropertyChanged(nameof(CanvasWidth));
-                OnPropertyChanged(nameof(CanvasHeight));
-                OnPropertyChanged(nameof(ScaledViewportWidth));
-                OnPropertyChanged(nameof(ScaledViewportHeight));
-            }
-        }
+		public Vec2<int> TileMargin
+		{
+			get => _tileMargin;
+			set
+			{
+				_tileMargin = value;
+				OnPropertyChanged(nameof(TileMargin));
+				OnPropertyChanged(nameof(ThicknessTileMargin));
+				OnPropertyChanged(nameof(CanvasWidth));
+				OnPropertyChanged(nameof(CanvasHeight));
+				OnPropertyChanged(nameof(ScaledViewportWidth));
+				OnPropertyChanged(nameof(ScaledViewportHeight));
+			}
+		}
 
-        public Vec2<int> GridSize => TileSize * NrTiles;
-        public abstract IReadOnlyList<GridCellViewModel> Cells { get; }
+		public Vec2<int> GridSize => TileSize * NrTiles;
+		public abstract IReadOnlyList<GridCellViewModel> Cells { get; }
 
-        private bool _gridLinesVisibility;
+		private bool _gridLinesVisibility;
 
-        public bool GridLinesVisibility
-        {
-            get => _gridLinesVisibility;
-            set
-            {
-                _gridLinesVisibility = value;
-                OnPropertyChanged(nameof(GridLinesVisibility));
-            }
-        }
+		public bool GridLinesVisibility
+		{
+			get => _gridLinesVisibility;
+			set
+			{
+				_gridLinesVisibility = value;
+				OnPropertyChanged(nameof(GridLinesVisibility));
+			}
+		}
 
-        public record LineInfo(double X1, double Y1, double X2, double Y2, bool IsEdge);
+		public record LineInfo(double X1, double Y1, double X2, double Y2, bool IsEdge);
 
-        private bool _isTileHovered = true;
+		private bool _isTileHovered = true;
 
-        public bool IsTileHovered
-        {
-            get => _isTileHovered;
-            set
-            {
-                _isTileHovered = value;
-                OnPropertyChanged(nameof(IsTileHovered));
-            }
-        }
+		public bool IsTileHovered
+		{
+			get => _isTileHovered;
+			set
+			{
+				_isTileHovered = value;
+				OnPropertyChanged(nameof(IsTileHovered));
+			}
+		}
 
-        private Vec2<int>? _hoveredTileIndex = new Vec2<int>(-1);
+		private Vec2<int>? _hoveredTileIndex = new Vec2<int>(-1);
 
-        public Vec2<int>? HoveredTileIndex
-        {
-            get => _hoveredTileIndex;
-            set
-            {
-                _hoveredTileIndex = value;
-                OnPropertyChanged(nameof(HoveredTileIndex));
-                if (_hoveredTileIndex != null && _hoveredTileIndex.X >= 0 && _hoveredTileIndex.Y >= 0)
-                {
-                    IsTileHovered = true;
-                    HoveredTileLocation = new Vec2<double>(_hoveredTileIndex.X * (TileSize.X + TileMargin.X), _hoveredTileIndex.Y * (TileSize.Y + TileMargin.Y));
-                }
-                else
-                {
-                    IsTileHovered = false;
-                    HoveredTileLocation = new Vec2<double>(0.0, 0.0);
-                }
-                OnPropertyChanged(nameof(IsTileHovered));
-                OnPropertyChanged(nameof(HoveredTileLocation));
-            }
-        }
+		public Vec2<int>? HoveredTileIndex
+		{
+			get => _hoveredTileIndex;
+			set
+			{
+				_hoveredTileIndex = value;
+				OnPropertyChanged(nameof(HoveredTileIndex));
+				if (_hoveredTileIndex != null && _hoveredTileIndex.X >= 0 && _hoveredTileIndex.Y >= 0)
+				{
+					IsTileHovered = true;
+					HoveredTileLocation = new Vec2<double>(_hoveredTileIndex.X * (TileSize.X + TileMargin.X), _hoveredTileIndex.Y * (TileSize.Y + TileMargin.Y));
+				}
+				else
+				{
+					IsTileHovered = false;
+					HoveredTileLocation = new Vec2<double>(0.0, 0.0);
+				}
+				OnPropertyChanged(nameof(IsTileHovered));
+				OnPropertyChanged(nameof(HoveredTileLocation));
+			}
+		}
 
-        private Vec2<double> _hoveredTileLocation = new Vec2<double>(0.0);
+		private Vec2<double> _hoveredTileLocation = new Vec2<double>(0.0);
 
-        public Vec2<double> HoveredTileLocation
-        {
-            get => _hoveredTileLocation;
-            set
-            {
-                _hoveredTileLocation = value;
-                OnPropertyChanged(nameof(HoveredTileLocation));
-            }
-        }
+		public Vec2<double> HoveredTileLocation
+		{
+			get => _hoveredTileLocation;
+			set
+			{
+				_hoveredTileLocation = value;
+				OnPropertyChanged(nameof(HoveredTileLocation));
+			}
+		}
 
-        private bool _canHighlightSelectedTile;
+		private bool _canHighlightSelectedTile;
 
-        public bool CanHighlightSelectedTile
-        {
-            get => _canHighlightSelectedTile;
-            set
-            {
-                _canHighlightSelectedTile = value;
-                OnPropertyChanged(nameof(CanHighlightSelectedTile));
-            }
-        }
+		public bool CanHighlightSelectedTile
+		{
+			get => _canHighlightSelectedTile;
+			set
+			{
+				_canHighlightSelectedTile = value;
+				OnPropertyChanged(nameof(CanHighlightSelectedTile));
+			}
+		}
 
-        public bool IsTileSelected => SelectionAreas.Count > 0;
+		public bool IsTileSelected => SelectionAreas.Count > 0;
 
-        private Vec2<int>? _initialSelectedTile = new Vec2<int>(-1);
+		private Vec2<int>? _initialSelectedTile = new Vec2<int>(-1);
 
-        public Vec2<int>? InitialSelectedTile
-        {
-            get => _initialSelectedTile;
-            set
-            {
-                _initialSelectedTile = value;
-                OnPropertyChanged(nameof(InitialSelectedTile));
-                OnPropertyChanged(nameof(IsTileSelected));            
-            }
-        }
+		public Vec2<int>? InitialSelectedTile
+		{
+			get => _initialSelectedTile;
+			set
+			{
+				_initialSelectedTile = value;
+				OnPropertyChanged(nameof(InitialSelectedTile));
+				OnPropertyChanged(nameof(IsTileSelected));            
+			}
+		}
 
-        public List<SelectionArea> SelectionAreas { get; private set; } = [];
-        public Geometry SelectionGeometry
-        {
-            get
-            {
-                Geometry? combined = null;
-                Vec2<int> TileSizeMargin = TileSize + TileMargin;
+		public List<SelectionArea> SelectionAreas { get; private set; } = [];
+		public Geometry SelectionGeometry
+		{
+			get
+			{
+				Geometry? combined = null;
+				Vec2<int> TileSizeMargin = TileSize + TileMargin;
 
-                foreach (SelectionArea area in SelectionAreas)
-                {
-                    RectangleGeometry rectGeom = new RectangleGeometry(area.RectArea);
-                    if (combined == null)
-                    {
-                        combined = rectGeom;
-                    }
-                    else
-                    {
-                        combined = Geometry.Combine(
-                            combined,
-                            rectGeom,
-                            GeometryCombineMode.Union,
-                            null);
-                    }
-                }
+				foreach (SelectionArea area in SelectionAreas)
+				{
+					RectangleGeometry rectGeom = new RectangleGeometry(area.RectArea);
+					if (combined == null)
+					{
+						combined = rectGeom;
+					}
+					else
+					{
+						combined = Geometry.Combine(
+							combined,
+							rectGeom,
+							GeometryCombineMode.Union,
+							null);
+					}
+				}
 
-                return combined ?? Geometry.Empty;
-            }
-        }
+				return combined ?? Geometry.Empty;
+			}
+		}
 
-        private bool _shouldBeCentered;
-        public bool ShouldBeCentered
-        {
-            get => _shouldBeCentered;
-            set
-            {
-                _shouldBeCentered = value;
-                OnPropertyChanged(nameof(ShouldBeCentered));
-            }
-        }
+		private bool _shouldBeCentered;
+		public bool ShouldBeCentered
+		{
+			get => _shouldBeCentered;
+			set
+			{
+				_shouldBeCentered = value;
+				OnPropertyChanged(nameof(ShouldBeCentered));
+			}
+		}
 
-        private Size _scrollViewerSize;
-        public Size ScrollViewerSize
-        {
-            get => _scrollViewerSize;  
-            set
-            {
-                _scrollViewerSize = value;
-                OnPropertyChanged(nameof(ScrollViewerSize));
-                OnPropertyChanged(nameof(CanvasWidth));
-                OnPropertyChanged(nameof(CanvasHeight));
-                OnPropertyChanged(nameof(ScaledViewportWidth));
-                OnPropertyChanged(nameof(ScaledViewportHeight));
-            }
-        }
+		private Size _scrollViewerSize;
+		public Size ScrollViewerSize
+		{
+			get => _scrollViewerSize;  
+			set
+			{
+				_scrollViewerSize = value;
+				OnPropertyChanged(nameof(ScrollViewerSize));
+				OnPropertyChanged(nameof(CanvasWidth));
+				OnPropertyChanged(nameof(CanvasHeight));
+				OnPropertyChanged(nameof(ScaledViewportWidth));
+				OnPropertyChanged(nameof(ScaledViewportHeight));
+			}
+		}
 
-        private double _scrollAreaMultiplier = 2.0;
+		private double _scrollAreaMultiplier = 2.0;
 
-        private double _scrollViewerZoom = 1.0;
-        public double ScrollViewerZoom
-        {
-            get => _scrollViewerZoom;
-            set
-            {
-                double oldZoom = _scrollViewerZoom;
-                _scrollViewerZoom = value;
-                OnPropertyChanged(nameof(ScrollViewerZoom));
-                OnPropertyChanged(nameof(CanvasWidth));
-                OnPropertyChanged(nameof(CanvasHeight));
-                OnPropertyChanged(nameof(ScaledViewportWidth));
-                OnPropertyChanged(nameof(ScaledViewportHeight));
-            }
-        }
+		private double _scrollViewerZoom = 1.0;
+		public double ScrollViewerZoom
+		{
+			get => _scrollViewerZoom;
+			set
+			{
+				double oldZoom = _scrollViewerZoom;
+				_scrollViewerZoom = value;
+				OnPropertyChanged(nameof(ScrollViewerZoom));
+				OnPropertyChanged(nameof(CanvasWidth));
+				OnPropertyChanged(nameof(CanvasHeight));
+				OnPropertyChanged(nameof(ScaledViewportWidth));
+				OnPropertyChanged(nameof(ScaledViewportHeight));
+			}
+		}
 
-        public double CanvasWidth => TileSize.X * NrTiles.X + TileMargin.X * (NrTiles.X + 1);
-        public double CanvasHeight => TileSize.Y * NrTiles.Y + TileMargin.Y * (NrTiles.Y + 1);
-        public double ScaledViewportWidth => CanvasWidth * ScrollViewerZoom + Convert.ToDouble(ShouldBeCentered) * ScrollViewerSize.Width * _scrollAreaMultiplier * 0.9;
-        public double ScaledViewportHeight => CanvasHeight * ScrollViewerZoom + Convert.ToDouble(ShouldBeCentered) * ScrollViewerSize.Height * _scrollAreaMultiplier * 0.9;
+		public double CanvasWidth => TileSize.X * NrTiles.X + TileMargin.X * (NrTiles.X + 1);
+		public double CanvasHeight => TileSize.Y * NrTiles.Y + TileMargin.Y * (NrTiles.Y + 1);
+		public double ScaledViewportWidth => CanvasWidth * ScrollViewerZoom + Convert.ToDouble(ShouldBeCentered) * ScrollViewerSize.Width * _scrollAreaMultiplier * 0.9;
+		public double ScaledViewportHeight => CanvasHeight * ScrollViewerZoom + Convert.ToDouble(ShouldBeCentered) * ScrollViewerSize.Height * _scrollAreaMultiplier * 0.9;
 
-        public ICommand HoverTileCommand { get; }
-        public ICommand SelectTileCommand { get; }
+		public ICommand HoverTileCommand { get; }
+		public ICommand SelectTileCommand { get; }
 
-        public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
-        {
-            _tileSize = tileSize;
-            _nrTiles = nrTiles;
-            _tileMargin = tileMargin;
-            _shouldBeCentered = shouldBeCentered;
-            _gridLinesVisibility = gridLinesVisibility;
-            _canHighlightSelectedTile = canHighlightSelectedTile;
+		public TileGridViewModel(Vec2<int> tileSize, Vec2<int> nrTiles, Vec2<int> tileMargin, Action<Vec2<int>?>? OnHover = null, Action<Vec2<int>?>? OnSelect = null, bool shouldBeCentered = false, bool gridLinesVisibility = false, bool canHighlightSelectedTile = true)
+		{
+			_tileSize = tileSize;
+			_nrTiles = nrTiles;
+			_tileMargin = tileMargin;
+			_shouldBeCentered = shouldBeCentered;
+			_gridLinesVisibility = gridLinesVisibility;
+			_canHighlightSelectedTile = canHighlightSelectedTile;
 
-            HoverTileCommand = new RelayCommand(p => 
-            {
-                if (p is not Vec2<int> Index)
-                { 
-                    HoveredTileIndex = null; 
-                }
-                else
-                {
-                    HoveredTileIndex = Index;
-                }
+			HoverTileCommand = new RelayCommand(p => 
+			{
+				if (p is not Vec2<int> Index)
+				{ 
+					HoveredTileIndex = null; 
+				}
+				else
+				{
+					HoveredTileIndex = Index;
+				}
 
-                OnHover?.Invoke(HoveredTileIndex);
-                OnTileHovered(HoveredTileIndex);
-            });
+				OnHover?.Invoke(HoveredTileIndex);
+				OnTileHovered(HoveredTileIndex);
+			});
 
-            SelectTileCommand = new RelayCommand(p =>
-            {
-                if (p is not TileSelectionArgs args)
-                    return;
+			SelectTileCommand = new RelayCommand(p =>
+			{
+				if (p is not TileSelectionArgs args)
+					return;
 
-                if (args.CurrentDragStage == DragStage.Start)
-                {
-                    if (!args.Add)
-                    { 
-                        SelectionAreas.Clear(); 
-                    }
+				if (args.CurrentDragStage == DragStage.Start)
+				{
+					if (!args.Add)
+					{ 
+						SelectionAreas.Clear(); 
+					}
 
-                    InitialSelectedTile = args.Index;
-                    if (args.Index != null)
-                    { 
-                        SelectionAreas.Add(GetSelectionArea(args.Index, args.Index)); 
-                    }
-                }
-                else if (args.Index != null && InitialSelectedTile != null)
-                {                    
-                    Debug.Assert(SelectionAreas.Count > 0);
-                    
-                    SelectionArea LastArea = SelectionAreas.Last();
-                    LastArea = GetSelectionArea(InitialSelectedTile, args.Index);
+					InitialSelectedTile = args.Index;
+					if (args.Index != null)
+					{ 
+						SelectionAreas.Add(GetSelectionArea(args.Index, args.Index)); 
+					}
+				}
+				else if (args.Index != null && InitialSelectedTile != null)
+				{                    
+					Debug.Assert(SelectionAreas.Count > 0);
+					
+					SelectionArea LastArea = SelectionAreas.Last();
+					LastArea = GetSelectionArea(InitialSelectedTile, args.Index);
 
-                    if (!args.Add)
-                    { 
-                        SelectionAreas.Clear(); 
-                        SelectionAreas.Add(LastArea);
-                    }
-                    else if (SelectionAreas.Count > 0)
-                    {
-                        SelectionAreas[SelectionAreas.Count - 1] = LastArea;
-                    }
-                }
-                OnPropertyChanged(nameof(SelectionGeometry));
-                OnSelect?.Invoke(args.Index);
-            });
+					if (!args.Add)
+					{ 
+						SelectionAreas.Clear(); 
+						SelectionAreas.Add(LastArea);
+					}
+					else if (SelectionAreas.Count > 0)
+					{
+						SelectionAreas[SelectionAreas.Count - 1] = LastArea;
+					}
+				}
+				OnPropertyChanged(nameof(SelectionGeometry));
+				OnSelect?.Invoke(args.Index);
+			});
 
-            //SetTileImages(tileImages);
-        }
+			//SetTileImages(tileImages);
+		}
 
-        public void SetNewGridValues(Vec2<int> tileSize, Vec2<int> nrTiles)
-        {
-            _tileSize = tileSize;
-            _nrTiles = nrTiles;
+		public void SetNewGridValues(Vec2<int> tileSize, Vec2<int> nrTiles)
+		{
+			_tileSize = tileSize;
+			_nrTiles = nrTiles;
 
-            NotifyGridUpdates();
-        }
+			NotifyGridUpdates();
+		}
 
-        //public void SetTileImages(List<GridCell>? cells = null)
-        //{
-        //    if (cells != null)
-        //    {
-        //        Cells = new ObservableCollection<GridCell>(cells);
-        //    }
-        //    else
-        //    {
-        //        Cells = new ObservableCollection<GridCell>();
-        //        for (int i = 0; i < NrTiles.X; i++)
-        //        {
-        //            for (int j = 0; j < NrTiles.Y; j++)
-        //            {
-        //                Cells.Add(new GridCell());
-        //            }
-        //        }
-        //    }
-        //}
+		//public void SetTileImages(List<GridCell>? cells = null)
+		//{
+		//    if (cells != null)
+		//    {
+		//        Cells = new ObservableCollection<GridCell>(cells);
+		//    }
+		//    else
+		//    {
+		//        Cells = new ObservableCollection<GridCell>();
+		//        for (int i = 0; i < NrTiles.X; i++)
+		//        {
+		//            for (int j = 0; j < NrTiles.Y; j++)
+		//            {
+		//                Cells.Add(new GridCell());
+		//            }
+		//        }
+		//    }
+		//}
 
-        private void NotifyGridUpdates()
-        {
-            OnPropertyChanged(nameof(CanvasWidth));
-            OnPropertyChanged(nameof(CanvasHeight));
-            OnPropertyChanged(nameof(ScaledViewportWidth));
-            OnPropertyChanged(nameof(ScaledViewportHeight));
-            OnPropertyChanged(nameof(TileSize));
-            OnPropertyChanged(nameof(NrTiles));
-        }
+		private void NotifyGridUpdates()
+		{
+			OnPropertyChanged(nameof(CanvasWidth));
+			OnPropertyChanged(nameof(CanvasHeight));
+			OnPropertyChanged(nameof(ScaledViewportWidth));
+			OnPropertyChanged(nameof(ScaledViewportHeight));
+			OnPropertyChanged(nameof(TileSize));
+			OnPropertyChanged(nameof(NrTiles));
+		}
 
-        private SelectionArea GetSelectionArea(Vec2<int> PointA, Vec2<int> PointB)
-        {
-            Vec2<int> StartTile = new Vec2<int>(-1);
-            Vec2<int> EndTile = new Vec2<int>(-1);
+		private SelectionArea GetSelectionArea(Vec2<int> PointA, Vec2<int> PointB)
+		{
+			Vec2<int> StartTile = new Vec2<int>(-1);
+			Vec2<int> EndTile = new Vec2<int>(-1);
 
-            if (PointA.X > PointB.X)
-            {
-                StartTile.X = PointB.X;
-                EndTile.X = PointA.X;
-            }
-            else
-            {
-                StartTile.X = PointA.X;
-                EndTile.X = PointB.X;
-            }
+			if (PointA.X > PointB.X)
+			{
+				StartTile.X = PointB.X;
+				EndTile.X = PointA.X;
+			}
+			else
+			{
+				StartTile.X = PointA.X;
+				EndTile.X = PointB.X;
+			}
 
-            if (PointA.Y > PointB.Y)
-            {
-                StartTile.Y = PointB.Y;
-                EndTile.Y = PointA.Y;
-            }
-            else
-            {
-                StartTile.Y = PointA.Y;
-                EndTile.Y = PointB.Y;
-            }
+			if (PointA.Y > PointB.Y)
+			{
+				StartTile.Y = PointB.Y;
+				EndTile.Y = PointA.Y;
+			}
+			else
+			{
+				StartTile.Y = PointA.Y;
+				EndTile.Y = PointB.Y;
+			}
 
-            return new SelectionArea(StartTile, EndTile, TileSize, TileMargin);
-        }
+			return new SelectionArea(StartTile, EndTile, TileSize, TileMargin);
+		}
 
-        protected abstract void OnTileHovered(Vec2<int>? initTile);
-    }
+		protected abstract void OnTileHovered(Vec2<int>? initTile);
+	}
 }

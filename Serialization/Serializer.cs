@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,83 +12,83 @@ using TileBasedLevelEditor.Models;
 
 namespace TileBasedLevelEditor.Serialization
 {
-    public static class Serializer
-    {
-        static string TilesetsFilesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Save");
-        static HashSet<string> TilesetsPaths = [];
-        public static Dictionary<Guid, Tileset> DeserializeTilesets()
-        {
-            Dictionary<Guid, Tileset> tilesets = [];
-            string existingTilesetsPath = Path.Combine(TilesetsFilesPath, "Tilesets.json");
-            if (!File.Exists(existingTilesetsPath))
-                return tilesets;
+	public static class Serializer
+	{
+		static string TilesetsFilesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Save");
+		static HashSet<string> TilesetsPaths = [];
+		public static Dictionary<Guid, Tileset> DeserializeTilesets()
+		{
+			Dictionary<Guid, Tileset> tilesets = [];
+			string existingTilesetsPath = Path.Combine(TilesetsFilesPath, "Tilesets.json");
+			if (!File.Exists(existingTilesetsPath))
+				return tilesets;
 
-            JsonSerializerSettings settings = new JsonSerializerSettings()
-            {
-                Formatting = Newtonsoft.Json.Formatting.Indented
-            };
+			JsonSerializerSettings settings = new JsonSerializerSettings()
+			{
+				Formatting = Newtonsoft.Json.Formatting.Indented
+			};
 
-            string tilesetsPathJson = File.ReadAllText(existingTilesetsPath);
-            HashSet<string>? LoadedTilesetsPaths = JsonConvert.DeserializeObject<HashSet<string>>(tilesetsPathJson, settings);
+			string tilesetsPathJson = File.ReadAllText(existingTilesetsPath);
+			HashSet<string>? LoadedTilesetsPaths = JsonConvert.DeserializeObject<HashSet<string>>(tilesetsPathJson, settings);
 
-            if (LoadedTilesetsPaths == null)
-                return tilesets;
+			if (LoadedTilesetsPaths == null)
+				return tilesets;
 
-            TilesetsPaths = LoadedTilesetsPaths;
+			TilesetsPaths = LoadedTilesetsPaths;
 
-            foreach ( string tilesetPath in TilesetsPaths )
-            {
-                if (!File.Exists(tilesetPath)) 
-                    continue;
+			foreach ( string tilesetPath in TilesetsPaths )
+			{
+				if (!File.Exists(tilesetPath)) 
+					continue;
 
-                string tilesetJson = File.ReadAllText(tilesetPath);
-                Tileset? tileset = JsonConvert.DeserializeObject<Tileset>(tilesetJson, settings);
+				string tilesetJson = File.ReadAllText(tilesetPath);
+				Tileset? tileset = JsonConvert.DeserializeObject<Tileset>(tilesetJson, settings);
 
-                if (tileset == null)
-                    continue;
+				if (tileset == null)
+					continue;
 
-                tilesets.Add(tileset.ID, tileset);
-            }
+				tilesets.Add(tileset.ID, tileset);
+			}
 
-            return tilesets;
-        }
+			return tilesets;
+		}
 
-        public static bool SaveTileset(Tileset tileset)
-        {
-            var dlg = new SaveFileDialog
-            {
-                Title = "Save tileset",
-                Filter = "Json files (*.json)|*.json",
-                DefaultExt = ".json",
-                FileName = tileset.Name,
-                OverwritePrompt = true
-            };
+		public static bool SaveTileset(Tileset tileset)
+		{
+			var dlg = new SaveFileDialog
+			{
+				Title = "Save tileset",
+				Filter = "Json files (*.json)|*.json",
+				DefaultExt = ".json",
+				FileName = tileset.Name,
+				OverwritePrompt = true
+			};
 
-            bool? result = dlg.ShowDialog();
-            if (result != true)
-                return false;
+			bool? result = dlg.ShowDialog();
+			if (result != true)
+				return false;
 
-            string path = dlg.FileName;
-            TilesetsPaths.Add(path);
+			string path = dlg.FileName;
+			TilesetsPaths.Add(path);
 
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                Formatting = Newtonsoft.Json.Formatting.Indented
-            };
+			JsonSerializerSettings settings = new JsonSerializerSettings
+			{
+				Formatting = Newtonsoft.Json.Formatting.Indented
+			};
 
-            string tilesetJson = JsonConvert.SerializeObject(tileset, settings);
-            File.WriteAllText(path, tilesetJson);
+			string tilesetJson = JsonConvert.SerializeObject(tileset, settings);
+			File.WriteAllText(path, tilesetJson);
 
-            string existingTilesetsPath = Path.Combine(TilesetsFilesPath, "Tilesets.json");
-            if (!Path.Exists(TilesetsFilesPath))
-            {
-                Directory.CreateDirectory(TilesetsFilesPath);
-            }
+			string existingTilesetsPath = Path.Combine(TilesetsFilesPath, "Tilesets.json");
+			if (!Path.Exists(TilesetsFilesPath))
+			{
+				Directory.CreateDirectory(TilesetsFilesPath);
+			}
 
-            string tilesetsPathJson = JsonConvert.SerializeObject(TilesetsPaths, settings);
-            File.WriteAllText(existingTilesetsPath, tilesetsPathJson);
-           
-            return true;
-        }
-    }
+			string tilesetsPathJson = JsonConvert.SerializeObject(TilesetsPaths, settings);
+			File.WriteAllText(existingTilesetsPath, tilesetsPathJson);
+		   
+			return true;
+		}
+	}
 }
