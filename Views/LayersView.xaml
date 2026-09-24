@@ -57,7 +57,10 @@
 				  BorderThickness="5 0 2 2"
 				  Padding="0"
 				  misc:ListViewFillColumnBehavior.IsListViewObserved="True"
-				  misc:ListViewReorderBehavior.ReorderCommand="True"
+				  misc:ListViewReorderBehavior.IsEnabled="True"
+				  misc:ListViewReorderBehavior.ColumnsToApply="0"
+				  misc:ListViewReorderBehavior.CommandOnReorder="{Binding SwapLayersCommand}"
+				  misc:ListViewReorderBehavior.ItemViewModelType="{x:Type vm:LayerViewModel}"
 				  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 			<ListView.View>
 				<GridView AllowsColumnReorder="False"

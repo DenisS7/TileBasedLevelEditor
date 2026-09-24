@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,21 +18,62 @@ namespace TileBasedLevelEditor.Misc
 {
 	public class ListViewReorderBehavior
 	{
-		static LayerViewModel? _selectedItem = null;
+		static object? _selectedItem = null;
 
-		public static readonly DependencyProperty ReorderCommandProperty =
+		public static readonly DependencyProperty IsEnabledProperty =
 			DependencyProperty.RegisterAttached(
-				"ReorderCommand",
+				"IsEnabled",
 				typeof(bool),
 				typeof(ListViewReorderBehavior),
 				new PropertyMetadata(default(bool), OnReorderCommandChanged)
 				);
 
-		public static void SetReorderCommand(DependencyObject d, bool cmd) => 
-			d.SetValue(ReorderCommandProperty, cmd);
+		public static void SetIsEnabled(DependencyObject d, bool value) => 
+			d.SetValue(IsEnabledProperty, value);
 
-		public static bool GetReorderCommand(DependencyObject d) => 
-			(bool)d.GetValue(ReorderCommandProperty);
+		public static bool GetIsEnabled(DependencyObject d) => 
+			(bool)d.GetValue(IsEnabledProperty);
+
+		public static readonly DependencyProperty ColumnsToApplyProperty =
+			DependencyProperty.RegisterAttached(
+				"ColumnsToApply",
+				typeof(string),
+				typeof(ListViewReorderBehavior),
+				new PropertyMetadata(null)
+				);
+		public static void SetColumnsToApply(DependencyObject d, string value) => 
+			d.SetValue(ColumnsToApplyProperty, value);
+
+		public static string GetColumnsToApply(DependencyObject d) => 
+			(string)d.GetValue(ColumnsToApplyProperty);
+
+		public static readonly DependencyProperty ItemViewModelTypeProperty =
+			DependencyProperty.RegisterAttached(
+				"ItemViewModelType",
+				typeof(Type),
+				typeof(ListViewReorderBehavior),
+				new PropertyMetadata(null)
+				);
+
+		public static void SetItemViewModelType(DependencyObject d, Type value) =>
+			d.SetValue(ItemViewModelTypeProperty, value);
+
+		public static Type GetItemViewModelType(DependencyObject d) =>
+			(Type)d.GetValue(ItemViewModelTypeProperty);
+
+		public static readonly DependencyProperty CommandOnReorderProperty =
+			DependencyProperty.RegisterAttached(
+				"CommandOnReorder",
+				typeof(ICommand),
+				typeof(ListViewReorderBehavior),
+				new PropertyMetadata(null)
+				);
+
+		public static void SetCommandOnReorder(DependencyObject d, ICommand cmd) =>
+			d.SetValue(CommandOnReorderProperty, cmd);
+
+		public static ICommand GetCommandOnReorder(DependencyObject d) =>
+			(ICommand)d.GetValue(CommandOnReorderProperty);
 
 		private static void OnReorderCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -52,7 +94,7 @@ namespace TileBasedLevelEditor.Misc
 			}
 		}
 
-		private static LayerViewModel? GetItemAt(ListView listView, Point point, List<int>? validColumns = null)
+		private static T? GetItemAtGeneric<T>(ListView listView, Point point, bool takeColumnsIntoAccount = false) where T : class
 		{
 			HitTestResult result = VisualTreeHelper.HitTest(listView, point);
 			if (result == null)
@@ -62,9 +104,10 @@ namespace TileBasedLevelEditor.Misc
 			if (hit == null)
 				return null;
 
+			List<int>? validColumns = GetColumnsToApply(listView)?.Split(',').Select(int.Parse).ToList();
+
 			bool validHit = false;
-			//TO DO: change this to variables in behavior
-			if (validColumns != null)
+			if (takeColumnsIntoAccount && validColumns != null)
 			{
 				if (listView.View is not GridView gridView || gridView.Columns.Count < 1)
 					  return null;
@@ -96,7 +139,7 @@ namespace TileBasedLevelEditor.Misc
 			{
 				if (obj is ListViewItem item2)
 				{
-					if (item2.DataContext is LayerViewModel vm)
+					if (item2.DataContext is T vm)
 						return vm;
 
 					return null;
@@ -108,12 +151,18 @@ namespace TileBasedLevelEditor.Misc
 			return null;
 		}
 
+		private static object? GetItemAt(Type itemType, ListView listView, Point point, bool takeColumnsIntoAccount = false)
+		{
+			MethodInfo? method = typeof(ListViewReorderBehavior).GetMethod(nameof(GetItemAtGeneric), BindingFlags.Static | BindingFlags.NonPublic)?.MakeGenericMethod(itemType);
+			return method?.Invoke(typeof(ListViewReorderBehavior), [listView, point, takeColumnsIntoAccount]);
+		}
+
 		private static void ListView_MouseLeftButtonDown(object sender, MouseEventArgs e)
 		{
 			if (sender is not ListView listView)
 				return;
 
-			_selectedItem = GetItemAt(listView, e.GetPosition(listView), new List<int> { 0 });
+			_selectedItem = GetItemAt(GetItemViewModelType(listView), listView, e.GetPosition(listView), true);
 			if (_selectedItem == null)
 				return;
 
@@ -129,15 +178,11 @@ namespace TileBasedLevelEditor.Misc
 			if (_selectedItem == null)
 				return;
 
-			LayersViewModel? vm2 = listView.DataContext as LayersViewModel;
-			if (vm2 is null)
-				return;
-
 			var item0 = listView.Items.GetItemAt(0);
 			var item1 = listView.Items.GetItemAt(1);
 
-			LayerViewModel? item = GetItemAt(listView, e.GetPosition(listView));
-			if (item is null)
+			object? item = GetItemAt(GetItemViewModelType(listView), listView, e.GetPosition(listView));
+			if (item == null)
 				return;
 
 			if (listView.SelectedItem == item)
@@ -146,8 +191,7 @@ namespace TileBasedLevelEditor.Misc
 			int from = listView.Items.IndexOf(_selectedItem);
 			int to = item != null ? listView.Items.IndexOf(item) : listView.Items.Count;
 
-			//change to command
-			vm2.MoveLayerTo(from, to);
+			GetCommandOnReorder(listView)?.Execute(new Tuple<int, int>(from, to));
 		}
 
 		private static void ListView_MouseLeftButtonUp(object sender, MouseEventArgs e)
@@ -156,7 +200,7 @@ namespace TileBasedLevelEditor.Misc
 				return;
 
 			_selectedItem = null;
-			//listView.ReleaseMouseCapture();
+			listView.ReleaseMouseCapture();
 		}
 	}
 }

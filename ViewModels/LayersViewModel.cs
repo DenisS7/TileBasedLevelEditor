@@ -44,6 +44,7 @@ namespace TileBasedLevelEditor.ViewModels
 		public ICommand DeleteLayerCommand { get; }
 		public ICommand ChangeLayerVisibilityCommand { get; }
 		public ICommand LockLayerCommand { get; }
+		public ICommand SwapLayersCommand { get; }
 
 		public LayersViewModel(ITilemapParent parent, ICustomNavigationService navigationService)
 		{
@@ -58,12 +59,16 @@ namespace TileBasedLevelEditor.ViewModels
 			DeleteLayerCommand = new RelayCommand(DeleteLayer);
 			ChangeLayerVisibilityCommand = new RelayCommand(ChangeLayerVisibility);
 			LockLayerCommand = new RelayCommand(LockLayer);
+			SwapLayersCommand = new RelayCommand(SwapLayers);
 		}
 
-		public void MoveLayerTo(int from, int to)
+		public void SwapLayers(object? parameter)
 		{
-			AllLayers.Move(from, to);
-			_parent.OnLayersSwapped(from, to);
+			if (parameter is not Tuple<int, int> values)
+				return;
+
+			AllLayers.Move(values.Item1, values.Item2);
+			_parent.OnLayersSwapped(values.Item1, values.Item2);
 		}
 
 		private void RefreshLayersSource(object? sender, NotifyCollectionChangedEventArgs args)
