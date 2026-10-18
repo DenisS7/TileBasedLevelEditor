@@ -26,6 +26,7 @@ namespace TileBasedLevelEditor.ViewModels
 			}
 		}
 
+		public EditableTextViewModel EditableName { get; }
 		public string Name
 		{
 			get => Layer.Name;
@@ -89,6 +90,12 @@ namespace TileBasedLevelEditor.ViewModels
 		public LayerViewModel(Layer layer)
 		{
 			_layer = layer;
+			EditableName = new EditableTextViewModel(layer.Name, OnRename);
+		}
+
+		public void OnRename(string newName)
+		{
+			Name = newName;
 		}
 	}
 }

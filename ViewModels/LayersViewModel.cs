@@ -29,6 +29,9 @@ namespace TileBasedLevelEditor.ViewModels
 			get => _selectedLayer;
 			set
 			{
+				if (_selectedLayer != null && _selectedLayer.EditableName.IsEditing)
+					_selectedLayer.EditableName.ApplyEditCommand.Execute(null);
+
 				_selectedLayer = value;
 				OnPropertyChanged(nameof(SelectedLayer));
 				OnPropertyChanged(nameof(CanDeleteLayer));
@@ -39,6 +42,7 @@ namespace TileBasedLevelEditor.ViewModels
 		private CollectionViewSource _layersSource;
 		public ICollectionView Layers => _layersSource.View;
 		public bool CanDeleteLayer => SelectedLayer != null && AllLayers.Count - 1 > 1;
+		public bool CanReorderLayers => !AllLayers.Any(layer => layer.EditableName.IsEditing);
 
 		public ICommand AddLayerCommand { get; }
 		public ICommand DeleteLayerCommand { get; }
@@ -55,11 +59,27 @@ namespace TileBasedLevelEditor.ViewModels
 			_layersSource.View.Filter = layer => !ReferenceEquals(layer, AllLayers.Last());
 			_parent.Layers.CollectionChanged += RefreshLayersSource;
 
+			foreach (var layer in AllLayers)
+			{
+				AddLayerDependencies(layer);
+			}
+
 			AddLayerCommand = new RelayCommand(AddLayer);
 			DeleteLayerCommand = new RelayCommand(DeleteLayer);
 			ChangeLayerVisibilityCommand = new RelayCommand(ChangeLayerVisibility);
 			LockLayerCommand = new RelayCommand(LockLayer);
 			SwapLayersCommand = new RelayCommand(SwapLayers);
+		}
+
+		private void AddLayerDependencies(LayerViewModel layer)
+		{
+			layer.EditableName.PropertyChanged += (sender, e) =>
+			{
+				if (e.PropertyName == nameof(EditableTextViewModel.IsEditing))
+				{
+					OnPropertyChanged(nameof(CanReorderLayers));
+				}
+			};
 		}
 
 		public void SwapLayers(object? parameter)
@@ -71,10 +91,10 @@ namespace TileBasedLevelEditor.ViewModels
 			_parent.OnLayersSwapped(values.Item1, values.Item2);
 		}
 
-		private void RefreshLayersSource(object? sender, NotifyCollectionChangedEventArgs args)
-		{
-			_layersSource.View.Refresh();
-		}
+        private void RefreshLayersSource(object? sender, NotifyCollectionChangedEventArgs args)
+        {
+            _layersSource.View.Refresh();
+        }
 
 		private void AddLayer(object? parameter)
 		{
@@ -89,6 +109,7 @@ namespace TileBasedLevelEditor.ViewModels
 				++AllLayers[i].VisibilityIndex;
 			}
 			AllLayers.Insert(newLayerIndex, newLayer);
+			AddLayerDependencies(newLayer);
 
 			SelectedLayer = newLayer;
 		}

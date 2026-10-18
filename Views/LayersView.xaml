@@ -57,7 +57,7 @@
 				  BorderThickness="5 0 2 2"
 				  Padding="0"
 				  misc:ListViewFillColumnBehavior.IsListViewObserved="True"
-				  misc:ListViewReorderBehavior.IsEnabled="True"
+				  misc:ListViewReorderBehavior.IsEnabled="{Binding CanReorderLayers}"
 				  misc:ListViewReorderBehavior.ColumnsToApply="0"
 				  misc:ListViewReorderBehavior.CommandOnReorder="{Binding SwapLayersCommand}"
 				  misc:ListViewReorderBehavior.ItemViewModelType="{x:Type vm:LayerViewModel}"
@@ -65,11 +65,11 @@
 			<ListView.View>
 				<GridView AllowsColumnReorder="False"
 						  ColumnHeaderContainerStyle="{StaticResource LayersColumnHeader}">
-					<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}">
+					<GridViewColumn Header="Name">
 						<GridViewColumn.CellTemplate>
 							<DataTemplate>
-								<TextBlock Text="{Binding Name}"
-										   Margin="3 0 0 0"/>
+								<local:EditableTextView DataContext="{Binding EditableName}"
+														Margin="3 0 0 0"/>
 							</DataTemplate>
 						</GridViewColumn.CellTemplate>
 					</GridViewColumn>
